@@ -1,0 +1,76 @@
+@use '../../styles/variables' as *;
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.draftBtn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: $radius-md;
+  border: 1.5px solid $color-border;
+  background: $color-white;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text;
+  cursor: pointer;
+  font-family: $font-base;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $color-text-secondary;
+    background: $color-bg;
+  }
+}
+
+.publishBtn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: $radius-md;
+  border: none;
+  background: $color-primary;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-white;
+  cursor: pointer;
+  font-family: $font-base;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 32px;
+  align-items: start;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

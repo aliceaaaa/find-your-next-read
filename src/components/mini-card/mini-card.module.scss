@@ -1,0 +1,15 @@
+@use '../../styles/variables'as *;
+
+.mini-card {
+  flex-shrink: 0;
+  transition: transform 0.15s;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  }
+}

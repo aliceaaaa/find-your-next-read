@@ -1,0 +1,94 @@
+@use '../../styles/variables'as *;
+
+.coverConstructor {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.groupLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text;
+  font-family: $font-base;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+
+  &--active {
+    border-color: $color-dark;
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px $color-white, 0 0 0 4px $color-dark;
+  }
+}
+
+.colorPickerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.colorPickerLabel {
+  font-size: 12px;
+  color: $color-text-secondary;
+  font-family: $font-base;
+  cursor: pointer;
+}
+
+.colorPicker {
+  width: 36px;
+  height: 28px;
+  padding: 0 2px;
+  border: 1px solid #e5e7eb;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  background: $color-white;
+  outline: none;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 2px;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+  }
+}
+
+.colorValue {
+  font-size: 12px;
+  font-family: monospace;
+  color: $color-text-secondary;
+}

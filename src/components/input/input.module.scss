@@ -1,0 +1,12 @@
+@use '../../styles/variables' as *;
+
+.input {
+  font-size: 14px;
+  font-family: $font-base;
+  color: $color-text;
+  outline: none;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}

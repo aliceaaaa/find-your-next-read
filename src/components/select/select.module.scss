@@ -1,0 +1,244 @@
+@use '../../styles/variables' as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text;
+}
+
+.trigger {
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 12px 6px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: $radius-md;
+  background: $color-white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: $font-base;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  text-align: left;
+
+  &:hover {
+    border-color: #c5c9d0;
+  }
+}
+
+.open {
+  border-color: $color-dark;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.triggerInner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.placeholder {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.singleValue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.singleLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.singleSublabel {
+  font-size: 13px;
+  color: $color-text-secondary;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.multiValue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: $color-primary-light;
+  color: $color-primary;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.arrow {
+  flex-shrink: 0;
+  color: $color-text-secondary;
+  transition: transform 0.2s;
+}
+
+.arrowOpen {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: $color-white;
+  border: 1px solid #e5e7eb;
+  border-radius: $radius-lg;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.1);
+  z-index: 100;
+  overflow: hidden;
+  animation: dropIn 0.15s ease forwards;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid $color-border;
+}
+
+.searchIcon {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  font-family: $font-base;
+  color: $color-text;
+  background: transparent;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.list {
+  max-height: 280px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-border;
+    border-radius: 2px;
+  }
+}
+
+.item {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: $font-base;
+  text-align: left;
+  transition: background 0.1s;
+
+  &:hover {
+    background: $color-bg;
+  }
+}
+
+.itemActive {
+  background: $color-primary-light;
+
+  .itemLabel {
+    color: $color-primary;
+  }
+}
+
+.itemContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.itemLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemSublabel {
+  font-size: 12px;
+  color: $color-text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.noneLabel {
+  font-size: 14px;
+  color: $color-text-secondary;
+}
+
+.check {
+  font-size: 14px;
+  color: $color-primary;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.empty {
+  padding: 20px 14px;
+  font-size: 13px;
+  color: $color-text-secondary;
+  text-align: center;
+  margin: 0;
+}

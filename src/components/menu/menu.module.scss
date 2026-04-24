@@ -1,0 +1,233 @@
+@use '../../styles/variables'as *;
+
+.menu {
+  width: $sidebar-width;
+  min-width: $sidebar-width;
+  height: 100vh;
+  background: $color-white;
+  border-right: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 72px;
+
+  nav {
+    flex: 1;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 16px;
+    border-radius: $radius-md;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: $font-base;
+    text-align: left;
+    width: 100%;
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+    cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed;
+      color: $color-text-secondary;
+
+      &:hover {
+        background: transparent;
+        color: $color-text-secondary;
+
+        .icon {
+          color: $color-text-secondary;
+        }
+      }
+    }
+
+    &:hover {
+      background: $color-hover;
+      color: $color-text;
+
+      .icon {
+        color: $color-text;
+      }
+    }
+
+    &.active {
+      background: $color-primary-light;
+      color: $color-text;
+      font-weight: 600;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background: $color-primary;
+        border-radius: 0 3px 3px 0;
+      }
+
+      .icon {
+        color: $color-primary;
+      }
+    }
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: #9CA3AF;
+    transition: color 0.15s;
+  }
+
+  .user {
+    margin: 16px 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: $radius-lg;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: $color-hover;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $color-crimson, $color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .info {
+      flex: 1;
+      min-width: 0;
+
+      .name {
+        font-size: 13px;
+        font-weight: 600;
+        color: $color-text;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .email {
+        font-size: 11px;
+        color: $color-text-secondary;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 1px;
+      }
+    }
+
+    .arrow {
+      color: $color-text-secondary;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+  }
+
+  .admin-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: $radius-sm;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+      background: $color-hover;
+      color: $color-text;
+    }
+
+    &--on {
+      color: $color-primary;
+
+      &:hover {
+        background: $color-primary-light;
+        color: $color-crimson;
+      }
+    }
+  }
+
+  .premium {
+    margin: 0 12px 20px;
+    padding: 16px;
+    background: #FAFAFA;
+    border: 1px solid $color-border;
+    border-radius: $radius-xl;
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+
+      .crown {
+        color: $color-primary;
+        font-size: 14px;
+      }
+
+      .title {
+        font-size: 13px;
+        font-weight: 700;
+        color: $color-text;
+      }
+    }
+
+    .desc {
+      font-size: 11px;
+      color: $color-text-secondary;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .upgrade-btn {
+      width: 100%;
+      background: $color-dark;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 9px 12px;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      border: none;
+      font-family: $font-base;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+  }
+}

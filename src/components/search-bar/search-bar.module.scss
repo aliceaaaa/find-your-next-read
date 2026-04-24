@@ -1,0 +1,60 @@
+@use '../../styles/variables'as *;
+
+.search-bar {
+  margin-bottom: 32px;
+
+  form {
+    display: flex;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border: 1px solid #E5E7EB;
+    background: white;
+
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+
+      .input-icon {
+        color: #9CA3AF;
+        flex-shrink: 0;
+      }
+
+      input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        color: $color-text;
+        background: transparent;
+        padding: 14px 0;
+        font-family: $font-base;
+
+        &::placeholder {
+          color: #9CA3AF;
+        }
+      }
+    }
+
+    .submit-btn {
+      width: 52px;
+      height: 52px;
+      background: $color-dark;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.15s;
+      border: none;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+  }
+}

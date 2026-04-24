@@ -1,0 +1,74 @@
+@use '../../styles/variables'as *;
+
+.summary {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background: $color-white;
+  padding: 28px 32px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text;
+  padding: 0;
+  margin-bottom: 24px;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.6;
+  }
+}
+
+.coverWrap {
+  width: 100%;
+  background: #EBEBF0;
+  border-radius: $radius-xl;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0 32px;
+  margin-bottom: 28px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.data {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 48px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0;
+}
+
+.empty {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin: 0;
+}
