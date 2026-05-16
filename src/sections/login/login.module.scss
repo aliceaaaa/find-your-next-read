@@ -1,0 +1,58 @@
+@use '../../styles/variables' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: $color-white;
+  border-radius: 20px;
+  padding: 48px 40px;
+  box-shadow: 0 8px 40px rgba(17, 24, 39, 0.08);
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 900;
+  color: $color-text;
+  letter-spacing: -0.04em;
+  margin-bottom: 32px;
+
+  span {
+    color: $color-primary;
+  }
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  color: $color-text;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.error {
+  font-size: 13px;
+  color: $color-primary;
+  background: rgba($color-primary, 0.06);
+  border-radius: $radius-sm;
+  padding: 10px 14px;
+}

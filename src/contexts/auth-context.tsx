@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
-import { apiLogin, clearToken, setToken } from 'api';
+import { apiLogin, clearToken, getToken, setToken } from 'api';
 
 type AuthUser = {
   id: number;
@@ -8,6 +8,7 @@ type AuthUser = {
 };
 
 type AuthContextValue = {
+  isAuthenticated: boolean;
   isAdmin: boolean;
   user: AuthUser | null;
   login: (email: string, password: string) => Promise<void>;
@@ -15,6 +16,7 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue>({
+  isAuthenticated: false,
   isAdmin: false,
   user: null,
   login: async () => {},
@@ -29,22 +31,25 @@ export const AuthProvider = ({
   defaultIsAdmin?: boolean;
 }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!getToken());
 
-  const isAdmin = defaultIsAdmin || user !== null;
+  const isAdmin = defaultIsAdmin || isAuthenticated;
 
   const login = async (email: string, password: string) => {
     const res = await apiLogin(email, password);
     setToken(res.token);
     setUser(res.user);
+    setIsAuthenticated(true);
   };
 
   const logout = () => {
     clearToken();
     setUser(null);
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAdmin, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

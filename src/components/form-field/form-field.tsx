@@ -8,7 +8,7 @@ type FormFieldProps = {
   label: string;
   placeholder?: string;
   required?: boolean;
-  type?: 'text' | 'number' | 'email' | 'url';
+  type?: 'text' | 'number' | 'email' | 'url' | 'password';
   value: string;
   onChange: (value: string) => void;
 };
