@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Navigate,
   Route,
@@ -10,62 +10,63 @@ import {
 import { Book, NavItemId, Post, PostStatus } from 'types';
 import { HomeFeed, PlaceholderPage } from 'sections';
 import { Summary, Library, Page, PostEditor } from 'components';
-import {
-  categories,
-  popularBooks,
-  newReleases,
-  reviews,
-} from '../data/mock-data';
 import { navFromPath, navPathMap } from '../constants';
 import { useBookOfTheDay } from './hooks/use-book-of-the-day';
+import { useBooks } from '../hooks/use-books';
 
 export const AppContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const summaryMatch = useMatch('/books/:bookId/summary');
 
-  const [activeCategory, setActiveCategory] = useState('History');
-  const [popular, setPopular] = useState(popularBooks);
-  const [releases, setReleases] = useState(newReleases);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [bookmarkOverrides, setBookmarkOverrides] = useState<Record<number, boolean>>({});
+
   const isAdmin = true;
 
-  const allBooks = [...popular, ...releases];
+  const { data: apiBooks = [], isLoading } = useBooks();
+
+  const allBooks: Book[] = apiBooks.map((b) => ({
+    ...b,
+    isBookmarked: bookmarkOverrides[b.id] ?? b.isBookmarked ?? false,
+  }));
+
+  const half = Math.ceil(allBooks.length / 2);
+  const popular = allBooks.slice(0, half);
+  const releases = allBooks.slice(half);
+
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(allBooks.flatMap((b) => b.categories)))],
+    [allBooks],
+  );
+
   const favoritesBooks = allBooks.filter((book) => book.isBookmarked);
+
   const { data: bookOfTheDayData } = useBookOfTheDay({
     popular,
     releases,
-    reviews,
+    reviews: [],
   });
 
   const locationState = location.state as { from?: string } | null;
   const summaryBook = summaryMatch?.params.bookId
-    ? allBooks.find((book) => book.id === Number(summaryMatch.params.bookId)) ||
-      null
+    ? allBooks.find((book) => book.id === Number(summaryMatch.params.bookId)) || null
     : null;
 
   const activeNavFromRoute = location.pathname.startsWith('/books/')
     ? navFromPath(locationState?.from || '/library')
     : navFromPath(location.pathname);
 
-  const handleSavePost = (
-    data: Omit<Post, 'id' | 'createdAt'>,
-    status: PostStatus,
-  ) => {
+  const handleSavePost = (data: Omit<Post, 'id' | 'createdAt'>, status: PostStatus) => {
     console.log('Post saved:', { ...data, status });
   };
 
   const handleBookmark = (id: number) => {
-    setPopular((prev) =>
-      prev.map((b) =>
-        b.id === id ? { ...b, isBookmarked: !b.isBookmarked } : b,
-      ),
-    );
-
-    setReleases((prev) =>
-      prev.map((b) =>
-        b.id === id ? { ...b, isBookmarked: !b.isBookmarked } : b,
-      ),
-    );
+    setBookmarkOverrides((prev) => {
+      const current = allBooks.find((b) => b.id === id);
+      const currentState = prev[id] ?? current?.isBookmarked ?? false;
+      return { ...prev, [id]: !currentState };
+    });
   };
 
   const handleNavChange = (id: NavItemId) => {
@@ -82,8 +83,7 @@ export const AppContent = () => {
   };
 
   const handleSummaryBack = () => {
-    const from = locationState?.from;
-    navigate(from || '/library');
+    navigate(locationState?.from || '/library');
   };
 
   return (
@@ -99,6 +99,8 @@ export const AppContent = () => {
             <HomeFeed
               activeCategory={activeCategory}
               bookOfTheDayData={bookOfTheDayData}
+              categories={categories}
+              isLoading={isLoading}
               onCategoryChange={setActiveCategory}
               popular={popular}
               releases={releases}
@@ -113,6 +115,8 @@ export const AppContent = () => {
             <HomeFeed
               activeCategory={activeCategory}
               bookOfTheDayData={bookOfTheDayData}
+              categories={categories}
+              isLoading={isLoading}
               onCategoryChange={setActiveCategory}
               popular={popular}
               releases={releases}
@@ -127,6 +131,7 @@ export const AppContent = () => {
             <Library
               books={allBooks}
               categories={categories}
+              isLoading={isLoading}
               onBookSelect={handleBookSelect}
               onBookmark={handleBookmark}
             />
@@ -144,10 +149,7 @@ export const AppContent = () => {
           }
         />
         <Route path="/profile" element={<PlaceholderPage title="Profile" />} />
-        <Route
-          path="/settings"
-          element={<PlaceholderPage title="Settings" />}
-        />
+        <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
         <Route
           path="/create-post"
           element={
@@ -168,7 +170,7 @@ export const AppContent = () => {
             summaryBook ? (
               <Summary
                 book={summaryBook}
-                reviews={reviews}
+                reviews={[]}
                 onBack={handleSummaryBack}
                 onBookmark={handleBookmark}
               />

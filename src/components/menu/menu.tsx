@@ -1,4 +1,4 @@
-import { FC, Fragment } from 'react';
+import { FC } from 'react';
 import cn from 'classnames';
 import { NavItemId } from 'types';
 import {
@@ -10,7 +10,7 @@ import {
   SettingsIcon,
   PlusCircleIcon,
 } from '../../icons';
-import { users } from '../../data/mock-data';
+import { useAuth } from '../../contexts/auth-context';
 import styles from './menu.module.scss';
 
 type MenuProps = {
@@ -32,47 +32,43 @@ const NAV_ITEMS: {
   { id: 'settings', label: 'Settings', Icon: SettingsIcon },
 ];
 
-export const Menu = ({
-  activeNav,
-  isAdmin = false,
-  onNavChange,
-}: MenuProps) => (
-  <aside className={styles.menu}>
-    <nav>
-      {NAV_ITEMS.map(({ id, label, Icon }) => (
-        <button
-          key={id}
-          className={cn(styles['nav-item'], {
-            [styles.active]: activeNav === id,
-          })}
-          onClick={() => onNavChange(id)}
-        >
-          <Icon className={styles.icon} />
-          {label}
-        </button>
-      ))}
-      {isAdmin && (
-        <button
-          className={cn(styles['nav-item'], {
-            [styles.active]: activeNav === 'post-constructor',
-          })}
-          onClick={() => onNavChange('post-constructor')}
-        >
-          <PlusCircleIcon className={styles.icon} />
-          Create Post
-        </button>
-      )}
-    </nav>
-    <div className={styles.user}>
-      {users.map((user) => (
-        <Fragment key={user.id}>
-          <div className={styles.avatar}>{user.avatar}</div>
+export const Menu = ({ activeNav, isAdmin = false, onNavChange }: MenuProps) => {
+  const { user } = useAuth();
+
+  return (
+    <aside className={styles.menu}>
+      <nav>
+        {NAV_ITEMS.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            className={cn(styles['nav-item'], { [styles.active]: activeNav === id })}
+            onClick={() => onNavChange(id)}
+          >
+            <Icon className={styles.icon} />
+            {label}
+          </button>
+        ))}
+        {isAdmin && (
+          <button
+            className={cn(styles['nav-item'], {
+              [styles.active]: activeNav === 'post-constructor',
+            })}
+            onClick={() => onNavChange('post-constructor')}
+          >
+            <PlusCircleIcon className={styles.icon} />
+            Create Post
+          </button>
+        )}
+      </nav>
+      {user && (
+        <div className={styles.user}>
+          <div className={styles.avatar}>{user.name[0]}</div>
           <div className={styles.info}>
             <div className={styles.name}>{user.name}</div>
             <div className={styles.email}>{user.email}</div>
           </div>
-        </Fragment>
-      ))}
-    </div>
-  </aside>
-);
+        </div>
+      )}
+    </aside>
+  );
+};

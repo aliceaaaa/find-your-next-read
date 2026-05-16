@@ -7,13 +7,24 @@ import styles from './library.module.scss';
 type LibraryProps = {
   books: Book[];
   categories: string[];
+  isLoading?: boolean;
   onBookSelect: (book: Book) => void;
   onBookmark: (id: number) => void;
 };
 
+const SkeletonCard = () => (
+  <div className={styles.skeletonCard}>
+    <div className={styles.skeletonCover} />
+    <div className={styles.skeletonTitle} />
+    <div className={styles.skeletonAuthor} />
+    <div className={styles.skeletonRating} />
+  </div>
+);
+
 export const Library = ({
   books,
   categories,
+  isLoading = false,
   onBookSelect,
   onBookmark,
 }: LibraryProps) => {
@@ -32,8 +43,22 @@ export const Library = ({
         onChange={setActiveCategory}
       />
 
-      {filtered.length === 0 ? (
-        <p className={styles.empty}>No books in this category yet.</p>
+      {isLoading ? (
+        <div className={styles.grid}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className={styles.empty}>
+          <span className={styles.emptyIcon}>📚</span>
+          <p className={styles.emptyTitle}>No books here yet</p>
+          <p className={styles.emptySubtitle}>
+            {activeCategory === 'All'
+              ? 'Books will appear here once they are added to the library.'
+              : `No books in the "${activeCategory}" category yet.`}
+          </p>
+        </div>
       ) : (
         <div className={styles.grid}>
           {filtered.map((book) => (
