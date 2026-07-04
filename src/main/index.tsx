@@ -12,6 +12,7 @@ import { HomeFeed, PlaceholderPage } from 'sections';
 import { Summary, Library, Page, PostEditor } from 'components';
 import { navFromPath, navPathMap } from '../constants';
 import { useBookOfTheDay } from './hooks/use-book-of-the-day';
+import { useBook } from '../hooks/use-book';
 import { useBooks } from '../hooks/use-books';
 
 export const AppContent = () => {
@@ -49,9 +50,17 @@ export const AppContent = () => {
   });
 
   const locationState = location.state as { from?: string } | null;
-  const summaryBook = summaryMatch?.params.bookId
-    ? allBooks.find((book) => book.id === Number(summaryMatch.params.bookId)) || null
+  const bookId = summaryMatch?.params.bookId
+    ? Number(summaryMatch.params.bookId)
     : null;
+
+  const { data: fetchedBook } = useBook(bookId);
+
+  const summaryBook = bookId
+    ? allBooks.find((book) => book.id === bookId) || null
+    : null;
+
+  const summaryReviews = fetchedBook?.reviews ?? [];
 
   const activeNavFromRoute = location.pathname.startsWith('/books/')
     ? navFromPath(locationState?.from || '/library')
@@ -170,7 +179,7 @@ export const AppContent = () => {
             summaryBook ? (
               <Summary
                 book={summaryBook}
-                reviews={[]}
+                reviews={summaryReviews}
                 onBack={handleSummaryBack}
                 onBookmark={handleBookmark}
               />

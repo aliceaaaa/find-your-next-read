@@ -31,6 +31,17 @@ const request = async <T>(
   return res.json();
 };
 
+export type ApiReview = {
+  id: number;
+  author: string;
+  text: string;
+  book_id: number;
+  rating: number;
+  language: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type ApiBook = {
   id: number;
   title: string;
@@ -39,6 +50,7 @@ export type ApiBook = {
   cover_text_color: string;
   categories: string[] | null;
   description: string | Record<string, unknown> | null;
+  reviews: ApiReview[] | null;
   published: string | null;
   pages: number | null;
   language: string | null;
@@ -74,4 +86,4 @@ export const apiGetBooks = (page = 1): Promise<ApiPaginatedResponse<ApiBook>> =>
   request<ApiPaginatedResponse<ApiBook>>(`/books?page=${page}`);
 
 export const apiGetBook = (id: number): Promise<ApiBook> =>
-  request<ApiBook>(`/books/${id}`);
+  request<ApiBook>(`/books/${id}?include=reviews`);

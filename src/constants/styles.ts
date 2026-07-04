@@ -44,6 +44,7 @@ export const PREVIEW_BASE: Omit<
   categories: [],
   description: '',
   published: 2024,
+  reviews: [],
   pages: 0,
   language: 'English',
 };

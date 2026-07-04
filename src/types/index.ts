@@ -3,6 +3,7 @@ export type Book = {
   title: string;
   author: string;
   rating: number;
+  reviews: Review[];
   reviewCount: number;
   coverColor: string;
   coverTextColor: string;
@@ -37,12 +38,12 @@ export type Post = {
 
 export type Review = {
   id: number;
-  bookId: number;
-  authorName: string;
-  authorInitials: string;
-  rating: number;
+  author: string;
   text: string;
-  date: string;
+  bookId: number;
+  rating: number;
+  language: string;
+  createdAt: Date;
 };
 
 export type NavItemId =
