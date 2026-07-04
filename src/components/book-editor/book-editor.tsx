@@ -22,18 +22,24 @@ type BookEditorProps = {
   onCancel: () => void;
 };
 
-const encodeDescription = (text: string): Record<string, unknown> => {
+const parseDescription = (
+  text: string,
+): { value?: Record<string, unknown>; error?: string } => {
   const trimmed = text.trim();
-  if (!trimmed) return { content: [] };
-  return {
-    content: [
-      {
-        type: 'paragraph',
-        content: [{ type: 'text', text: trimmed }],
-      },
-    ],
-  };
+  if (!trimmed) return { value: {} };
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      return { error: 'Description must be a JSON object, e.g. { "en": "..." }' };
+    }
+    return { value: parsed as Record<string, unknown> };
+  } catch {
+    return { error: 'Invalid JSON' };
+  }
 };
+
+const pickRandom = (arr: readonly string[]): string =>
+  arr[Math.floor(Math.random() * arr.length)];
 
 export const BookEditor = ({
   bookId,
@@ -52,8 +58,12 @@ export const BookEditor = ({
   const [language, setLanguage] = useState('English');
   const [published, setPublished] = useState('');
   const [description, setDescription] = useState('');
-  const [coverColor, setCoverColor] = useState(PRESET_BG_COLORS[0]);
-  const [coverTextColor, setCoverTextColor] = useState(PRESET_TEXT_COLORS[0]);
+  const [coverColor, setCoverColor] = useState(() =>
+    isEdit ? PRESET_BG_COLORS[0] : pickRandom(PRESET_BG_COLORS),
+  );
+  const [coverTextColor, setCoverTextColor] = useState(() =>
+    isEdit ? PRESET_TEXT_COLORS[0] : pickRandom(PRESET_TEXT_COLORS),
+  );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [nextBookIds, setNextBookIds] = useState<number[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -62,10 +72,15 @@ export const BookEditor = ({
     if (!isEdit || !existing) return;
     setTitle(existing.title);
     setAuthor(existing.author);
-    setIsbn('');
+    setIsbn(existing.isbn ?? '');
     setPages(existing.pages ? String(existing.pages) : '');
     setLanguage(existing.language || 'English');
-    setDescription(existing.description);
+    setPublished(existing.publishedDate ? existing.publishedDate.slice(0, 10) : '');
+    setDescription(
+      existing.descriptionRaw
+        ? JSON.stringify(existing.descriptionRaw, null, 2)
+        : '',
+    );
     setCoverColor(existing.coverColor);
     setCoverTextColor(existing.coverTextColor);
     setSelectedCategories(existing.categories);
@@ -122,6 +137,8 @@ export const BookEditor = ({
     const next: Record<string, string> = {};
     if (!title.trim()) next.title = 'Title is required';
     if (!author.trim()) next.author = 'Author is required';
+    const desc = parseDescription(description);
+    if (desc.error) next.description = desc.error;
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -132,7 +149,7 @@ export const BookEditor = ({
     cover_color: coverColor,
     cover_text_color: coverTextColor,
     categories: selectedCategories,
-    description: encodeDescription(description),
+    description: parseDescription(description).value ?? {},
     published: published ? new Date(published).toISOString() : null,
     pages: pages ? Number(pages) : null,
     language: language || null,
@@ -280,11 +297,16 @@ export const BookEditor = ({
             <textarea
               id="book-description"
               className={styles.textarea}
-              placeholder="Short description..."
-              rows={5}
+              placeholder='{ "en": "A science fiction novel..." }'
+              rows={6}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+            {errors.description && (
+              <span className={styles.error} role="alert">
+                {errors.description}
+              </span>
+            )}
           </div>
 
           <Select

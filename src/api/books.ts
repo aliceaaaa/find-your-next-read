@@ -4,17 +4,14 @@ import { ApiBook, apiGetBook, apiGetBooks } from './client';
 const descriptionToString = (desc: ApiBook['description']): string => {
   if (!desc) return '';
   if (typeof desc === 'string') return desc;
-
-  const content = (desc as any)?.content;
-
-  if (Array.isArray(content)) {
-    return content
-      .flatMap((block: any) => block?.content ?? [])
-      .filter((node: any) => node?.type === 'text')
-      .map((node: any) => node.text)
-      .join(' ');
+  if (typeof desc === 'object') {
+    const record = desc as Record<string, unknown>;
+    if (typeof record.en === 'string') return record.en;
+    const firstString = Object.values(record).find(
+      (v) => typeof v === 'string',
+    ) as string | undefined;
+    return firstString ?? '';
   }
-
   return '';
 };
 
@@ -48,9 +45,15 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   coverTextColor: apiBook.cover_text_color,
   categories: apiBook.categories ?? [],
   description: descriptionToString(apiBook.description),
+  descriptionRaw:
+    apiBook.description && typeof apiBook.description === 'object'
+      ? (apiBook.description as Record<string, unknown>)
+      : null,
   published: apiBook.published ? new Date(apiBook.published).getFullYear() : 0,
+  publishedDate: apiBook.published ?? '',
   pages: apiBook.pages ?? 0,
   language: apiBook.language ?? '',
+  isbn: apiBook.isbn ?? '',
   reviews: (apiBook.reviews ?? []).map((review) => ({
     id: review.id,
     author: review.author,

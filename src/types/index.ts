@@ -9,10 +9,13 @@ export type Book = {
   coverTextColor: string;
   categories: string[];
   description: string;
+  descriptionRaw?: Record<string, unknown> | null;
   published: number;
   pages: number;
   language: string;
   isBookmarked?: boolean;
+  isbn?: string;
+  publishedDate?: string;
   nextBooks?: Book[];
   nextBookIds?: number[];
 };

@@ -13,6 +13,34 @@
   gap: 16px;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: $radius-md;
+  border: 1.5px solid $color-border;
+  background: $color-white;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text;
+  cursor: pointer;
+  font-family: $font-base;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $color-text-secondary;
+    background: $color-bg;
+  }
+}
+
 .title {
   font-size: 22px;
   font-weight: 700;

@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { Book } from 'types';
 import { Cover } from '../cover';
 import { Button } from '../button';
-import { EditIcon, TrashIcon } from '../../icons';
+import { EditIcon, TrashIcon, LogoutIcon } from '../../icons';
+import { useAuth } from '../../contexts/auth-context';
 import styles from './admin-books.module.scss';
 
 type AdminBooksProps = {
@@ -12,12 +13,28 @@ type AdminBooksProps = {
 
 export const AdminBooks = ({ books, isLoading }: AdminBooksProps) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
         <h2 className={styles.title}>Books</h2>
-        <Button onClick={() => navigate('/admin/books/new')}>Add book</Button>
+        <div className={styles.headerActions}>
+          <Button onClick={() => navigate('/admin/books/new')}>Add book</Button>
+          <button
+            type="button"
+            className={styles.logoutBtn}
+            onClick={handleLogout}
+          >
+            <LogoutIcon size={16} />
+            Sign out
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
