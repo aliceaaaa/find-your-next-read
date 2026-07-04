@@ -13,6 +13,8 @@ export type Book = {
   pages: number;
   language: string;
   isBookmarked?: boolean;
+  nextBooks?: Book[];
+  nextBookIds?: number[];
 };
 
 export type User = {
@@ -55,6 +57,7 @@ export type NavItemId =
   | 'reviews'
   | 'profile'
   | 'settings'
-  | 'post-constructor';
+  | 'post-constructor'
+  | 'admin-books';
 
 export * from './book-of-the-day';

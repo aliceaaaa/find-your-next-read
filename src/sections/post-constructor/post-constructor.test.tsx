@@ -2,19 +2,27 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { AuthProvider } from '../../contexts/auth-context';
 import { PostConstructor } from './post-constructor';
 
-const renderDefault = () =>
+const renderDefault = () => {
+  localStorage.clear();
   render(
     <AuthProvider>
       <PostConstructor />
     </AuthProvider>,
   );
+};
 
-const renderAsAdmin = () =>
+const renderAsAdmin = () => {
+  localStorage.clear();
+  localStorage.setItem(
+    'auth_user',
+    JSON.stringify({ id: 1, name: 'Admin', email: 'admin@example.com' }),
+  );
   render(
-    <AuthProvider defaultIsAdmin>
+    <AuthProvider>
       <PostConstructor />
     </AuthProvider>,
   );
+};
 
 describe('PostConstructor', () => {
   describe('access control', () => {

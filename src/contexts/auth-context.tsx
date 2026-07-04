@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { apiLogin, clearToken, setToken } from 'api';
 
 type AuthUser = {
@@ -14,6 +20,18 @@ type AuthContextValue = {
   logout: () => void;
 };
 
+const USER_KEY = 'auth_user';
+
+const readUser = (): AuthUser | null => {
+  const raw = localStorage.getItem(USER_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as AuthUser;
+  } catch {
+    return null;
+  }
+};
+
 const AuthContext = createContext<AuthContextValue>({
   isAdmin: false,
   user: null,
@@ -21,16 +39,18 @@ const AuthContext = createContext<AuthContextValue>({
   logout: () => {},
 });
 
-export const AuthProvider = ({
-  children,
-  defaultIsAdmin = false,
-}: {
-  children: ReactNode;
-  defaultIsAdmin?: boolean;
-}) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<AuthUser | null>(() => readUser());
 
-  const isAdmin = defaultIsAdmin || user !== null;
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(USER_KEY);
+    }
+  }, [user]);
+
+  const isAdmin = user !== null;
 
   const login = async (email: string, password: string) => {
     const res = await apiLogin(email, password);

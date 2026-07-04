@@ -1,0 +1,97 @@
+@use '../../styles/variables' as *;
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 16px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.starBtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.starOn {
+  color: #f5a623;
+}
+
+.starOff {
+  color: $color-border;
+}
+
+.textarea {
+  font-family: $font-base;
+  font-size: 14px;
+  color: $color-text;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 10px 12px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}
+
+.error {
+  font-size: 13px;
+  color: $color-primary;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.cancel {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: $radius-md;
+  border: 1.5px solid $color-border;
+  background: $color-white;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text;
+  cursor: pointer;
+  font-family: $font-base;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

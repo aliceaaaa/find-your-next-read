@@ -1,0 +1,114 @@
+@use '../../styles/variables' as *;
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cancelBtn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: $radius-md;
+  border: 1.5px solid $color-border;
+  background: $color-white;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text;
+  cursor: pointer;
+  font-family: $font-base;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $color-text-secondary;
+    background: $color-bg;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 32px;
+  align-items: start;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text;
+}
+
+.textarea {
+  font-family: $font-base;
+  font-size: 14px;
+  color: $color-text;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 10px 12px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}
+
+.dateInput {
+  font-family: $font-base;
+  font-size: 14px;
+  color: $color-text;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  height: 42px;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}

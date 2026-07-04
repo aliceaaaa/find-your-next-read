@@ -123,3 +123,34 @@ export const GlobeIcon = createIcon(
   </>,
   'GlobeIcon',
 );
+
+export const LogoutIcon = createIcon(
+  <>
+    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+    <path d="M16 17l5-5-5-5M21 12H9" />
+  </>,
+  'LogoutIcon',
+);
+
+export const EditIcon = createIcon(
+  <>
+    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+    <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </>,
+  'EditIcon',
+);
+
+export const TrashIcon = createIcon(
+  <>
+    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+  </>,
+  'TrashIcon',
+);
+
+export const BookIcon = createIcon(
+  <>
+    <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+  </>,
+  'BookIcon',
+);

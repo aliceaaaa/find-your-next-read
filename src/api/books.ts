@@ -18,6 +18,28 @@ const descriptionToString = (desc: ApiBook['description']): string => {
   return '';
 };
 
+const mapNextBook = (apiBook: ApiBook): Book => {
+  const base = {
+    id: apiBook.id,
+    title: apiBook.title,
+    author: apiBook.author,
+    coverColor: apiBook.cover_color,
+    coverTextColor: apiBook.cover_text_color,
+    categories: apiBook.categories ?? [],
+    description: '',
+    published: apiBook.published
+      ? new Date(apiBook.published).getFullYear()
+      : 0,
+    pages: apiBook.pages ?? 0,
+    language: apiBook.language ?? '',
+    reviews: [],
+    rating: 0,
+    reviewCount: 0,
+    isBookmarked: false,
+  };
+  return base;
+};
+
 export const mapApiBook = (apiBook: ApiBook): Book => ({
   id: apiBook.id,
   title: apiBook.title,
@@ -38,6 +60,8 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
     language: review.language,
     createdAt: new Date(review.created_at),
   })),
+  nextBooks: (apiBook.next_books ?? []).map(mapNextBook),
+  nextBookIds: (apiBook.next_books ?? []).map((b) => b.id),
   rating: 0,
   reviewCount: 0,
   isBookmarked: false,
