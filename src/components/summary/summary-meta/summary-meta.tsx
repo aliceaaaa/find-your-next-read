@@ -1,5 +1,6 @@
 import { UserIcon, CalendarIcon, LibraryIcon, GlobeIcon } from '../../../icons';
 import { Book } from 'types';
+import { languageName } from '../../../constants';
 import styles from './summary-meta.module.scss';
 
 type SummaryMetaProps = {
@@ -13,6 +14,9 @@ const META = [
   { Icon: GlobeIcon, label: 'Language', valueKey: 'language' },
 ] as const;
 
+const formatValue = (key: string, value: string | number): string | number =>
+  key === 'language' ? languageName(value as string) : value;
+
 export const SummaryMeta = ({ book }: SummaryMetaProps) => (
   <div className={styles.meta}>
     {META.map(({ Icon, label, valueKey }) => (
@@ -23,7 +27,9 @@ export const SummaryMeta = ({ book }: SummaryMetaProps) => (
           </span>
           <span className={styles.metaLabel}>{label}</span>
         </div>
-        <span className={styles.metaValue}>{book[valueKey]}</span>
+        <span className={styles.metaValue}>
+          {formatValue(valueKey, book[valueKey])}
+        </span>
       </div>
     ))}
   </div>

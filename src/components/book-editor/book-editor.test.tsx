@@ -12,7 +12,6 @@ const renderEditor = () => {
       <MemoryRouter>
         <BookEditor
           allBooks={[]}
-          categories={['All']}
           onSaved={jest.fn()}
           onCancel={jest.fn()}
         />

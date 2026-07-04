@@ -11,13 +11,12 @@ import { FormField } from '../form-field';
 import { Select, SelectOption } from '../select';
 import { CoverConstructor } from '../cover-constructor';
 import { Button } from '../button';
-import { PRESET_BG_COLORS, PRESET_TEXT_COLORS } from '../../constants';
+import { PRESET_BG_COLORS, PRESET_TEXT_COLORS, LANGUAGES, GENRES } from '../../constants';
 import styles from './book-editor.module.scss';
 
 type BookEditorProps = {
   bookId?: number;
   allBooks: Book[];
-  categories: string[];
   onSaved: (id: number) => void;
   onCancel: () => void;
 };
@@ -44,7 +43,6 @@ const pickRandom = (arr: readonly string[]): string =>
 export const BookEditor = ({
   bookId,
   allBooks,
-  categories,
   onSaved,
   onCancel,
 }: BookEditorProps) => {
@@ -55,7 +53,7 @@ export const BookEditor = ({
   const [author, setAuthor] = useState('');
   const [isbn, setIsbn] = useState('');
   const [pages, setPages] = useState('');
-  const [language, setLanguage] = useState('English');
+  const [language, setLanguage] = useState('en');
   const [published, setPublished] = useState('');
   const [description, setDescription] = useState('');
   const [coverColor, setCoverColor] = useState(() =>
@@ -74,7 +72,7 @@ export const BookEditor = ({
     setAuthor(existing.author);
     setIsbn(existing.isbn ?? '');
     setPages(existing.pages ? String(existing.pages) : '');
-    setLanguage(existing.language || 'English');
+    setLanguage(existing.language || 'en');
     setPublished(existing.publishedDate ? existing.publishedDate.slice(0, 10) : '');
     setDescription(
       existing.descriptionRaw
@@ -99,9 +97,10 @@ export const BookEditor = ({
     detachNextBook.isPending;
 
   const categoryOptions: SelectOption[] = Array.from(
-    new Set(
-      [...categories, ...selectedCategories].filter((c) => c && c !== 'All'),
-    ),
+    new Set([
+      ...GENRES,
+      ...selectedCategories.filter((c) => c && c !== 'All'),
+    ]),
   ).map((c) => ({ value: c, label: c }));
 
   const nextBookOptions: SelectOption[] = allBooks
@@ -260,12 +259,14 @@ export const BookEditor = ({
             />
           </div>
           <div className={styles.row}>
-            <FormField
-              id="book-language"
+            <Select
               label="Language"
-              placeholder="English"
+              options={LANGUAGES.map((l) => ({ value: l.code, label: l.name }))}
               value={language}
-              onChange={setLanguage}
+              placeholder="Select language..."
+              onChange={(v) =>
+                setLanguage(typeof v === 'string' ? v : 'en')
+              }
             />
             <div className={styles.field}>
               <label className={styles.label} htmlFor="book-published">

@@ -220,7 +220,6 @@ export const AppContent = () => {
             <RequireAdmin>
               <BookEditor
                 allBooks={allBooks}
-                categories={categories}
                 onSaved={() => navigate('/admin/books')}
                 onCancel={() => navigate('/admin/books')}
               />
@@ -234,7 +233,6 @@ export const AppContent = () => {
               <BookEditor
                 bookId={editingBookId}
                 allBooks={allBooks}
-                categories={categories}
                 onSaved={() => navigate('/admin/books')}
                 onCancel={() => navigate('/admin/books')}
               />
