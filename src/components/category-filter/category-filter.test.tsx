@@ -54,19 +54,6 @@ describe('CategoryFilter', () => {
     expect(onChange).toHaveBeenCalledWith('Science');
   });
 
-  it('renders "View all" button', () => {
-    render(
-      <CategoryFilter
-        categories={categories}
-        active="History"
-        onChange={jest.fn()}
-      />,
-    );
-    expect(
-      screen.getByRole('button', { name: /view all/i }),
-    ).toBeInTheDocument();
-  });
-
   it('renders section title "Categories"', () => {
     render(
       <CategoryFilter

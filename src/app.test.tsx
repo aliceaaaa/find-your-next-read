@@ -21,9 +21,4 @@ describe('App', () => {
     render(<App />);
     expect(screen.getByText('New Releases')).toBeInTheDocument();
   });
-
-  it('renders Categories section', () => {
-    render(<App />);
-    expect(screen.getAllByText('Categories').length).toBeGreaterThan(0);
-  });
 });

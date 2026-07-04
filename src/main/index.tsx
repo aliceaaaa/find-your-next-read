@@ -32,7 +32,6 @@ export const AppContent = () => {
   const summaryMatch = useMatch('/books/:bookId/summary');
   const editMatch = useMatch('/admin/books/:bookId/edit');
 
-  const [activeCategory, setActiveCategory] = useState('All');
   const [bookmarkOverrides, setBookmarkOverrides] = useState<Record<number, boolean>>({});
 
   const { data: apiBooks = [], isLoading } = useBooks();
@@ -126,11 +125,8 @@ export const AppContent = () => {
           path="/"
           element={
             <HomeFeed
-              activeCategory={activeCategory}
               bookOfTheDayData={bookOfTheDayData}
-              categories={categories}
               isLoading={isLoading}
-              onCategoryChange={setActiveCategory}
               popular={popular}
               releases={releases}
               onBookSelect={handleBookSelect}
@@ -142,11 +138,8 @@ export const AppContent = () => {
           path="/search"
           element={
             <HomeFeed
-              activeCategory={activeCategory}
               bookOfTheDayData={bookOfTheDayData}
-              categories={categories}
               isLoading={isLoading}
-              onCategoryChange={setActiveCategory}
               popular={popular}
               releases={releases}
               onBookSelect={handleBookSelect}

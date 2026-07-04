@@ -16,63 +16,10 @@
     }
   }
 
-  .scroll-wrap {
+  .list {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
-
-    .list {
-      position: relative;
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      flex: 1;
-      padding-bottom: 2px;
-
-      &::-webkit-scrollbar {
-        display: none;
-      }
-    }
-
-    .view-all {
-      position: absolute;
-      top: 0;
-      right: -50px;
-      font-size: 11px;
-      font-weight: 500;
-      color: $color-primary;
-      cursor: pointer;
-      transition: opacity 0.15s;
-      border: none;
-      background: none;
-      font-family: $font-base;
-
-      &:hover {
-        opacity: 0.75;
-      }
-    }
-
-    .arrow-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1px solid #E5E7EB;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: $color-text-secondary;
-      flex-shrink: 0;
-      transition: all 0.15s;
-      cursor: pointer;
-
-      &:hover {
-        background: $color-hover;
-        color: $color-text;
-      }
-    }
   }
 
   .pill {

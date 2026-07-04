@@ -154,3 +154,8 @@ export const BookIcon = createIcon(
   </>,
   'BookIcon',
 );
+
+export const CloseIcon = createIcon(
+  <path d="M18 6L6 18M6 6l12 12" />,
+  'CloseIcon',
+);
