@@ -1,5 +1,6 @@
 import { Section } from 'components';
 import { Book, ReviewsOfTheDay } from 'types';
+import { languageName } from '../../constants';
 import { buildReviewData } from './utils';
 import styles from './book-of-the-day.module.scss';
 
@@ -71,7 +72,7 @@ export const BookOfTheDay = ({
           <div className={styles.infoStat}>
             <span className={styles.infoStatLabel}>Language</span>
             <span className={styles.infoStatValue}>
-              {bookOfTheDay.language}
+              {languageName(bookOfTheDay.language)}
             </span>
           </div>
         </div>

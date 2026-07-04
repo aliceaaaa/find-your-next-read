@@ -93,18 +93,13 @@
   }
 
   .user {
-    margin: 16px 12px;
+    margin: 16px 12px 0;
     padding: 14px;
     display: flex;
     align-items: center;
     gap: 10px;
     border-radius: $radius-lg;
-    cursor: pointer;
     transition: background 0.15s;
-
-    &:hover {
-      background: $color-hover;
-    }
 
     .avatar {
       width: 40px;
@@ -148,6 +143,20 @@
       font-size: 18px;
       flex-shrink: 0;
     }
+  }
+
+  .userBlock {
+    margin: 16px 12px;
+    padding-top: 16px;
+    border-top: 1px solid $color-border;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .logoutBtn,
+  .loginBtn {
+    margin: 0;
   }
 
   .admin-toggle {

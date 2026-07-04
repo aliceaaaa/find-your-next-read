@@ -1,0 +1,52 @@
+@use '../../styles/variables' as *;
+
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-bg;
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  background: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $radius-xl;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: $color-text-secondary;
+  margin: -8px 0 4px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text;
+}
+
+.error {
+  font-size: 13px;
+  color: $color-primary;
+}

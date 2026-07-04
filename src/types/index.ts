@@ -3,15 +3,21 @@ export type Book = {
   title: string;
   author: string;
   rating: number;
+  reviews: Review[];
   reviewCount: number;
   coverColor: string;
   coverTextColor: string;
   categories: string[];
   description: string;
+  descriptionRaw?: Record<string, unknown> | null;
   published: number;
   pages: number;
   language: string;
   isBookmarked?: boolean;
+  isbn?: string;
+  publishedDate?: string;
+  nextBooks?: Book[];
+  nextBookIds?: number[];
 };
 
 export type User = {
@@ -37,12 +43,12 @@ export type Post = {
 
 export type Review = {
   id: number;
-  bookId: number;
-  authorName: string;
-  authorInitials: string;
-  rating: number;
+  author: string;
   text: string;
-  date: string;
+  bookId: number;
+  rating: number;
+  language: string;
+  createdAt: Date;
 };
 
 export type NavItemId =
@@ -54,6 +60,7 @@ export type NavItemId =
   | 'reviews'
   | 'profile'
   | 'settings'
-  | 'post-constructor';
+  | 'post-constructor'
+  | 'admin-books';
 
 export * from './book-of-the-day';

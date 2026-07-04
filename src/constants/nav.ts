@@ -11,9 +11,13 @@ export const navPathMap: Record<
   profile: '/profile',
   settings: '/settings',
   'post-constructor': '/create-post',
+  'admin-books': '/admin/books',
 };
 
 export const navFromPath = (pathname: string): NavItemId => {
+  if (pathname.startsWith('/admin')) {
+    return 'admin-books';
+  }
   if (pathname === '/search') {
     return 'search';
   }

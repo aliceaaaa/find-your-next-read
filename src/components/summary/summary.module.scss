@@ -60,11 +60,33 @@
   margin-top: 4px;
 }
 
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .sectionTitle {
   font-size: 17px;
   font-weight: 700;
   color: $color-text;
   margin: 0;
+}
+
+.addBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-primary;
+  padding: 0;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.7;
+  }
 }
 
 .empty {

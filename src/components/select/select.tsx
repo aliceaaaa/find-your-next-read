@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, SyntheticEvent } from 'react';
 import cn from 'classnames';
-import { SearchIcon, ChevronDownIcon } from '../../icons';
+import { SearchIcon, ChevronDownIcon, CloseIcon } from '../../icons';
 import styles from './select.module.scss';
 
 export type SelectOption = {
@@ -87,6 +87,12 @@ export const Select = ({
     onChange(next.length ? next : null);
   };
 
+  const removeValue = (val: SelectOption['value'], e: SyntheticEvent) => {
+    e.stopPropagation();
+    const next = selectedValues.filter((v) => v !== val);
+    onChange(next.length ? next : null);
+  };
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -114,14 +120,34 @@ export const Select = ({
       return <span className={styles.placeholder}>{placeholder}</span>;
     }
     if (multiple) {
-      const labels = selectedValues
-        .map((v) => options.find((o) => o.value === v)?.label)
-        .filter(Boolean);
+      const selected = selectedValues
+        .map((v) => ({
+          value: v,
+          label: options.find((o) => o.value === v)?.label,
+        }))
+        .filter((s): s is { value: SelectOption['value']; label: string } =>
+          Boolean(s.label),
+        );
       return (
         <span className={styles.multiValue}>
-          {labels.map((l) => (
-            <span key={l} className={styles.chip}>
-              {l}
+          {selected.map((s) => (
+            <span key={s.value} className={styles.chip}>
+              {s.label}
+              <span
+                role="button"
+                tabIndex={0}
+                aria-label={`Remove ${s.label}`}
+                className={styles.chipRemove}
+                onClick={(e) => removeValue(s.value, e)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    removeValue(s.value, e);
+                  }
+                }}
+              >
+                <CloseIcon size={12} />
+              </span>
             </span>
           ))}
         </span>

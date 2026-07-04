@@ -8,6 +8,7 @@ const book: Book = {
   author: 'Marianne Fritz',
   rating: 4.5,
   reviewCount: 50,
+  reviews: [],
   coverColor: '#E8A898',
   coverTextColor: '#C42B3F',
   categories: ['Romance', 'History'],

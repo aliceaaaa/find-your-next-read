@@ -9,6 +9,8 @@ import {
   UserIcon,
   SettingsIcon,
   PlusCircleIcon,
+  BookIcon,
+  LogoutIcon,
 } from '../../icons';
 import { useAuth } from '../../contexts/auth-context';
 import styles from './menu.module.scss';
@@ -33,7 +35,7 @@ const NAV_ITEMS: {
 ];
 
 export const Menu = ({ activeNav, isAdmin = false, onNavChange }: MenuProps) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <aside className={styles.menu}>
@@ -49,25 +51,57 @@ export const Menu = ({ activeNav, isAdmin = false, onNavChange }: MenuProps) => 
           </button>
         ))}
         {isAdmin && (
-          <button
-            className={cn(styles['nav-item'], {
-              [styles.active]: activeNav === 'post-constructor',
-            })}
-            onClick={() => onNavChange('post-constructor')}
-          >
-            <PlusCircleIcon className={styles.icon} />
-            Create Post
-          </button>
+          <>
+            <button
+              className={cn(styles['nav-item'], {
+                [styles.active]: activeNav === 'admin-books',
+              })}
+              onClick={() => onNavChange('admin-books')}
+            >
+              <BookIcon className={styles.icon} />
+              Manage Books
+            </button>
+            <button
+              className={cn(styles['nav-item'], {
+                [styles.active]: activeNav === 'post-constructor',
+              })}
+              onClick={() => onNavChange('post-constructor')}
+            >
+              <PlusCircleIcon className={styles.icon} />
+              Create Post
+            </button>
+          </>
         )}
       </nav>
-      {user && (
-        <div className={styles.user}>
-          <div className={styles.avatar}>{user.name[0]}</div>
-          <div className={styles.info}>
-            <div className={styles.name}>{user.name}</div>
-            <div className={styles.email}>{user.email}</div>
+      {user ? (
+        <div className={styles.userBlock}>
+          <div className={styles.user}>
+            <div className={styles.avatar}>{user.name[0]}</div>
+            <div className={styles.info}>
+              <div className={styles.name}>{user.name}</div>
+              <div className={styles.email}>{user.email}</div>
+            </div>
           </div>
+          <button
+            className={cn(styles['nav-item'], styles.logoutBtn)}
+            onClick={logout}
+          >
+            <LogoutIcon className={styles.icon} />
+            Sign out
+          </button>
         </div>
+      ) : (
+        !isAdmin && (
+          <div className={styles.userBlock}>
+            <button
+              className={cn(styles['nav-item'], styles.loginBtn)}
+              onClick={() => onNavChange('admin-books')}
+            >
+              <LogoutIcon className={styles.icon} />
+              Admin sign in
+            </button>
+          </div>
+        )
       )}
     </aside>
   );

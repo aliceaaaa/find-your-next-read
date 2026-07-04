@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Navigate,
   Route,
@@ -9,20 +9,30 @@ import {
 } from 'react-router-dom';
 import { Book, NavItemId, Post, PostStatus } from 'types';
 import { HomeFeed, PlaceholderPage } from 'sections';
-import { Summary, Library, Page, PostEditor } from 'components';
+import {
+  AdminBooks,
+  BookEditor,
+  Library,
+  Login,
+  Page,
+  PostEditor,
+  RequireAdmin,
+  Summary,
+} from 'components';
+import { useAuth } from '../contexts/auth-context';
 import { navFromPath, navPathMap } from '../constants';
 import { useBookOfTheDay } from './hooks/use-book-of-the-day';
+import { useBook } from '../hooks/use-book';
 import { useBooks } from '../hooks/use-books';
 
 export const AppContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAdmin } = useAuth();
   const summaryMatch = useMatch('/books/:bookId/summary');
+  const editMatch = useMatch('/admin/books/:bookId/edit');
 
-  const [activeCategory, setActiveCategory] = useState('All');
   const [bookmarkOverrides, setBookmarkOverrides] = useState<Record<number, boolean>>({});
-
-  const isAdmin = true;
 
   const { data: apiBooks = [], isLoading } = useBooks();
 
@@ -49,9 +59,27 @@ export const AppContent = () => {
   });
 
   const locationState = location.state as { from?: string } | null;
-  const summaryBook = summaryMatch?.params.bookId
-    ? allBooks.find((book) => book.id === Number(summaryMatch.params.bookId)) || null
+  const bookId = summaryMatch?.params.bookId
+    ? Number(summaryMatch.params.bookId)
     : null;
+
+  const { data: fetchedBook } = useBook(bookId);
+
+  const summaryBook = bookId
+    ? allBooks.find((book) => book.id === bookId) || null
+    : null;
+
+  useEffect(() => {
+    document.title = summaryBook
+      ? `${summaryBook.title} | FindYourNextRead`
+      : 'FindYourNextRead';
+  }, [summaryBook]);
+
+  const summaryReviews = fetchedBook?.reviews ?? [];
+
+  const editingBookId = editMatch?.params.bookId
+    ? Number(editMatch.params.bookId)
+    : undefined;
 
   const activeNavFromRoute = location.pathname.startsWith('/books/')
     ? navFromPath(locationState?.from || '/library')
@@ -97,11 +125,8 @@ export const AppContent = () => {
           path="/"
           element={
             <HomeFeed
-              activeCategory={activeCategory}
               bookOfTheDayData={bookOfTheDayData}
-              categories={categories}
               isLoading={isLoading}
-              onCategoryChange={setActiveCategory}
               popular={popular}
               releases={releases}
               onBookSelect={handleBookSelect}
@@ -113,11 +138,8 @@ export const AppContent = () => {
           path="/search"
           element={
             <HomeFeed
-              activeCategory={activeCategory}
               bookOfTheDayData={bookOfTheDayData}
-              categories={categories}
               isLoading={isLoading}
-              onCategoryChange={setActiveCategory}
               popular={popular}
               releases={releases}
               onBookSelect={handleBookSelect}
@@ -160,7 +182,7 @@ export const AppContent = () => {
                 onSave={handleSavePost}
               />
             ) : (
-              <Navigate to="/" replace />
+              <Navigate to="/login" replace />
             )
           }
         />
@@ -170,7 +192,8 @@ export const AppContent = () => {
             summaryBook ? (
               <Summary
                 book={summaryBook}
-                reviews={[]}
+                reviews={summaryReviews}
+                isAdmin={isAdmin}
                 onBack={handleSummaryBack}
                 onBookmark={handleBookmark}
               />
@@ -179,6 +202,43 @@ export const AppContent = () => {
             )
           }
         />
+
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/admin/books"
+          element={
+            <RequireAdmin>
+              <AdminBooks books={allBooks} isLoading={isLoading} />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/admin/books/new"
+          element={
+            <RequireAdmin>
+              <BookEditor
+                allBooks={allBooks}
+                onSaved={() => navigate('/admin/books')}
+                onCancel={() => navigate('/admin/books')}
+              />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/admin/books/:bookId/edit"
+          element={
+            <RequireAdmin>
+              <BookEditor
+                bookId={editingBookId}
+                allBooks={allBooks}
+                onSaved={() => navigate('/admin/books')}
+                onCancel={() => navigate('/admin/books')}
+              />
+            </RequireAdmin>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Page>
