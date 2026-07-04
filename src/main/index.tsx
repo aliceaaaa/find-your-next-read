@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Navigate,
   Route,
@@ -69,6 +69,12 @@ export const AppContent = () => {
   const summaryBook = bookId
     ? allBooks.find((book) => book.id === bookId) || null
     : null;
+
+  useEffect(() => {
+    document.title = summaryBook
+      ? `${summaryBook.title} | FindYourNextRead`
+      : 'FindYourNextRead';
+  }, [summaryBook]);
 
   const summaryReviews = fetchedBook?.reviews ?? [];
 
