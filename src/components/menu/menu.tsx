@@ -1,17 +1,10 @@
-import { FC } from 'react';
 import cn from 'classnames';
 import { NavItemId } from 'types';
-import {
-  HomeIcon,
-  SearchIcon,
-  LibraryIcon,
-  HeartIcon,
-  UserIcon,
-  SettingsIcon,
-  PlusCircleIcon,
-} from '../../icons';
+import { PlusCircleIcon } from '../../icons';
 import { useAuth } from '../../contexts/auth-context';
+import { navItems } from './constants';
 import styles from './menu.module.scss';
+import { Logo } from 'components/logo';
 
 type MenuProps = {
   activeNav: NavItemId;
@@ -19,29 +12,23 @@ type MenuProps = {
   onNavChange: (id: NavItemId) => void;
 };
 
-const NAV_ITEMS: {
-  id: NavItemId;
-  label: string;
-  Icon: FC<{ className?: string }>;
-}[] = [
-  { id: 'home', label: 'Home', Icon: HomeIcon },
-  { id: 'search', label: 'Search', Icon: SearchIcon },
-  { id: 'library', label: 'Library', Icon: LibraryIcon },
-  { id: 'favorites', label: 'Favorites', Icon: HeartIcon },
-  { id: 'profile', label: 'Profile', Icon: UserIcon },
-  { id: 'settings', label: 'Settings', Icon: SettingsIcon },
-];
-
-export const Menu = ({ activeNav, isAdmin = false, onNavChange }: MenuProps) => {
+export const Menu = ({
+  activeNav,
+  isAdmin = false,
+  onNavChange,
+}: MenuProps) => {
   const { user } = useAuth();
 
   return (
     <aside className={styles.menu}>
+      <Logo onNavChange={onNavChange} />
       <nav>
-        {NAV_ITEMS.map(({ id, label, Icon }) => (
+        {navItems.map(({ id, label, Icon }) => (
           <button
             key={id}
-            className={cn(styles['nav-item'], { [styles.active]: activeNav === id })}
+            className={cn(styles['nav-item'], {
+              [styles.active]: activeNav === id,
+            })}
             onClick={() => onNavChange(id)}
           >
             <Icon className={styles.icon} />

@@ -5,6 +5,12 @@ const descriptionToString = (desc: ApiBook['description']): string => {
   if (!desc) return '';
   if (typeof desc === 'string') return desc;
 
+  const localized =
+    (desc as Record<string, unknown>).en ??
+    Object.values(desc).find((value) => typeof value === 'string');
+
+  if (typeof localized === 'string') return localized;
+
   const content = (desc as any)?.content;
 
   if (Array.isArray(content)) {
@@ -18,6 +24,16 @@ const descriptionToString = (desc: ApiBook['description']): string => {
   return '';
 };
 
+const languageToName = (code: string): string => {
+  if (!code) return '';
+
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'language' }).of(code) ?? code;
+  } catch {
+    return code;
+  }
+};
+
 export const mapApiBook = (apiBook: ApiBook): Book => ({
   id: apiBook.id,
   title: apiBook.title,
@@ -28,7 +44,7 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   description: descriptionToString(apiBook.description),
   published: apiBook.published ? new Date(apiBook.published).getFullYear() : 0,
   pages: apiBook.pages ?? 0,
-  language: apiBook.language ?? '',
+  language: languageToName(apiBook.language ?? ''),
   rating: 0,
   reviewCount: 0,
   isBookmarked: false,

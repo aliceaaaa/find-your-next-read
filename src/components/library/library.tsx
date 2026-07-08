@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Book } from 'types';
 import { Card } from '../card';
 import { CategoryFilter } from '../category-filter';
+import { EmptyState } from '../empty-state';
+import { SkeletonCard } from '../skeleton-card';
 import styles from './library.module.scss';
 
 type LibraryProps = {
@@ -11,15 +13,6 @@ type LibraryProps = {
   onBookSelect: (book: Book) => void;
   onBookmark: (id: number) => void;
 };
-
-const SkeletonCard = () => (
-  <div className={styles.skeletonCard}>
-    <div className={styles.skeletonCover} />
-    <div className={styles.skeletonTitle} />
-    <div className={styles.skeletonAuthor} />
-    <div className={styles.skeletonRating} />
-  </div>
-);
 
 export const Library = ({
   books,
@@ -50,15 +43,15 @@ export const Library = ({
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className={styles.empty}>
-          <span className={styles.emptyIcon}>📚</span>
-          <p className={styles.emptyTitle}>No books here yet</p>
-          <p className={styles.emptySubtitle}>
-            {activeCategory === 'All'
+        <EmptyState
+          className={styles.empty}
+          title="No books here yet"
+          subtitle={
+            activeCategory === 'All'
               ? 'Books will appear here once they are added to the library.'
-              : `No books in the "${activeCategory}" category yet.`}
-          </p>
-        </div>
+              : `No books in the "${activeCategory}" category yet.`
+          }
+        />
       ) : (
         <div className={styles.grid}>
           {filtered.map((book) => (

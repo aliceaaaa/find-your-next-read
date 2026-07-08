@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Section } from './section';
+import { BookShelf } from './book-shelf';
 
 const books = [
   {
@@ -34,9 +34,9 @@ const books = [
   },
 ];
 
-const meta: Meta<typeof Section> = {
-  title: 'Components/Section',
-  component: Section,
+const meta: Meta<typeof BookShelf> = {
+  title: 'Components/BookShelf',
+  component: BookShelf,
   tags: ['autodocs'],
   args: {
     onBookSelect: () => {},
@@ -45,21 +45,21 @@ const meta: Meta<typeof Section> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Section>;
+type Story = StoryObj<typeof BookShelf>;
 
-export const PopularPicks: Story = {
+export const FullCards: Story = {
   args: {
     title: 'Popular Picks',
     books,
-    variant: 'popular',
+    cardType: 'full',
   },
 };
 
-export const NewReleases: Story = {
+export const MiniCards: Story = {
   args: {
     title: 'New Releases',
     books,
-    variant: 'new-releases',
+    cardType: 'mini',
   },
 };
 
@@ -67,6 +67,6 @@ export const SingleBook: Story = {
   args: {
     title: 'Popular Picks',
     books: [books[0]],
-    variant: 'popular',
+    cardType: 'full',
   },
 };

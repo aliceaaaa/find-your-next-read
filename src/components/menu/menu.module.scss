@@ -10,7 +10,6 @@
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  margin-top: 72px;
 
   nav {
     flex: 1;
@@ -72,10 +71,9 @@
         left: 0;
         top: 50%;
         transform: translateY(-50%);
-        width: 3px;
-        height: 60%;
+        width: 1px;
+        height: 75%;
         background: $color-primary;
-        border-radius: 0 3px 3px 0;
       }
 
       .icon {

@@ -1,4 +1,4 @@
-import { Section } from 'components';
+import { Card } from 'components';
 import { Book, ReviewsOfTheDay } from 'types';
 import { buildReviewData } from './utils';
 import styles from './book-of-the-day.module.scss';
@@ -17,16 +17,13 @@ export const BookOfTheDay = ({
   onBookmark,
 }: BookOfTheDayProps) => (
   <div className={styles.wrapper}>
+    <h2>Book of the Day</h2>
     <div className={styles.content}>
-      <div className={styles.bookColumn}>
-        <Section
-          title="Book Of The Day"
-          books={[bookOfTheDay]}
-          variant="popular"
-          onBookSelect={onBookSelect}
-          onBookmark={onBookmark}
-        />
-      </div>
+      <Card
+        book={bookOfTheDay}
+        onSelect={onBookSelect}
+        onBookmark={onBookmark}
+      />
       <div className={styles.reviewsWrap}>
         {buildReviewData(reviewsOfTheDay).map((review) => (
           <section key={review.key} className={styles.reviewSection}>
@@ -39,23 +36,27 @@ export const BookOfTheDay = ({
               <h3 className={styles.reviewTitle}>{review.title}</h3>
             </div>
             <p className={styles.reviewText}>{review.text}</p>
-            <button
-              className={styles.readMore}
-              onClick={() => onBookSelect(bookOfTheDay)}
-            >
-              Read the review →
-            </button>
+            {review.rating !== null && (
+              <button
+                className={styles.readMore}
+                onClick={() => onBookSelect(bookOfTheDay)}
+              >
+                Read the review →
+              </button>
+            )}
             <p className={styles.reviewMeta}>
               Rating:
               {review.rating === null
-                ? `${review.title.replace('Review from ', '')} will review ${bookOfTheDay.title} as soon as possible`
-                : `${review.rating}/5`}
+                ? ` ${review.title.replace('Review from ', '')} will review ${bookOfTheDay.title} as soon as possible`
+                : ` ${review.rating}/5`}
             </p>
           </section>
         ))}
       </div>
       <aside className={styles.infoPanel}>
-        <p className={styles.infoDescription}>{bookOfTheDay.description}</p>
+        {bookOfTheDay.description && (
+          <p className={styles.infoDescription}>{bookOfTheDay.description}</p>
+        )}
         <hr className={styles.infoDivider} />
         <div className={styles.infoStats}>
           <div className={styles.infoStat}>

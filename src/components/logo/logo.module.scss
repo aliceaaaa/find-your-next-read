@@ -1,0 +1,47 @@
+@use '../../styles/variables'as *;
+
+.logo {
+  flex-shrink: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  border: none;
+  border-bottom: 1px solid $color-border;
+  background: transparent;
+  font-family: $font-base;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover .logoMark {
+    transform: rotate(-6deg) scale(1.05);
+  }
+}
+
+.logoMark {
+  width: 20px;
+  flex-shrink: 0;
+  color: $color-primary;
+  transition: transform 0.2s ease;
+  filter: drop-shadow(0 3px 6px rgba(230, 57, 70, 0.35));
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.logoText {
+  font-size: 38px;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  color: $color-text;
+  white-space: nowrap;
+
+  em {
+    font-style: normal;
+    color: $color-primary;
+  }
+}

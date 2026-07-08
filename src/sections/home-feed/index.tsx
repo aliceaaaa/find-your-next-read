@@ -1,5 +1,5 @@
 import { Book, BookOfTheDayPayload } from 'types';
-import { CategoryFilter, Section } from 'components';
+import { BookShelf, CategoryFilter } from 'components';
 import { BookOfTheDay } from '../book-of-the-day';
 
 type HomeFeedProps = {
@@ -39,19 +39,23 @@ export const HomeFeed = ({
       active={activeCategory}
       onChange={onCategoryChange}
     />
-    <Section
+    <BookShelf
       title="Popular Picks"
       books={popular}
       isLoading={isLoading}
-      variant="popular"
+      cardType="full"
+      emptyTitle="No popular picks yet"
+      emptySubtitle="Check back soon — great reads are on the way."
       onBookSelect={onBookSelect}
       onBookmark={onBookmark}
     />
-    <Section
+    <BookShelf
       title="New Releases"
       books={releases}
       isLoading={isLoading}
-      variant="new-releases"
+      cardType="mini"
+      emptyTitle="No new releases yet"
+      emptySubtitle="New books will appear here once added."
       onBookSelect={onBookSelect}
     />
   </>

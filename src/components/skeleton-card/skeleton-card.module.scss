@@ -1,0 +1,38 @@
+@use '../../styles/skeleton' as *;
+
+.skeletonCard {
+  flex-shrink: 0;
+  width: 248px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #ebeef3;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+}
+
+.skeletonCover {
+  @include skeleton-block;
+  width: 100%;
+  aspect-ratio: 210 / 297;
+  margin-bottom: 12px;
+}
+
+.skeletonTitle {
+  @include skeleton-block;
+  height: 18px;
+  width: 80%;
+  margin-bottom: 8px;
+}
+
+.skeletonAuthor {
+  @include skeleton-block;
+  height: 14px;
+  width: 60%;
+  margin-bottom: 8px;
+}
+
+.skeletonRating {
+  @include skeleton-block;
+  height: 14px;
+  width: 40%;
+}
