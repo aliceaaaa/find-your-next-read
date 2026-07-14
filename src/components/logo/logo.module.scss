@@ -17,6 +17,10 @@
   &:hover .logoMark {
     transform: rotate(-6deg) scale(1.05);
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .logoMark {

@@ -1,89 +1,52 @@
-import { useMemo, useState } from 'react';
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useMatch,
-  useNavigate,
-} from 'react-router-dom';
-import { Book, NavItemId, Post, PostStatus } from 'types';
-import { HomeFeed, PlaceholderPage } from 'sections';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { Post, PostStatus } from 'types';
+import { HomeFeed } from 'sections';
 import { Summary, Library, Page, PostEditor } from 'components';
-import { navFromPath, navPathMap } from '../constants';
-import { useBookOfTheDay } from './hooks/use-book-of-the-day';
-import { useBooks } from '../hooks/use-books';
+import { useAuth } from '../contexts/auth-context';
+import {
+  useNavigation,
+  useBookmarks,
+  useBooksStats,
+  useBooks,
+  useReviews,
+} from '../hooks';
 
 export const AppContent = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const summaryMatch = useMatch('/books/:bookId/summary');
+  const { isAdmin } = useAuth();
 
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [bookmarkOverrides, setBookmarkOverrides] = useState<Record<number, boolean>>({});
+  const { data: apiBooks = [], isPending: isLoading } = useBooks();
+  const { data: reviews = [] } = useReviews();
+  const { bookmarks, setBookmarks } = useBookmarks();
 
-  const isAdmin = true;
+  const {
+    activeNavFromRoute,
+    activeCategory,
+    summaryBook,
+    handleCategoryChange,
+    handleNavChange,
+    handleBookSelect,
+    handleCategorySelect,
+    handleSummaryBack,
+  } = useNavigation(apiBooks);
 
-  const { data: apiBooks = [], isLoading } = useBooks();
-
-  const allBooks: Book[] = apiBooks.map((b) => ({
-    ...b,
-    isBookmarked: bookmarkOverrides[b.id] ?? b.isBookmarked ?? false,
-  }));
-
-  const half = Math.ceil(allBooks.length / 2);
-  const popular = allBooks.slice(0, half);
-  const releases = allBooks.slice(half);
-
-  const categories = useMemo(
-    () => ['All', ...Array.from(new Set(allBooks.flatMap((b) => b.categories)))],
-    [allBooks],
-  );
-
-  const favoritesBooks = allBooks.filter((book) => book.isBookmarked);
-
-  const { data: bookOfTheDayData } = useBookOfTheDay({
+  const {
+    allBooks,
     popular,
     releases,
-    reviews: [],
-  });
+    categories,
+    favoritesBooks,
+    bookOfTheDayData,
+  } = useBooksStats(apiBooks, reviews, bookmarks);
 
-  const locationState = location.state as { from?: string } | null;
-  const summaryBook = summaryMatch?.params.bookId
-    ? allBooks.find((book) => book.id === Number(summaryMatch.params.bookId)) || null
-    : null;
-
-  const activeNavFromRoute = location.pathname.startsWith('/books/')
-    ? navFromPath(locationState?.from || '/library')
-    : navFromPath(location.pathname);
-
-  const handleSavePost = (data: Omit<Post, 'id' | 'createdAt'>, status: PostStatus) => {
+  const handleSavePost = (
+    data: Omit<Post, 'id' | 'createdAt'>,
+    status: PostStatus,
+  ) => {
     console.log('Post saved:', { ...data, status });
   };
 
   const handleBookmark = (id: number) => {
-    setBookmarkOverrides((prev) => {
-      const current = allBooks.find((b) => b.id === id);
-      const currentState = prev[id] ?? current?.isBookmarked ?? false;
-      return { ...prev, [id]: !currentState };
-    });
-  };
-
-  const handleNavChange = (id: NavItemId) => {
-    const path = navPathMap[id as keyof typeof navPathMap];
-    if (path) {
-      navigate(path);
-    }
-  };
-
-  const handleBookSelect = (book: Book) => {
-    navigate(`/books/${book.id}/summary`, {
-      state: { from: location.pathname },
-    });
-  };
-
-  const handleSummaryBack = () => {
-    navigate(locationState?.from || '/library');
+    setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
@@ -97,27 +60,11 @@ export const AppContent = () => {
           path="/"
           element={
             <HomeFeed
-              activeCategory={activeCategory}
+              activeCategory="All"
               bookOfTheDayData={bookOfTheDayData}
               categories={categories}
               isLoading={isLoading}
-              onCategoryChange={setActiveCategory}
-              popular={popular}
-              releases={releases}
-              onBookSelect={handleBookSelect}
-              onBookmark={handleBookmark}
-            />
-          }
-        />
-        <Route
-          path="/search"
-          element={
-            <HomeFeed
-              activeCategory={activeCategory}
-              bookOfTheDayData={bookOfTheDayData}
-              categories={categories}
-              isLoading={isLoading}
-              onCategoryChange={setActiveCategory}
+              onCategoryChange={handleCategorySelect}
               popular={popular}
               releases={releases}
               onBookSelect={handleBookSelect}
@@ -132,6 +79,8 @@ export const AppContent = () => {
               books={allBooks}
               categories={categories}
               isLoading={isLoading}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
               onBookSelect={handleBookSelect}
               onBookmark={handleBookmark}
             />
@@ -143,13 +92,13 @@ export const AppContent = () => {
             <Library
               books={favoritesBooks}
               categories={categories}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
               onBookSelect={handleBookSelect}
               onBookmark={handleBookmark}
             />
           }
         />
-        <Route path="/profile" element={<PlaceholderPage title="Profile" />} />
-        <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
         <Route
           path="/create-post"
           element={
@@ -170,11 +119,12 @@ export const AppContent = () => {
             summaryBook ? (
               <Summary
                 book={summaryBook}
-                reviews={[]}
+                reviews={reviews}
                 onBack={handleSummaryBack}
                 onBookmark={handleBookmark}
+                onCategorySelect={handleCategorySelect}
               />
-            ) : (
+            ) : isLoading ? null : (
               <Navigate to="/library" replace />
             )
           }

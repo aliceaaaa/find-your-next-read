@@ -47,13 +47,8 @@ export type Review = {
 
 export type NavItemId =
   | 'home'
-  | 'search'
   | 'library'
   | 'favorites'
-  | 'categories'
-  | 'reviews'
-  | 'profile'
-  | 'settings'
   | 'post-constructor';
 
 export * from './book-of-the-day';

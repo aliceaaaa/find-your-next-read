@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { ChevronRightIcon } from '../../icons';
 import styles from './category-filter.module.scss';
@@ -15,6 +15,14 @@ export const CategoryFilter = ({
   onChange,
 }: CategoryFilterProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    const activePill = scrollRef.current?.querySelector<HTMLButtonElement>(
+      `.${styles.active}`,
+    );
+    activePill?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }, [active, categories]);
 
   const scroll = () => {
     scrollRef.current?.scrollBy({ left: 150, behavior: 'smooth' });
@@ -24,9 +32,18 @@ export const CategoryFilter = ({
     <div className={styles['category-filter']}>
       <div className={styles.header}>
         <h2>Categories</h2>
+        <button
+          className={styles['view-all']}
+          onClick={() => setIsExpanded((prev) => !prev)}
+        >
+          {isExpanded ? 'Show less' : 'View all'}
+        </button>
       </div>
       <div className={styles['scroll-wrap']}>
-        <div className={styles.list} ref={scrollRef}>
+        <div
+          className={cn(styles.list, { [styles.expanded]: isExpanded })}
+          ref={scrollRef}
+        >
           {categories.map((cat) => (
             <button
               key={cat}
@@ -38,15 +55,16 @@ export const CategoryFilter = ({
               {cat}
             </button>
           ))}
-          <button className={styles['view-all']}>View all</button>
         </div>
-        <button
-          className={styles['arrow-btn']}
-          onClick={scroll}
-          aria-label="Scroll right"
-        >
-          <ChevronRightIcon size={16} />
-        </button>
+        {!isExpanded && (
+          <button
+            className={styles['arrow-btn']}
+            onClick={scroll}
+            aria-label="Scroll right"
+          >
+            <ChevronRightIcon size={16} />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -11,6 +11,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
 }
 
 .heading {
@@ -67,6 +71,10 @@
   grid-template-columns: 45% 55%;
   gap: 32px;
   align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form {

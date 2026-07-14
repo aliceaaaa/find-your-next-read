@@ -70,8 +70,24 @@ export const apiLogin = (
     body: JSON.stringify({ email, password }),
   });
 
+export type ApiReview = {
+  id: number;
+  author: string;
+  text: string;
+  book_id: number;
+  rating: number;
+  language: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export const apiGetBooks = (page = 1): Promise<ApiPaginatedResponse<ApiBook>> =>
   request<ApiPaginatedResponse<ApiBook>>(`/books?page=${page}`);
 
 export const apiGetBook = (id: number): Promise<ApiBook> =>
   request<ApiBook>(`/books/${id}`);
+
+export const apiGetReviews = (
+  page = 1,
+): Promise<ApiPaginatedResponse<ApiReview>> =>
+  request<ApiPaginatedResponse<ApiReview>>(`/reviews?page=${page}`);

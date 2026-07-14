@@ -29,7 +29,7 @@ export const HomeFeed = ({
     {bookOfTheDayData?.bookOfTheDay && (
       <BookOfTheDay
         bookOfTheDay={bookOfTheDayData.bookOfTheDay}
-        reviewsOfTheDay={bookOfTheDayData.reviewsOfTheDay!}
+        reviewsOfTheDay={bookOfTheDayData.reviewsOfTheDay}
         onBookSelect={onBookSelect}
         onBookmark={onBookmark}
       />
@@ -53,10 +53,11 @@ export const HomeFeed = ({
       title="New Releases"
       books={releases}
       isLoading={isLoading}
-      cardType="mini"
+      cardType="full"
       emptyTitle="No new releases yet"
       emptySubtitle="New books will appear here once added."
       onBookSelect={onBookSelect}
+      onBookmark={onBookmark}
     />
   </>
 );

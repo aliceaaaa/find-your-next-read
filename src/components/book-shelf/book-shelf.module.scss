@@ -60,4 +60,9 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @media (max-width: 768px) {
+    --card-width: 168px;
+    gap: 12px;
+  }
 }

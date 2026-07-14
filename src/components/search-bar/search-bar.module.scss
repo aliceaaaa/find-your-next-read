@@ -33,6 +33,10 @@
         padding: 14px 0;
         font-family: $font-base;
 
+        @media (max-width: 768px) {
+          padding: 10px 0;
+        }
+
         &::placeholder {
           color: #9CA3AF;
         }
@@ -42,6 +46,11 @@
     .submit-btn {
       width: 52px;
       height: 52px;
+
+      @media (max-width: 768px) {
+        width: 44px;
+        height: 44px;
+      }
       background: $color-dark;
       color: white;
       display: flex;

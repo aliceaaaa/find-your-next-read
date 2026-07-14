@@ -1,11 +1,10 @@
-import { Card } from 'components';
-import { Book, ReviewsOfTheDay } from 'types';
-import { buildReviewData } from './utils';
+import { Card, StarRating } from 'components';
+import { Book, Review } from 'types';
 import styles from './book-of-the-day.module.scss';
 
 type BookOfTheDayProps = {
   bookOfTheDay: Book;
-  reviewsOfTheDay: ReviewsOfTheDay;
+  reviewsOfTheDay: Review[];
   onBookSelect: (book: Book) => void;
   onBookmark: (id: number) => void;
 };
@@ -25,33 +24,36 @@ export const BookOfTheDay = ({
         onBookmark={onBookmark}
       />
       <div className={styles.reviewsWrap}>
-        {buildReviewData(reviewsOfTheDay).map((review) => (
-          <section key={review.key} className={styles.reviewSection}>
-            <div className={styles.reviewHeader}>
-              <div
-                className={`${styles.avatar}${review.avatarClassName ? ` ${review.avatarClassName}` : ''}`}
-              >
-                {review.initial}
+        {reviewsOfTheDay.length === 0 ? (
+          <section className={styles.reviewSection}>
+            <h3 className={styles.reviewTitle}>No reviews yet</h3>
+            <p className={styles.reviewText}>
+              Nobody has reviewed {bookOfTheDay.title} yet.
+            </p>
+          </section>
+        ) : (
+          reviewsOfTheDay.map((review) => (
+            <section key={review.id} className={styles.reviewSection}>
+              <div className={styles.reviewHeader}>
+                <div className={styles.avatar}>{review.authorInitials}</div>
+                <h3 className={styles.reviewTitle}>
+                  Review from {review.authorName}
+                </h3>
               </div>
-              <h3 className={styles.reviewTitle}>{review.title}</h3>
-            </div>
-            <p className={styles.reviewText}>{review.text}</p>
-            {review.rating !== null && (
+              <p className={styles.reviewText}>{review.text}</p>
               <button
                 className={styles.readMore}
                 onClick={() => onBookSelect(bookOfTheDay)}
               >
                 Read the review →
               </button>
-            )}
-            <p className={styles.reviewMeta}>
-              Rating:
-              {review.rating === null
-                ? ` ${review.title.replace('Review from ', '')} will review ${bookOfTheDay.title} as soon as possible`
-                : ` ${review.rating}/5`}
-            </p>
-          </section>
-        ))}
+              <div className={styles.reviewMeta}>
+                <StarRating rating={review.rating} size={13} />
+                <span>{review.rating}/5</span>
+              </div>
+            </section>
+          ))
+        )}
       </div>
       <aside className={styles.infoPanel}>
         {bookOfTheDay.description && (

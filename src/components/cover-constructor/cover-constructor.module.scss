@@ -4,6 +4,18 @@
   display: flex;
   gap: 32px;
   align-items: flex-start;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .controls {
+    width: 100%;
+  }
 }
 
 .controls {

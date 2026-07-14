@@ -4,26 +4,31 @@ import { Menu } from './menu';
 describe('Menu', () => {
   it('renders all navigation items', () => {
     render(<Menu activeNav="home" onNavChange={jest.fn()} />);
-    [
-      'Home',
-      'Search',
-      'Library',
-      'Favorites',
-      'Categories',
-      'Reviews',
-      'Profile',
-      'Settings',
-    ].forEach((label) =>
+    ['Home', 'Library', 'Favorites'].forEach((label) =>
       expect(
-        screen.getByRole('button', { name: new RegExp(label, 'i') }),
+        screen.getByRole('button', { name: new RegExp(`^${label}$`, 'i') }),
       ).toBeInTheDocument(),
     );
   });
 
+  it('does not render Create Post for non-admin', () => {
+    render(<Menu activeNav="home" onNavChange={jest.fn()} />);
+    expect(
+      screen.queryByRole('button', { name: /create post/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders Create Post for admin', () => {
+    render(<Menu activeNav="home" isAdmin onNavChange={jest.fn()} />);
+    expect(
+      screen.getByRole('button', { name: /create post/i }),
+    ).toBeInTheDocument();
+  });
+
   it('marks active nav item with active class', () => {
-    render(<Menu activeNav="search" onNavChange={jest.fn()} />);
-    const searchBtn = screen.getByRole('button', { name: /search/i });
-    expect(searchBtn).toHaveClass('active');
+    render(<Menu activeNav="library" onNavChange={jest.fn()} />);
+    const libraryBtn = screen.getByRole('button', { name: /library/i });
+    expect(libraryBtn).toHaveClass('active');
   });
 
   it('non-active items do not have active class', () => {
@@ -37,19 +42,5 @@ describe('Menu', () => {
     render(<Menu activeNav="home" onNavChange={onNavChange} />);
     fireEvent.click(screen.getByRole('button', { name: /library/i }));
     expect(onNavChange).toHaveBeenCalledWith('library');
-  });
-
-  it('renders user name and email', () => {
-    render(<Menu activeNav="home" onNavChange={jest.fn()} />);
-    expect(screen.getByText('Alexandra')).toBeInTheDocument();
-    expect(screen.getByText('alexandra@mail.com')).toBeInTheDocument();
-  });
-
-  it('renders Premium Access block', () => {
-    render(<Menu activeNav="home" onNavChange={jest.fn()} />);
-    expect(screen.getByText('Premium Access')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /upgrade now/i }),
-    ).toBeInTheDocument();
   });
 });

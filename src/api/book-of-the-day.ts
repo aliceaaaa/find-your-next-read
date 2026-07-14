@@ -18,7 +18,7 @@ export const fetchBookOfTheDay = async ({
   if (!books.length) {
     return {
       bookOfTheDay: null,
-      reviewsOfTheDay: null,
+      reviewsOfTheDay: [],
     };
   }
 
@@ -27,25 +27,10 @@ export const fetchBookOfTheDay = async ({
   const index = daySeed % books.length;
   const bookOfTheDay = books[index];
 
-  const related = reviews.filter((review) => review.bookId === bookOfTheDay.id);
-  const nikReview = related[0];
-  const aliceReview = related[1] || related[0];
-
   return {
     bookOfTheDay,
-    reviewsOfTheDay: {
-      nik: nikReview
-        ? { text: nikReview.text, rating: nikReview.rating }
-        : {
-            text: `Nik is going to review ${bookOfTheDay.title} soon, so stay tuned!`,
-            rating: null,
-          },
-      alice: aliceReview
-        ? { text: aliceReview.text, rating: aliceReview.rating }
-        : {
-            text: `Alice is going to review ${bookOfTheDay.title} soon, so stay tuned!`,
-            rating: null,
-          },
-    },
+    reviewsOfTheDay: reviews
+      .filter((review) => review.bookId === bookOfTheDay.id)
+      .slice(0, 2),
   };
 };

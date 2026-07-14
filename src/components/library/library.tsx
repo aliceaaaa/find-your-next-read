@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Book } from 'types';
 import { Card } from '../card';
 import { CategoryFilter } from '../category-filter';
@@ -10,6 +9,8 @@ type LibraryProps = {
   books: Book[];
   categories: string[];
   isLoading?: boolean;
+  activeCategory: string;
+  onCategoryChange: (category: string) => void;
   onBookSelect: (book: Book) => void;
   onBookmark: (id: number) => void;
 };
@@ -18,11 +19,11 @@ export const Library = ({
   books,
   categories,
   isLoading = false,
+  activeCategory,
+  onCategoryChange,
   onBookSelect,
   onBookmark,
 }: LibraryProps) => {
-  const [activeCategory, setActiveCategory] = useState('All');
-
   const filtered =
     activeCategory === 'All'
       ? books
@@ -33,7 +34,7 @@ export const Library = ({
       <CategoryFilter
         categories={categories}
         active={activeCategory}
-        onChange={setActiveCategory}
+        onChange={onCategoryChange}
       />
 
       {isLoading ? (

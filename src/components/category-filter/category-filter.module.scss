@@ -6,6 +6,7 @@
   .header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 14px;
     gap: 24px;
 
@@ -13,6 +14,22 @@
       font-size: 18px;
       font-weight: 700;
       color: $color-text;
+    }
+
+    .view-all {
+      font-size: 13px;
+      font-weight: 500;
+      color: $color-primary;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      border: none;
+      background: none;
+      font-family: $font-base;
+      padding: 0;
+
+      &:hover {
+        opacity: 0.75;
+      }
     }
   }
 
@@ -34,23 +51,10 @@
       &::-webkit-scrollbar {
         display: none;
       }
-    }
 
-    .view-all {
-      position: absolute;
-      top: 0;
-      right: -50px;
-      font-size: 11px;
-      font-weight: 500;
-      color: $color-primary;
-      cursor: pointer;
-      transition: opacity 0.15s;
-      border: none;
-      background: none;
-      font-family: $font-base;
-
-      &:hover {
-        opacity: 0.75;
+      &.expanded {
+        flex-wrap: wrap;
+        overflow-x: visible;
       }
     }
 
