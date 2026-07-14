@@ -1,7 +1,9 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { Post, PostStatus } from 'types';
 import { HomeFeed } from 'sections';
 import { Summary, Library, Page, PostEditor } from 'components';
+import { LoginPage } from '../sections/login/login';
 import { useAuth } from '../contexts/auth-context';
 import {
   useNavigation,
@@ -13,6 +15,7 @@ import {
 
 export const AppContent = () => {
   const { isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const { data: apiBooks = [], isPending: isLoading } = useBooks();
   const { data: reviews = [] } = useReviews();
@@ -48,6 +51,34 @@ export const AppContent = () => {
   const handleBookmark = (id: number) => {
     setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTypingTarget =
+        !!target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable);
+
+      if (isTypingTarget) return;
+
+      const isShiftL = event.shiftKey && event.key.toLowerCase() === 'l';
+      const hasModifier = event.metaKey || event.ctrlKey;
+
+      if (isShiftL && hasModifier) {
+        event.preventDefault();
+        navigate('/login');
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [navigate]);
 
   return (
     <Page
@@ -113,6 +144,7 @@ export const AppContent = () => {
             )
           }
         />
+        <Route path="/login" element={<LoginPage />} />
         <Route
           path="/books/:bookId/summary"
           element={
