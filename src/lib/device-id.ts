@@ -1,9 +1,5 @@
 const DEVICE_ID_KEY = 'device_id';
 
-/**
- * Stable per-device identifier kept in localStorage. Used to attribute reader
- * ratings and analytics events without an account. Generated once, then reused.
- */
 export const getDeviceId = (): string => {
   let id = localStorage.getItem(DEVICE_ID_KEY);
 

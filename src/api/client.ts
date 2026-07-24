@@ -74,6 +74,9 @@ export const apiLogin = (
     body: JSON.stringify({ email, password }),
   });
 
+export const apiLogout = (): Promise<unknown> =>
+  request('/logout', { method: 'POST' });
+
 export type ApiReview = {
   id: number;
   author: string;
@@ -113,6 +116,19 @@ export const apiGetBooks = (
 export const apiGetBook = (id: number): Promise<ApiBook> =>
   request<ApiBook>(`/books/${id}`);
 
+export type ApiCategory = {
+  id: number;
+  name: string;
+  books_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export const apiGetCategories = (
+  page = 1,
+): Promise<ApiPaginatedResponse<ApiCategory>> =>
+  request<ApiPaginatedResponse<ApiCategory>>(`/categories?page=${page}`);
+
 export const apiGetReviews = (
   page = 1,
 ): Promise<ApiPaginatedResponse<ApiReview>> =>
@@ -134,6 +150,18 @@ export const apiCreateReview = (
     body: JSON.stringify(payload),
   });
 
+export const apiGetReview = (id: number): Promise<ApiReview> =>
+  request<ApiReview>(`/reviews/${id}`);
+
+export const apiUpdateReview = (
+  id: number,
+  payload: Partial<CreateReviewPayload>,
+): Promise<ApiReview> =>
+  request<ApiReview>(`/reviews/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+
 export type CreateBookPayload = {
   title: string;
   author: string;
@@ -152,4 +180,47 @@ export const apiCreateBook = (payload: CreateBookPayload): Promise<ApiBook> =>
   request<ApiBook>('/books', {
     method: 'POST',
     body: JSON.stringify(payload),
+  });
+
+export const apiUpdateBook = (
+  id: number,
+  payload: Partial<CreateBookPayload>,
+): Promise<ApiBook> =>
+  request<ApiBook>(`/books/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+
+export const apiDeleteBook = (id: number): Promise<unknown> =>
+  request(`/books/${id}`, { method: 'DELETE' });
+
+export const apiRestoreBook = (id: number): Promise<ApiBook> =>
+  request<ApiBook>(`/books/${id}/restore`, { method: 'POST' });
+
+export const apiSetNextBooks = (
+  id: number,
+  nextBookIds: number[],
+): Promise<unknown> =>
+  request(`/books/${id}/next-books`, {
+    method: 'POST',
+    body: JSON.stringify({ next_book_ids: nextBookIds }),
+  });
+
+export const apiRemoveNextBook = (
+  id: number,
+  nextBookId: number,
+): Promise<unknown> =>
+  request(`/books/${id}/next-books/${nextBookId}`, { method: 'DELETE' });
+
+export const apiTrackImpression = (id: number): Promise<unknown> =>
+  request(`/events/impressions/${id}`, { method: 'POST' });
+
+export const apiRateBook = (
+  id: number,
+  rating: number,
+  visitorId: string,
+): Promise<unknown> =>
+  request(`/events/ratings/${id}`, {
+    method: 'POST',
+    body: JSON.stringify({ rating, visitor_id: visitorId }),
   });

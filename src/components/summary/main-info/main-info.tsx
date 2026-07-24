@@ -28,21 +28,17 @@ export const MainInfo = ({
       />
     </div>
     <div className={styles.ratingRow}>
-      <StarRating rating={book.rating} outOf={10} size={16} />
+      <StarRating rating={book.ratingAvg ?? 0} outOf={10} size={16} />
       <span className={styles.ratingText}>
-        {book.rating}/10 ({book.reviewCount}{' '}
-        {book.reviewCount === 1 ? 'review' : 'reviews'})
+        {book.ratingAvg != null
+          ? `${book.ratingAvg.toFixed(1)}/10`
+          : 'No ratings yet'}
+        {book.reviewCount > 0 &&
+          ` (${book.rating}/10 from ${book.reviewCount} ${
+            book.reviewCount === 1 ? 'review' : 'reviews'
+          })`}
       </span>
     </div>
-    {book.ratingAvg != null && (
-      <div className={styles.ratingRow}>
-        <StarRating rating={book.ratingAvg} outOf={10} size={16} />
-        <span className={styles.ratingText}>
-          {book.ratingAvg.toFixed(1)}/10 · {book.ratingsCount ?? 0}{' '}
-          {(book.ratingsCount ?? 0) === 1 ? 'reader rating' : 'reader ratings'}
-        </span>
-      </div>
-    )}
     <div className={styles.categories}>
       {book.categories.map((cat) =>
         onCategorySelect ? (

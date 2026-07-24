@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
-import { apiLogin, clearToken, getToken, setToken } from 'api';
+import { apiLogin, apiLogout, clearToken, getToken, setToken } from 'api';
 
 type AuthUser = {
   id: number;
@@ -43,13 +43,16 @@ export const AuthProvider = ({
   };
 
   const logout = () => {
+    apiLogout().catch(() => {});
     clearToken();
     setUser(null);
     setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, isAdmin, user, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

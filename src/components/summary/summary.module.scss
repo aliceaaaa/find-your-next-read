@@ -5,7 +5,6 @@
   height: 100%;
   overflow-y: auto;
   background: $color-white;
-  padding: 28px 32px 48px;
   display: flex;
   flex-direction: column;
 }
@@ -17,13 +16,13 @@
   align-self: flex-start;
   background: none;
   border: none;
-  cursor: pointer;
   font-size: 14px;
   font-weight: 500;
   color: $color-text;
   padding: 0;
   margin-bottom: 24px;
   transition: opacity 0.15s;
+  cursor: pointer;
 
   &:hover {
     opacity: 0.6;
@@ -64,6 +63,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 32px;
 }
 
 .sectionTitle {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiCreateReview } from 'api';
 import { track } from '../../lib';
+import { useAuth } from '../../contexts/auth-context';
 import { Button } from '../button';
 import styles from './review-form.module.scss';
 
@@ -10,6 +11,7 @@ type ReviewFormProps = {
 };
 
 export const ReviewForm = ({ bookId }: ReviewFormProps) => {
+  const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [author, setAuthor] = useState('');
   const [text, setText] = useState('');
@@ -17,7 +19,12 @@ export const ReviewForm = ({ bookId }: ReviewFormProps) => {
 
   const mutation = useMutation({
     mutationFn: () =>
-      apiCreateReview({ author: author.trim(), text: text.trim(), rating, book_id: bookId }),
+      apiCreateReview({
+        author: author.trim(),
+        text: text.trim(),
+        rating,
+        book_id: bookId,
+      }),
     onSuccess: () => {
       track('add_review', { bookId, rating });
       setAuthor('');
@@ -28,6 +35,10 @@ export const ReviewForm = ({ bookId }: ReviewFormProps) => {
   });
 
   const canSubmit = author.trim() && text.trim() && !mutation.isPending;
+
+  if (!isAdmin) {
+    return null;
+  }
 
   return (
     <form
@@ -77,7 +88,12 @@ export const ReviewForm = ({ bookId }: ReviewFormProps) => {
         </span>
       )}
       <div className={styles.actions}>
-        <Button type="submit" variant="primary" disabled={!canSubmit} loading={mutation.isPending}>
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={!canSubmit}
+          loading={mutation.isPending}
+        >
           Submit review
         </Button>
       </div>

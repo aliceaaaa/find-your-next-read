@@ -1,23 +1,19 @@
 type StarRatingProps = {
   rating: number;
   size?: number;
-  /** Scale the incoming rating is on. Ratings from the API are 0..10; the
-   * widget always renders 5 stars, so pass outOf={10} to scale down. */
   outOf?: number;
 };
 
 const STAR_PATH =
   'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
 
-const StarIcon = ({
-  fill,
-  size,
-  id,
-}: {
+type IconProps = {
   fill: 'full' | 'half' | 'empty';
   size: number;
   id: string;
-}) => {
+};
+
+const StarIcon = ({ fill, size, id }: IconProps) => {
   const clipId = `half-${id}`;
   const halfTestId = `half-clip-${id}`;
 
@@ -37,11 +33,7 @@ const StarIcon = ({
           </clipPath>
         </defs>
       )}
-
-      {/* Фон (пустая звезда) */}
       <path d={STAR_PATH} fill="#E8E8E8" />
-
-      {/* Заливка */}
       {fill === 'full' && (
         <path d={STAR_PATH} fill="var(--color-star, #c80e1e)" />
       )}
@@ -56,7 +48,11 @@ const StarIcon = ({
   );
 };
 
-export const StarRating = ({ rating, size = 16, outOf = 5 }: StarRatingProps) => {
+export const StarRating = ({
+  rating,
+  size = 16,
+  outOf = 5,
+}: StarRatingProps) => {
   const stars = outOf === 5 ? rating : (rating / outOf) * 5;
 
   return (

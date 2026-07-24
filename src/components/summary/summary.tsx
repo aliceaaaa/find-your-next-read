@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
+import { apiTrackImpression } from 'api';
 import { Book, Review } from '../../types';
 import { Cover } from '../cover';
 import { ArrowLeftIcon } from '../../icons';
@@ -35,14 +36,20 @@ export const Summary = ({
   const [expandedReviews, setExpandedReviews] = useState<Set<number>>(
     new Set(),
   );
-  const bookReviews = reviews.filter((r) => r.bookId === book.id);
 
+  useEffect(() => {
+    apiTrackImpression(book.id).catch(() => {});
+  }, [book.id]);
+
+  const bookReviews = reviews.filter((r) => r.bookId === book.id);
   const reviewCount = bookReviews.length;
+
   const reviewAverage = reviewCount
     ? Math.round(
         (bookReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount) * 10,
       ) / 10
     : 0;
+
   const bookWithRating: Book = {
     ...book,
     rating: reviewAverage,

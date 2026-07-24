@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiCreateBook } from 'api';
 import { PRESET_BG_COLORS, PRESET_TEXT_COLORS } from '../../constants';
 import { track } from '../../lib';
+import { useCategories } from '../../hooks';
 import { useAuth } from '../../contexts/auth-context';
 import {
   FormField,
@@ -28,10 +29,6 @@ type FormState = {
   coverTextColor: string;
 };
 
-type PostConstructorProps = {
-  categories?: string[];
-};
-
 const pick = <T,>(list: T[]): T =>
   list[Math.floor(Math.random() * list.length)];
 
@@ -48,24 +45,32 @@ const makeInitial = (): FormState => ({
   coverTextColor: pick(PRESET_TEXT_COLORS),
 });
 
-export const PostConstructor = ({ categories = [] }: PostConstructorProps) => {
+export const PostConstructor = () => {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
+  const { data: categories = [] } = useCategories();
+
   const [form, setForm] = useState<FormState>(makeInitial);
   const [submitted, setSubmitted] = useState(false);
 
-  const categoryOptions: SelectOption[] = categories
-    .filter((c) => c !== 'All')
-    .map((c) => ({ value: c, label: c }));
+  const categoryOptions: SelectOption[] = categories.map((c) => ({
+    value: c.name,
+    label: c.name,
+  }));
 
   const handleCategoriesChange = (
     value: SelectOption['value'] | SelectOption['value'][] | null,
   ) => {
-    const next = Array.isArray(value)
-      ? value.map(String)
-      : value != null
-        ? [String(value)]
-        : [];
+    let next: string[];
+
+    if (Array.isArray(value)) {
+      next = value.map(String);
+    }
+
+    if (value != null) {
+      next = [String(value)];
+    }
+
     setForm((prev) => ({ ...prev, categories: next }));
   };
 

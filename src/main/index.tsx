@@ -18,6 +18,7 @@ import {
   useBookmarks,
   useBooksStats,
   useBooks,
+  useCategories,
   useReviews,
 } from '../hooks';
 
@@ -53,14 +54,11 @@ export const AppContent = () => {
     handleSummaryBack,
   } = useNavigation(apiBooks);
 
-  const {
-    allBooks,
-    popular,
-    releases,
-    categories,
-    favoritesBooks,
-    bookOfTheDayData,
-  } = useBooksStats(apiBooks, reviews, bookmarks);
+  const { allBooks, popular, releases, favoritesBooks, bookOfTheDayData } =
+    useBooksStats(apiBooks, reviews, bookmarks);
+
+  const { data: apiCategories = [] } = useCategories();
+  const categories = ['All', ...apiCategories.map((c) => c.name)];
 
   const handleBookmark = (id: number) => {
     setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -201,10 +199,7 @@ export const AppContent = () => {
             />
           }
         />
-        <Route
-          path="/create-post"
-          element={<PostConstructor categories={categories} />}
-        />
+        <Route path="/create-post" element={<PostConstructor />} />
         <Route
           path="/search"
           element={
