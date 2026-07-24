@@ -10,11 +10,26 @@ type StaticContent = {
 // Заглушки
 const PAGES: Record<string, StaticContent> = {
   about: {
-    title: 'About',
+    title: 'About & Impressum',
     description: 'What Find your next read is and who it is for.',
     body: [
-      'Find your next read helps you discover books worth your time — browse the library, search by title, author or genre, and keep track of what you want to read next.',
-      'This is a placeholder page. Real copy will go here.',
+      'Impressum / Legal Notice',
+      'Information pursuant to § 5 DDG (Digitale-Dienste-Gesetz)',
+      'Website Operator / Service Provider:',
+      'Nikolai Surovegin',
+      'Braunstr. 21',
+      '24145, Kiel, Germany',
+      'Contact Information:',
+      'Email: infawn@gmail.com',
+      'Liability for Contents (Haftung für Inhalte)',
+      'As a service provider, we are responsible for our own content on these pages in accordance with general laws pursuant to § 7 Abs. 1 DDG. According to §§ 8 to 10 DDG, however, we as a service provider are not obliged to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.',
+      'Obligations to remove or block the use of information in accordance with general laws remain unaffected by this. However, liability in this regard is only possible from the moment of knowledge of a specific infringement. Upon notification of corresponding rights violations, we will remove this content immediately.',
+      'Liability for Links (Haftung für Links)',
+      'Our website may contain links to external third-party websites over whose content we have no influence. Therefore, we cannot assume any liability for these external contents. The respective provider or operator of the pages is always responsible for the content of the linked pages.',
+      'The linked pages were checked for possible legal violations at the time of linking. Illegal content was not recognizable at the time of linking. However, permanent monitoring of the content of the linked pages is not reasonable without concrete evidence of a violation. Upon notification of rights violations, we will remove such links immediately.',
+      'Copyright (Urheberrecht)',
+      'The content and works created by the site operator on these pages are subject to German copyright law (Deutsches Urheberrecht). Duplication, processing, distribution, and any kind of exploitation outside the limits of copyright law require the written consent of the respective author or creator.',
+      'Downloads and copies of this site are only permitted for private, non-commercial use. Insofar as the content on this site was not created by the operator, the copyrights of third parties are respected. In particular, third-party content is identified as such. Should you nevertheless become aware of a copyright infringement, please inform us accordingly. Upon notification of violations, we will remove such content immediately.',
     ],
   },
   terms: {
