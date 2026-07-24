@@ -1,6 +1,9 @@
 type StarRatingProps = {
   rating: number;
   size?: number;
+  /** Scale the incoming rating is on. Ratings from the API are 0..10; the
+   * widget always renders 5 stars, so pass outOf={10} to scale down. */
+  outOf?: number;
 };
 
 const STAR_PATH =
@@ -53,22 +56,26 @@ const StarIcon = ({
   );
 };
 
-export const StarRating = ({ rating, size = 16 }: StarRatingProps) => (
-  <span
-    data-testid="star-rating"
-    style={{
-      display: 'inline-flex',
-      gap: 3,
-      alignItems: 'center',
-      lineHeight: 1,
-    }}
-  >
-    {[1, 2, 3, 4, 5].map((i) => {
-      const fill =
-        i <= Math.floor(rating) ? 'full' : i - 0.5 <= rating ? 'half' : 'empty';
-      const id = `star-${i}-${rating}`;
+export const StarRating = ({ rating, size = 16, outOf = 5 }: StarRatingProps) => {
+  const stars = outOf === 5 ? rating : (rating / outOf) * 5;
 
-      return <StarIcon key={i} id={id} fill={fill} size={size} />;
-    })}
-  </span>
-);
+  return (
+    <span
+      data-testid="star-rating"
+      style={{
+        display: 'inline-flex',
+        gap: 3,
+        alignItems: 'center',
+        lineHeight: 1,
+      }}
+    >
+      {[1, 2, 3, 4, 5].map((i) => {
+        const fill =
+          i <= Math.floor(stars) ? 'full' : i - 0.5 <= stars ? 'half' : 'empty';
+        const id = `star-${i}-${stars}`;
+
+        return <StarIcon key={i} id={id} fill={fill} size={size} />;
+      })}
+    </span>
+  );
+};

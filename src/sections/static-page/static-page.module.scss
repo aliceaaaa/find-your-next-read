@@ -1,0 +1,19 @@
+@use '../../styles/variables' as *;
+
+.page {
+  max-width: 720px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0 0 20px;
+}
+
+.paragraph {
+  font-size: 15px;
+  line-height: 1.7;
+  color: $color-text-secondary;
+  margin: 0 0 16px;
+}

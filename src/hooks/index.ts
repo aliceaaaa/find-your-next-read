@@ -1,4 +1,5 @@
 export * from './use-book-of-the-day';
+export * from './use-book-rating';
 export * from './use-bookmarks';
 export * from './use-books-stats';
 export * from './use-books';

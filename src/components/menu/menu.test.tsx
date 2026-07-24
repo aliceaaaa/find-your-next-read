@@ -11,17 +11,17 @@ describe('Menu', () => {
     );
   });
 
-  it('does not render Create Post for non-admin', () => {
+  it('does not render Add Book for non-admin', () => {
     render(<Menu activeNav="home" onNavChange={jest.fn()} />);
     expect(
-      screen.queryByRole('button', { name: /create post/i }),
+      screen.queryByRole('button', { name: /add book/i }),
     ).not.toBeInTheDocument();
   });
 
-  it('renders Create Post for admin', () => {
+  it('renders Add Book for admin', () => {
     render(<Menu activeNav="home" isAdmin onNavChange={jest.fn()} />);
     expect(
-      screen.getByRole('button', { name: /create post/i }),
+      screen.getByRole('button', { name: /add book/i }),
     ).toBeInTheDocument();
   });
 

@@ -13,6 +13,15 @@
     0 6px 14px rgba(17, 24, 39, 0.12);
 }
 
+.image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
 .sm {
   width: 90px;
   padding: 12px 10px;

@@ -4,8 +4,14 @@ export type Book = {
   author: string;
   rating: number;
   reviewCount: number;
+  /** Average reader rating (0..10) from the API's rating_avg; null = no ratings yet. */
+  ratingAvg?: number | null;
+  ratingsCount?: number;
   coverColor: string;
   coverTextColor: string;
+  /** Uploaded cover image (URL or data URL). When set, it replaces the
+   * generated colour cover. */
+  coverImage?: string | null;
   categories: string[];
   description: string;
   published: number;

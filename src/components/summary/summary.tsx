@@ -5,6 +5,9 @@ import { Cover } from '../cover';
 import { ArrowLeftIcon } from '../../icons';
 
 import { Reviews } from '../reviews';
+import { RateBook } from '../rate-book';
+import { ReviewForm } from '../review-form';
+import { BookShelf } from '../book-shelf';
 import { MainInfo } from './main-info';
 import { SummaryMeta } from './summary-meta';
 
@@ -13,22 +16,38 @@ import styles from './summary.module.scss';
 interface SummaryProps {
   book: Book;
   reviews: Review[];
+  nextBooks?: Book[];
   onBack: () => void;
   onBookmark: (id: number) => void;
+  onBookSelect?: (book: Book) => void;
   onCategorySelect?: (category: string) => void;
 }
 
 export const Summary = ({
   book,
   reviews,
+  nextBooks = [],
   onBack,
   onBookmark,
+  onBookSelect,
   onCategorySelect,
 }: SummaryProps) => {
   const [expandedReviews, setExpandedReviews] = useState<Set<number>>(
     new Set(),
   );
   const bookReviews = reviews.filter((r) => r.bookId === book.id);
+
+  const reviewCount = bookReviews.length;
+  const reviewAverage = reviewCount
+    ? Math.round(
+        (bookReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount) * 10,
+      ) / 10
+    : 0;
+  const bookWithRating: Book = {
+    ...book,
+    rating: reviewAverage,
+    reviewCount,
+  };
 
   const toggleReview = (id: number) => {
     setExpandedReviews((prev) => {
@@ -58,10 +77,11 @@ export const Summary = ({
         </div>
         <div className={styles.headline}>
           <MainInfo
-            book={book}
+            book={bookWithRating}
             onBookmark={onBookmark}
             onCategorySelect={onCategorySelect}
           />
+          <RateBook bookId={book.id} />
           {book.description && (
             <p className={styles.description}>{book.description}</p>
           )}
@@ -81,7 +101,19 @@ export const Summary = ({
             onToggleReview={toggleReview}
           />
         )}
+        <ReviewForm bookId={book.id} />
       </section>
+      {nextBooks.length > 0 && onBookSelect && (
+        <section className={styles.section}>
+          <BookShelf
+            title="Next books"
+            books={nextBooks}
+            cardType="full"
+            onBookSelect={onBookSelect}
+            onBookmark={onBookmark}
+          />
+        </section>
+      )}
     </div>
   );
 };

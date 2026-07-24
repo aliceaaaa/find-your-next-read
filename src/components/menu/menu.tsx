@@ -43,7 +43,7 @@ export const Menu = ({
             onClick={() => onNavChange('post-constructor')}
           >
             <PlusCircleIcon className={styles.icon} />
-            Create Post
+            Add Book
           </button>
         )}
       </nav>

@@ -1,20 +1,37 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../../contexts/auth-context';
 import { PostConstructor } from './post-constructor';
 
-const renderDefault = () =>
-  render(
-    <AuthProvider>
-      <PostConstructor />
-    </AuthProvider>,
-  );
+jest.mock('api', () => ({
+  ...jest.requireActual('api'),
+  apiCreateBook: jest.fn(() => Promise.resolve({ id: 1 })),
+}));
 
-const renderAsAdmin = () =>
-  render(
-    <AuthProvider defaultIsAdmin>
-      <PostConstructor />
-    </AuthProvider>,
+const renderWith = (isAdmin: boolean) => {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={client}>
+      <AuthProvider defaultIsAdmin={isAdmin}>
+        <PostConstructor />
+      </AuthProvider>
+    </QueryClientProvider>,
   );
+};
+
+const renderDefault = () => renderWith(false);
+const renderAsAdmin = () => renderWith(true);
+
+const fillRequired = () => {
+  fireEvent.change(screen.getByLabelText(/^title/i), {
+    target: { value: 'My Book' },
+  });
+  fireEvent.change(screen.getByLabelText(/^author/i), {
+    target: { value: 'Jane Doe' },
+  });
+};
 
 describe('PostConstructor', () => {
   describe('access control', () => {
@@ -31,14 +48,14 @@ describe('PostConstructor', () => {
     it('does not show form when not admin', () => {
       renderDefault();
       expect(
-        screen.queryByRole('form', { name: /create book post/i }),
+        screen.queryByRole('form', { name: /add book form/i }),
       ).not.toBeInTheDocument();
     });
 
     it('shows form when admin', () => {
       renderAsAdmin();
       expect(
-        screen.getByRole('form', { name: /create book post form/i }),
+        screen.getByRole('form', { name: /add book form/i }),
       ).toBeInTheDocument();
     });
   });
@@ -46,7 +63,7 @@ describe('PostConstructor', () => {
   describe('admin form', () => {
     it('renders page title', () => {
       renderAsAdmin();
-      expect(screen.getByText('Create Book Post')).toBeInTheDocument();
+      expect(screen.getByText('Add Book')).toBeInTheDocument();
     });
 
     it('renders Title field', () => {
@@ -76,12 +93,14 @@ describe('PostConstructor', () => {
 
     it('renders Categories field', () => {
       renderAsAdmin();
-      expect(screen.getByLabelText(/^categories/i)).toBeInTheDocument();
+      expect(screen.getByText(/^categories$/i)).toBeInTheDocument();
     });
 
     it('renders the rich text editor', () => {
       renderAsAdmin();
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      expect(
+        screen.getByRole('textbox', { name: /what i think/i }),
+      ).toBeInTheDocument();
     });
 
     it('renders image upload zone', () => {
@@ -96,10 +115,10 @@ describe('PostConstructor', () => {
       expect(screen.getByTestId('cover')).toBeInTheDocument();
     });
 
-    it('renders Create Post submit button', () => {
+    it('renders Publish submit button', () => {
       renderAsAdmin();
       expect(
-        screen.getByRole('button', { name: /create post/i }),
+        screen.getByRole('button', { name: /publish/i }),
       ).toBeInTheDocument();
     });
 
@@ -110,28 +129,33 @@ describe('PostConstructor', () => {
       ).toBeInTheDocument();
     });
 
-    it('shows success screen after form submit', () => {
+    it('shows success screen after a valid submit', async () => {
       renderAsAdmin();
-      fireEvent.click(screen.getByRole('button', { name: /create post/i }));
-      expect(screen.getByTestId('success-message')).toBeInTheDocument();
-      expect(screen.getByText('Post Created!')).toBeInTheDocument();
+      fillRequired();
+      fireEvent.click(screen.getByRole('button', { name: /publish/i }));
+      expect(await screen.findByTestId('success-message')).toBeInTheDocument();
+      expect(screen.getByText('Book Added!')).toBeInTheDocument();
     });
 
-    it('shows Create Another button after submit', () => {
+    it('shows Add Another button after submit', async () => {
       renderAsAdmin();
-      fireEvent.click(screen.getByRole('button', { name: /create post/i }));
+      fillRequired();
+      fireEvent.click(screen.getByRole('button', { name: /publish/i }));
       expect(
-        screen.getByRole('button', { name: /create another/i }),
+        await screen.findByRole('button', { name: /add another/i }),
       ).toBeInTheDocument();
     });
 
-    it('returns to form after Create Another click', () => {
+    it('returns to form after Add Another click', async () => {
       renderAsAdmin();
-      fireEvent.click(screen.getByRole('button', { name: /create post/i }));
-      fireEvent.click(screen.getByRole('button', { name: /create another/i }));
-      expect(
-        screen.getByRole('form', { name: /create book post form/i }),
-      ).toBeInTheDocument();
+      fillRequired();
+      fireEvent.click(screen.getByRole('button', { name: /publish/i }));
+      fireEvent.click(await screen.findByRole('button', { name: /add another/i }));
+      await waitFor(() =>
+        expect(
+          screen.getByRole('form', { name: /add book form/i }),
+        ).toBeInTheDocument(),
+      );
     });
 
     it('resets title field when Reset is clicked', () => {

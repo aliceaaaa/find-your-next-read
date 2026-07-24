@@ -1,8 +1,16 @@
 import { useEffect } from 'react';
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import { Post, PostStatus } from 'types';
-import { HomeFeed } from 'sections';
-import { Summary, Library, Page, PostEditor } from 'components';
+import {
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
+import { Book } from 'types';
+import { HomeFeed, SearchResults, StaticPage, PostConstructor } from 'sections';
+import { getStaticPageMeta } from '../sections/static-page';
+import { Summary, Library, Page } from 'components';
+import { setDocumentMeta, trackPageView } from '../lib';
 import { LoginPage } from '../sections/login/login';
 import { useAuth } from '../contexts/auth-context';
 import {
@@ -13,9 +21,22 @@ import {
   useReviews,
 } from '../hooks';
 
+const getNextBooks = (allBooks: Book[], current: Book, limit = 6): Book[] => {
+  const others = allBooks.filter((b) => b.id !== current.id);
+
+  const sameCategory = others.filter((b) =>
+    b.categories.some((c) => current.categories.includes(c)),
+  );
+
+  const rest = others.filter((b) => !sameCategory.includes(b));
+
+  return [...sameCategory, ...rest].slice(0, limit);
+};
+
 export const AppContent = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { data: apiBooks = [], isPending: isLoading } = useBooks();
   const { data: reviews = [] } = useReviews();
@@ -41,16 +62,65 @@ export const AppContent = () => {
     bookOfTheDayData,
   } = useBooksStats(apiBooks, reviews, bookmarks);
 
-  const handleSavePost = (
-    data: Omit<Post, 'id' | 'createdAt'>,
-    status: PostStatus,
-  ) => {
-    console.log('Post saved:', { ...data, status });
-  };
-
   const handleBookmark = (id: number) => {
     setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  const handleSearch = (query: string) => {
+    const trimmed = query.trim();
+
+    if (trimmed) {
+      navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+    }
+  };
+
+  useEffect(() => {
+    const { pathname, search } = location;
+    trackPageView(pathname);
+
+    if (pathname === '/') {
+      setDocumentMeta({
+        description:
+          'Discover your next favourite book — browse, search and save reads.',
+      });
+    } else if (pathname === '/library') {
+      setDocumentMeta({
+        title: 'Library',
+        description: 'Browse the full catalogue of books.',
+      });
+    } else if (pathname === '/favorites') {
+      setDocumentMeta({
+        title: 'Favorites',
+        description: 'The books you saved to read next.',
+      });
+    } else if (pathname === '/search') {
+      const q = new URLSearchParams(search).get('q') ?? '';
+      setDocumentMeta({
+        title: q ? `Search: ${q}` : 'Search',
+        description: 'Search books by title, author or genre.',
+      });
+    } else if (pathname === '/create-post') {
+      setDocumentMeta({
+        title: 'Add Book',
+        description: 'Add a new book to the catalogue.',
+      });
+    } else if (pathname === '/login') {
+      setDocumentMeta({ title: 'Log in' });
+    } else if (pathname.startsWith('/books/') && summaryBook) {
+      setDocumentMeta({
+        title: summaryBook.title,
+        description: summaryBook.description?.slice(0, 160) || undefined,
+      });
+    } else if (pathname.startsWith('/pages/')) {
+      const meta = getStaticPageMeta(pathname.split('/')[2] ?? '');
+      setDocumentMeta({
+        title: meta?.title ?? 'Page',
+        description: meta?.description,
+      });
+    } else {
+      setDocumentMeta({});
+    }
+  }, [location, summaryBook]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -85,6 +155,7 @@ export const AppContent = () => {
       activeNav={activeNavFromRoute}
       isAdmin={isAdmin}
       onNavChange={handleNavChange}
+      onSearch={handleSearch}
     >
       <Routes>
         <Route
@@ -132,18 +203,19 @@ export const AppContent = () => {
         />
         <Route
           path="/create-post"
+          element={<PostConstructor categories={categories} />}
+        />
+        <Route
+          path="/search"
           element={
-            isAdmin ? (
-              <PostEditor
-                books={allBooks}
-                categories={categories}
-                onSave={handleSavePost}
-              />
-            ) : (
-              <Navigate to="/" replace />
-            )
+            <SearchResults
+              bookmarks={bookmarks}
+              onBookSelect={handleBookSelect}
+              onBookmark={handleBookmark}
+            />
           }
         />
+        <Route path="/pages/:slug" element={<StaticPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/books/:bookId/summary"
@@ -152,8 +224,10 @@ export const AppContent = () => {
               <Summary
                 book={summaryBook}
                 reviews={reviews}
+                nextBooks={getNextBooks(allBooks, summaryBook)}
                 onBack={handleSummaryBack}
                 onBookmark={handleBookmark}
+                onBookSelect={handleBookSelect}
                 onCategorySelect={handleCategorySelect}
               />
             ) : isLoading ? null : (

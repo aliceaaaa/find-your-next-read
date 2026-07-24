@@ -43,8 +43,12 @@ export type ApiBook = {
   pages: number | null;
   language: string | null;
   isbn: string | null;
+  cover_image: string | null;
   created_at: string;
   updated_at: string;
+  ratings_sum: number | null;
+  ratings_count: number | null;
+  rating_avg: number | null;
 };
 
 export type ApiPaginatedResponse<T> = {
@@ -81,8 +85,30 @@ export type ApiReview = {
   updated_at: string;
 };
 
-export const apiGetBooks = (page = 1): Promise<ApiPaginatedResponse<ApiBook>> =>
-  request<ApiPaginatedResponse<ApiBook>>(`/books?page=${page}`);
+export type BooksQuery = {
+  search?: string;
+  perPage?: number;
+  sort?: string;
+};
+
+export const apiGetBooks = (
+  page = 1,
+  { search, perPage, sort }: BooksQuery = {},
+): Promise<ApiPaginatedResponse<ApiBook>> => {
+  const params = new URLSearchParams({ page: String(page) });
+
+  if (search) {
+    params.set('filter[search]', search);
+  }
+  if (perPage) {
+    params.set('per_page', String(perPage));
+  }
+  if (sort) {
+    params.set('sort', sort);
+  }
+
+  return request<ApiPaginatedResponse<ApiBook>>(`/books?${params.toString()}`);
+};
 
 export const apiGetBook = (id: number): Promise<ApiBook> =>
   request<ApiBook>(`/books/${id}`);
@@ -91,3 +117,39 @@ export const apiGetReviews = (
   page = 1,
 ): Promise<ApiPaginatedResponse<ApiReview>> =>
   request<ApiPaginatedResponse<ApiReview>>(`/reviews?page=${page}`);
+
+export type CreateReviewPayload = {
+  author: string;
+  text: string;
+  rating: number;
+  book_id: number;
+  language?: string;
+};
+
+export const apiCreateReview = (
+  payload: CreateReviewPayload,
+): Promise<ApiReview> =>
+  request<ApiReview>('/reviews', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export type CreateBookPayload = {
+  title: string;
+  author: string;
+  published?: string | null;
+  pages?: number | null;
+  language?: string | null;
+  categories?: string[];
+  description?: { en: string } | null;
+  cover_color: string;
+  cover_text_color: string;
+  cover_image?: string | null;
+  isbn?: string | null;
+};
+
+export const apiCreateBook = (payload: CreateBookPayload): Promise<ApiBook> =>
+  request<ApiBook>('/books', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });

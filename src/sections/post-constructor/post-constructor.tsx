@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiCreateBook } from 'api';
+import { PRESET_BG_COLORS, PRESET_TEXT_COLORS } from '../../constants';
+import { track } from '../../lib';
 import { useAuth } from '../../contexts/auth-context';
 import {
   FormField,
@@ -6,6 +10,8 @@ import {
   ImageUpload,
   RichTextEditor,
   CoverConstructor,
+  Select,
+  SelectOption,
 } from '../../components';
 import styles from './post-constructor.module.scss';
 
@@ -15,30 +21,74 @@ type FormState = {
   published: string;
   pages: string;
   language: string;
-  categories: string;
+  categories: string[];
   description: string;
   image: string;
   coverColor: string;
   coverTextColor: string;
 };
 
-const INITIAL: FormState = {
+type PostConstructorProps = {
+  categories?: string[];
+};
+
+const pick = <T,>(list: T[]): T =>
+  list[Math.floor(Math.random() * list.length)];
+
+const makeInitial = (): FormState => ({
   title: '',
   author: '',
   published: '',
   pages: '',
   language: '',
-  categories: '',
+  categories: [],
   description: '',
   image: '',
-  coverColor: '#1D3557',
-  coverTextColor: '#FFFFFF',
-};
+  coverColor: pick(PRESET_BG_COLORS),
+  coverTextColor: pick(PRESET_TEXT_COLORS),
+});
 
-export const PostConstructor = () => {
+export const PostConstructor = ({ categories = [] }: PostConstructorProps) => {
   const { isAdmin } = useAuth();
-  const [form, setForm] = useState<FormState>(INITIAL);
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState<FormState>(makeInitial);
   const [submitted, setSubmitted] = useState(false);
+
+  const categoryOptions: SelectOption[] = categories
+    .filter((c) => c !== 'All')
+    .map((c) => ({ value: c, label: c }));
+
+  const handleCategoriesChange = (
+    value: SelectOption['value'] | SelectOption['value'][] | null,
+  ) => {
+    const next = Array.isArray(value)
+      ? value.map(String)
+      : value != null
+        ? [String(value)]
+        : [];
+    setForm((prev) => ({ ...prev, categories: next }));
+  };
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      apiCreateBook({
+        title: form.title.trim(),
+        author: form.author.trim(),
+        published: form.published ? `${form.published}-01-01` : null,
+        pages: form.pages ? Number(form.pages) : null,
+        language: form.language.trim() || null,
+        categories: form.categories,
+        description: form.description ? { en: form.description } : null,
+        cover_color: form.coverColor,
+        cover_text_color: form.coverTextColor,
+        cover_image: form.image || null,
+      }),
+    onSuccess: () => {
+      track('add_book', { title: form.title.trim() });
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      setSubmitted(true);
+    },
+  });
 
   const set =
     (field: keyof FormState) =>
@@ -65,17 +115,17 @@ export const PostConstructor = () => {
         <div className={styles.successIcon} aria-hidden="true">
           ✓
         </div>
-        <h2 className={styles.successTitle}>Post Created!</h2>
+        <h2 className={styles.successTitle}>Book Added!</h2>
         <p className={styles.successText}>
-          Your book post has been successfully created.
+          The book has been successfully added to the catalog.
         </p>
         <Button
           onClick={() => {
-            setForm(INITIAL);
+            setForm(makeInitial());
             setSubmitted(false);
           }}
         >
-          Create Another
+          Add Another
         </Button>
       </div>
     );
@@ -84,7 +134,7 @@ export const PostConstructor = () => {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Create Book Post</h1>
+        <h1 className={styles.title}>Add Book</h1>
         <p className={styles.subtitle}>
           Fill in the details to add a new book to the catalog
         </p>
@@ -94,9 +144,11 @@ export const PostConstructor = () => {
         className={styles.form}
         onSubmit={(e) => {
           e.preventDefault();
-          setSubmitted(true);
+          if (form.title.trim() && form.author.trim()) {
+            mutation.mutate();
+          }
         }}
-        aria-label="Create book post form"
+        aria-label="Add book form"
       >
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Book Info</h2>
@@ -141,13 +193,13 @@ export const PostConstructor = () => {
               onChange={set('language')}
               placeholder="English"
             />
-            <FormField
+            <Select
               label="Categories"
-              id="categories"
+              options={categoryOptions}
               value={form.categories}
-              onChange={set('categories')}
-              placeholder="Fiction, History, Romance"
-              hint="Separate multiple categories with commas"
+              placeholder="Select categories..."
+              multiple
+              onChange={handleCategoriesChange}
             />
           </div>
         </section>
@@ -183,19 +235,30 @@ export const PostConstructor = () => {
             onTextColorChange={set('coverTextColor')}
             previewTitle={form.title}
             previewAuthor={form.author}
+            previewImage={form.image}
           />
         </section>
 
+        {mutation.isError && (
+          <p role="alert" className={styles.subtitle}>
+            Could not add the book. Please check the fields and try again.
+          </p>
+        )}
         <div className={styles.actions}>
           <Button
             type="button"
             variant="ghost"
-            onClick={() => setForm(INITIAL)}
+            onClick={() => setForm(makeInitial())}
           >
             Reset
           </Button>
-          <Button type="submit" variant="primary" size="lg">
-            Create Post
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            loading={mutation.isPending}
+          >
+            Publish
           </Button>
         </div>
       </form>

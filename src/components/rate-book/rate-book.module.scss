@@ -1,0 +1,41 @@
+@use '../../styles/variables' as *;
+
+.rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.label {
+  font-size: 13px;
+  color: $color-text-secondary;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.on {
+  color: $color-primary;
+}
+
+.off {
+  color: #d8d8d8;
+}
+
+.value {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text;
+}

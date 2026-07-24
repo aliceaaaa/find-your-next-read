@@ -1,5 +1,5 @@
 import { Book } from 'types';
-import { ApiBook, apiGetBook, apiGetBooks } from './client';
+import { ApiBook, BooksQuery, apiGetBook, apiGetBooks } from './client';
 
 const descriptionToString = (desc: ApiBook['description']): string => {
   if (!desc) return '';
@@ -40,6 +40,7 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   author: apiBook.author,
   coverColor: apiBook.cover_color,
   coverTextColor: apiBook.cover_text_color,
+  coverImage: apiBook.cover_image ?? null,
   categories: apiBook.categories ?? [],
   description: descriptionToString(apiBook.description),
   published: apiBook.published ? new Date(apiBook.published).getFullYear() : 0,
@@ -47,23 +48,52 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   language: languageToName(apiBook.language ?? ''),
   rating: 0,
   reviewCount: 0,
+  ratingAvg: apiBook.rating_avg,
+  ratingsCount: apiBook.ratings_count ?? 0,
   isBookmarked: false,
 });
 
-export const fetchBooks = async (): Promise<Book[]> => {
+export const fetchBooks = async (search?: string): Promise<Book[]> => {
   const allBooks: Book[] = [];
   let page = 1;
 
   while (true) {
-    const res = await apiGetBooks(page);
+    const res = await apiGetBooks(page, { search });
     allBooks.push(...res.data.map(mapApiBook));
 
-    if (res.current_page >= res.last_page) break;
+    if (res.current_page >= res.last_page) {
+      break;
+    }
+
     page++;
   }
 
   return allBooks;
 };
+
+export type BookPage = {
+  books: Book[];
+  page: number;
+  lastPage: number;
+  total: number;
+};
+
+export const fetchBookPage = async (
+  page = 1,
+  query: BooksQuery = {},
+): Promise<BookPage> => {
+  const res = await apiGetBooks(page, query);
+
+  return {
+    books: res.data.map(mapApiBook),
+    page: res.current_page,
+    lastPage: res.last_page,
+    total: res.total,
+  };
+};
+
+export const searchBooks = (query: string, page = 1): Promise<BookPage> =>
+  fetchBookPage(page, { search: query });
 
 export const fetchBook = async (id: number): Promise<Book> => {
   const apiBook = await apiGetBook(id);

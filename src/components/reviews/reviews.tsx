@@ -15,10 +15,12 @@ export const Reviews = ({
 }: ReviewsProps) => (
   <div className={styles.reviews}>
     {reviews.map((review) => {
-      const isLong = review.text.length > 140;
+      const isLong = review.text.length > 1000;
       const isExpanded = expandedReviews.has(review.id);
       const displayText =
-        isLong && !isExpanded ? review.text.slice(0, 140) + '...' : review.text;
+        isLong && !isExpanded
+          ? review.text.slice(0, 1000) + '...'
+          : review.text;
 
       return (
         <div key={review.id} className={styles.reviewCard}>
@@ -28,7 +30,7 @@ export const Reviews = ({
               <span className={styles.reviewAuthor}>{review.authorName}</span>
               <span className={styles.reviewDate}>{review.date}</span>
             </div>
-            <StarRating rating={review.rating} size={13} />
+            <StarRating rating={review.rating} outOf={10} size={13} />
           </div>
           <p className={styles.reviewText}>{displayText}</p>
           {isLong && (

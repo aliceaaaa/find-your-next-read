@@ -15,6 +15,7 @@ type CoverConstructorProps = {
   coverTextColor: string;
   previewTitle?: string;
   previewAuthor?: string;
+  previewImage?: string;
   onCoverColorChange: (color: string) => void;
   onTextColorChange: (color: string) => void;
 };
@@ -24,6 +25,7 @@ export const CoverConstructor = ({
   coverTextColor,
   previewTitle,
   previewAuthor,
+  previewImage,
   onCoverColorChange,
   onTextColorChange,
 }: CoverConstructorProps) => {
@@ -31,6 +33,7 @@ export const CoverConstructor = ({
     ...PREVIEW_BASE,
     coverColor,
     coverTextColor,
+    coverImage: previewImage || null,
     title: previewTitle || 'Book Title',
     author: previewAuthor || 'Author Name',
   };
