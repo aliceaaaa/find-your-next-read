@@ -13,6 +13,18 @@ type FormFieldProps = {
   onChange: (value: string) => void;
 };
 
+const describedById = (id: string, error?: string, hint?: string) => {
+  if (error) {
+    return `${id}-error`;
+  }
+
+  if (hint) {
+    return `${id}-hint`;
+  }
+
+  return undefined;
+};
+
 export const FormField = ({
   error,
   hint,
@@ -43,7 +55,7 @@ export const FormField = ({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       aria-required={required}
-      aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+      aria-describedby={describedById(id, error, hint)}
       aria-invalid={error ? true : undefined}
     />
     {error && (

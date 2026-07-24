@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { NavItemId } from 'types';
 import { Menu } from '../menu';
 import { SearchBar } from '../search-bar';
@@ -22,24 +23,42 @@ export const Page = ({
   onSearch,
   rightPanel,
   children,
-}: PageProps) => (
-  <>
-    <div className={styles.page}>
-      <Menu activeNav={activeNav} isAdmin={isAdmin} onNavChange={onNavChange} />
-      <div className={styles.content}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>
-            Find your next <em>read</em>
-          </h1>
-          <SearchBar onSearch={onSearch} className={styles.search} />
-        </header>
-        <div className={styles.body}>
-          <main className={styles.main}> {children}</main>
-          {rightPanel && <aside className={styles.aside}> {rightPanel}</aside>}
+}: PageProps) => {
+  const location = useLocation();
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    if (content && typeof content.scrollTo === 'function') {
+      content.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
+
+  return (
+    <>
+      <div className={styles.page}>
+        <Menu
+          activeNav={activeNav}
+          isAdmin={isAdmin}
+          onNavChange={onNavChange}
+        />
+        <div className={styles.content} ref={contentRef}>
+          <header className={styles.header}>
+            <h1 className={styles.title}>
+              Find your next <em>read</em>
+            </h1>
+            <SearchBar onSearch={onSearch} className={styles.search} />
+          </header>
+          <div className={styles.body}>
+            <main className={styles.main}> {children}</main>
+            {rightPanel && (
+              <aside className={styles.aside}> {rightPanel}</aside>
+            )}
+          </div>
+          <Footer />
         </div>
-        <Footer />
       </div>
-    </div>
-    <CookieBanner />
-  </>
-);
+      <CookieBanner />
+    </>
+  );
+};

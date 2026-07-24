@@ -33,6 +33,41 @@ export const BookShelf = ({
   onBookSelect,
   onViewAll,
 }: BookShelfProps) => {
+  const defaultSkeletonCount = cardType === 'mini' ? 6 : 4;
+  const loaderCount = skeletonCount ?? defaultSkeletonCount;
+
+  const renderList = () => {
+    if (isLoading) {
+      return <Loader cardType={cardType} count={loaderCount} />;
+    }
+
+    if (books.length === 0) {
+      return (
+        <EmptyState
+          className={styles.empty}
+          icon="📖"
+          title={emptyTitle}
+          subtitle={emptySubtitle}
+        />
+      );
+    }
+
+    if (cardType === 'full') {
+      return books.map((book) => (
+        <Card
+          key={book.id}
+          book={book}
+          onSelect={onBookSelect}
+          onBookmark={onBookmark || (() => {})}
+        />
+      ));
+    }
+
+    return books.map((book) => (
+      <MiniCard key={book.id} book={book} onSelect={onBookSelect} />
+    ));
+  };
+
   return (
     <div className={styles.shelf}>
       {title && (
@@ -45,34 +80,7 @@ export const BookShelf = ({
           )}
         </div>
       )}
-      <div className={styles.list}>
-        {isLoading ? (
-          <Loader
-            cardType={cardType}
-            count={skeletonCount ?? (cardType === 'mini' ? 6 : 4)}
-          />
-        ) : books.length === 0 ? (
-          <EmptyState
-            className={styles.empty}
-            icon="📖"
-            title={emptyTitle}
-            subtitle={emptySubtitle}
-          />
-        ) : cardType === 'full' ? (
-          books.map((book) => (
-            <Card
-              key={book.id}
-              book={book}
-              onSelect={onBookSelect}
-              onBookmark={onBookmark || (() => {})}
-            />
-          ))
-        ) : (
-          books.map((book) => (
-            <MiniCard key={book.id} book={book} onSelect={onBookSelect} />
-          ))
-        )}
-      </div>
+      <div className={styles.list}>{renderList()}</div>
     </div>
   );
 };

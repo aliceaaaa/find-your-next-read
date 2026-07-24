@@ -40,6 +40,61 @@ export const SearchResults = ({
 
   const isInitialLoading = isFetching && !isFetchingNextPage;
 
+  const emptySubtitle = query
+    ? `We couldn't find anything for “${query}”. Try another title, author, or genre.`
+    : 'Type something in the search bar to find your next read.';
+
+  const renderResults = () => {
+    if (isInitialLoading) {
+      return (
+        <div className={styles.grid}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      );
+    }
+
+    if (results.length === 0) {
+      return (
+        <EmptyState
+          className={styles.empty}
+          icon="🔍"
+          title="No matching books"
+          subtitle={emptySubtitle}
+        />
+      );
+    }
+
+    return (
+      <>
+        <div className={styles.grid}>
+          {results.map((book) => (
+            <Card
+              key={book.id}
+              book={book}
+              onSelect={onBookSelect}
+              onBookmark={onBookmark}
+            />
+          ))}
+        </div>
+
+        {hasNextPage && (
+          <div className={styles.loadMore}>
+            <Button
+              variant="secondary"
+              onClick={() => fetchNextPage()}
+              loading={isFetchingNextPage}
+              disabled={isFetchingNextPage}
+            >
+              Load more
+            </Button>
+          </div>
+        )}
+      </>
+    );
+  };
+
   return (
     <div className={styles.results}>
       <h2 className={styles.heading}>
@@ -49,50 +104,7 @@ export const SearchResults = ({
         )}
       </h2>
 
-      {isInitialLoading ? (
-        <div className={styles.grid}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      ) : results.length === 0 ? (
-        <EmptyState
-          className={styles.empty}
-          icon="🔍"
-          title="No matching books"
-          subtitle={
-            query
-              ? `We couldn't find anything for “${query}”. Try another title, author, or genre.`
-              : 'Type something in the search bar to find your next read.'
-          }
-        />
-      ) : (
-        <>
-          <div className={styles.grid}>
-            {results.map((book) => (
-              <Card
-                key={book.id}
-                book={book}
-                onSelect={onBookSelect}
-                onBookmark={onBookmark}
-              />
-            ))}
-          </div>
-
-          {hasNextPage && (
-            <div className={styles.loadMore}>
-              <Button
-                variant="secondary"
-                onClick={() => fetchNextPage()}
-                loading={isFetchingNextPage}
-                disabled={isFetchingNextPage}
-              >
-                Load more
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+      {renderResults()}
     </div>
   );
 };

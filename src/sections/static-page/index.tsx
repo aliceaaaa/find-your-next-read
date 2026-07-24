@@ -7,7 +7,7 @@ type StaticContent = {
   body: string[];
 };
 
-// Заглушки. Реальные юридические тексты подставим позже.
+// Заглушки
 const PAGES: Record<string, StaticContent> = {
   about: {
     title: 'About',

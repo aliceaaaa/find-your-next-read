@@ -14,24 +14,51 @@
 
 .stars {
   display: inline-flex;
-  gap: 2px;
+  gap: 3px;
 }
 
 .star {
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  font-size: 20px;
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  font-size: 22px;
   line-height: 1;
 }
 
-.on {
+.starBg {
+  display: block;
+  color: #d8d8d8;
+}
+
+.starFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  white-space: nowrap;
   color: $color-primary;
 }
 
-.off {
-  color: #d8d8d8;
+.hitLeft,
+.hitRight {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hitLeft {
+  left: 0;
+}
+
+.hitRight {
+  right: 0;
 }
 
 .value {

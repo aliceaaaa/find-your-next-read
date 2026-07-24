@@ -41,11 +41,17 @@ export const Select = ({
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const selectedValues = Array.isArray(value)
-    ? value
-    : value !== null
-      ? [value]
-      : [];
+  const toSelectedValues = () => {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    if (value !== null) {
+      return [value];
+    }
+    return [];
+  };
+
+  const selectedValues = toSelectedValues();
 
   const filtered = query.trim()
     ? options.filter(

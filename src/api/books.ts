@@ -1,34 +1,80 @@
 import { Book } from 'types';
 import { ApiBook, BooksQuery, apiGetBook, apiGetBooks } from './client';
 
+type RichTextNode = {
+  type?: string;
+  text?: string;
+};
+
+type RichTextBlock = {
+  content?: RichTextNode[];
+};
+
+type RichTextDescription = {
+  content?: RichTextBlock[];
+};
+
+const createLanguageNames = (): Intl.DisplayNames | null => {
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'language' });
+  } catch {
+    return null;
+  }
+};
+
+const languageNames = createLanguageNames();
+
 const descriptionToString = (desc: ApiBook['description']): string => {
-  if (!desc) return '';
-  if (typeof desc === 'string') return desc;
-
-  const localized =
-    (desc as Record<string, unknown>).en ??
-    Object.values(desc).find((value) => typeof value === 'string');
-
-  if (typeof localized === 'string') return localized;
-
-  const content = (desc as any)?.content;
-
-  if (Array.isArray(content)) {
-    return content
-      .flatMap((block: any) => block?.content ?? [])
-      .filter((node: any) => node?.type === 'text')
-      .map((node: any) => node.text)
-      .join(' ');
+  if (!desc) {
+    return '';
   }
 
-  return '';
+  if (typeof desc === 'string') {
+    return desc;
+  }
+
+  if ('en' in desc && typeof desc.en === 'string') {
+    return desc.en;
+  }
+
+  const firstString = Object.values(desc).find(
+    (value) => typeof value === 'string',
+  );
+
+  if (typeof firstString === 'string') {
+    return firstString;
+  }
+
+  const content = (desc as RichTextDescription).content;
+
+  if (!Array.isArray(content)) {
+    return '';
+  }
+
+  const text: string[] = [];
+
+  for (const block of content) {
+    for (const node of block.content ?? []) {
+      if (node.type === 'text' && typeof node.text === 'string') {
+        text.push(node.text);
+      }
+    }
+  }
+
+  return text.join(' ');
 };
 
 const languageToName = (code: string): string => {
-  if (!code) return '';
+  if (!code) {
+    return '';
+  }
+
+  if (!languageNames) {
+    return code;
+  }
 
   try {
-    return new Intl.DisplayNames(['en'], { type: 'language' }).of(code) ?? code;
+    return languageNames.of(code) ?? code;
   } catch {
     return code;
   }
@@ -59,6 +105,7 @@ export const fetchBooks = async (search?: string): Promise<Book[]> => {
 
   while (true) {
     const res = await apiGetBooks(page, { search });
+
     allBooks.push(...res.data.map(mapApiBook));
 
     if (res.current_page >= res.last_page) {
@@ -92,10 +139,12 @@ export const fetchBookPage = async (
   };
 };
 
-export const searchBooks = (query: string, page = 1): Promise<BookPage> =>
-  fetchBookPage(page, { search: query });
+export const searchBooks = (query: string, page = 1): Promise<BookPage> => {
+  return fetchBookPage(page, { search: query });
+};
 
 export const fetchBook = async (id: number): Promise<Book> => {
   const apiBook = await apiGetBook(id);
+
   return mapApiBook(apiBook);
 };

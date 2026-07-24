@@ -48,6 +48,18 @@ const StarIcon = ({ fill, size, id }: IconProps) => {
   );
 };
 
+const starFill = (index: number, stars: number): 'full' | 'half' | 'empty' => {
+  if (index <= Math.floor(stars)) {
+    return 'full';
+  }
+
+  if (index - 0.5 <= stars) {
+    return 'half';
+  }
+
+  return 'empty';
+};
+
 export const StarRating = ({
   rating,
   size = 16,
@@ -66,11 +78,11 @@ export const StarRating = ({
       }}
     >
       {[1, 2, 3, 4, 5].map((i) => {
-        const fill =
-          i <= Math.floor(stars) ? 'full' : i - 0.5 <= stars ? 'half' : 'empty';
         const id = `star-${i}-${stars}`;
 
-        return <StarIcon key={i} id={id} fill={fill} size={size} />;
+        return (
+          <StarIcon key={i} id={id} fill={starFill(i, stars)} size={size} />
+        );
       })}
     </span>
   );

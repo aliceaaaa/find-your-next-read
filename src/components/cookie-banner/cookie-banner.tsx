@@ -5,8 +5,6 @@ import styles from './cookie-banner.module.scss';
 
 const CONSENT_KEY = 'cookie_consent';
 
-// NOTE: заготовка. Пока просто запоминает выбор в localStorage и прячет баннер.
-// Реальную логику согласия (категории cookie, интеграция с аналитикой) добавим позже.
 export const CookieBanner = () => {
   const [visible, setVisible] = useState(
     () => !localStorage.getItem(CONSENT_KEY),

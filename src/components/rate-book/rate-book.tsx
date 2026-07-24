@@ -6,11 +6,27 @@ type RateBookProps = {
   bookId: number;
 };
 
+const fillPercent = (star: number, stars: number): number => {
+  if (stars >= star) {
+    return 100;
+  }
+  if (stars >= star - 0.5) {
+    return 50;
+  }
+  return 0;
+};
+
 export const RateBook = ({ bookId }: RateBookProps) => {
   const { rating, setRating } = useBookRating(bookId);
   const [hover, setHover] = useState<number | null>(null);
 
-  const activeStars = hover ?? (rating != null ? rating / 2 : 0);
+  let currentRating = 0;
+  if (rating != null) {
+    currentRating = rating;
+  }
+
+  const activeRating = hover ?? currentRating;
+  const activeStars = activeRating / 2;
 
   return (
     <div className={styles.rate}>
@@ -22,20 +38,29 @@ export const RateBook = ({ bookId }: RateBookProps) => {
         aria-label="Rate this book"
       >
         {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            className={styles.star}
-            aria-label={`${star} of 5`}
-            aria-checked={rating != null && rating / 2 === star}
-            role="radio"
-            onMouseEnter={() => setHover(star)}
-            onClick={() => setRating(star * 2)}
-          >
-            <span className={star <= activeStars ? styles.on : styles.off}>
+          <span key={star} className={styles.star}>
+            <span className={styles.starBg}>★</span>
+            <span
+              className={styles.starFill}
+              style={{ width: `${fillPercent(star, activeStars)}%` }}
+            >
               ★
             </span>
-          </button>
+            <button
+              type="button"
+              className={styles.hitLeft}
+              aria-label={`${star * 2 - 1} of 10`}
+              onMouseEnter={() => setHover(star * 2 - 1)}
+              onClick={() => setRating(star * 2 - 1)}
+            />
+            <button
+              type="button"
+              className={styles.hitRight}
+              aria-label={`${star * 2} of 10`}
+              onMouseEnter={() => setHover(star * 2)}
+              onClick={() => setRating(star * 2)}
+            />
+          </span>
         ))}
       </div>
       {rating != null && <span className={styles.value}>{rating}/10</span>}

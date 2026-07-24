@@ -61,13 +61,11 @@ export const PostConstructor = () => {
   const handleCategoriesChange = (
     value: SelectOption['value'] | SelectOption['value'][] | null,
   ) => {
-    let next: string[];
+    let next: string[] = [];
 
     if (Array.isArray(value)) {
       next = value.map(String);
-    }
-
-    if (value != null) {
+    } else if (value != null) {
       next = [String(value)];
     }
 

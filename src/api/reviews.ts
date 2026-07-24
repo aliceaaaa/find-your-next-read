@@ -32,7 +32,9 @@ export const fetchReviews = async (): Promise<Review[]> => {
     const res = await apiGetReviews(page);
     allReviews.push(...res.data.map(mapApiReview));
 
-    if (res.current_page >= res.last_page) break;
+    if (res.current_page >= res.last_page) {
+      break;
+    }
     page++;
   }
 

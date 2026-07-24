@@ -130,7 +130,9 @@ export const AppContent = () => {
           target.tagName === 'SELECT' ||
           target.isContentEditable);
 
-      if (isTypingTarget) return;
+      if (isTypingTarget) {
+        return;
+      }
 
       const isShiftL = event.shiftKey && event.key.toLowerCase() === 'l';
       const hasModifier = event.metaKey || event.ctrlKey;
@@ -147,6 +149,28 @@ export const AppContent = () => {
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [navigate]);
+
+  const renderBookSummary = () => {
+    if (summaryBook) {
+      return (
+        <Summary
+          book={summaryBook}
+          reviews={reviews}
+          nextBooks={getNextBooks(allBooks, summaryBook)}
+          onBack={handleSummaryBack}
+          onBookmark={handleBookmark}
+          onBookSelect={handleBookSelect}
+          onCategorySelect={handleCategorySelect}
+        />
+      );
+    }
+
+    if (isLoading) {
+      return null;
+    }
+
+    return <Navigate to="/library" replace />;
+  };
 
   return (
     <Page
@@ -214,21 +238,7 @@ export const AppContent = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/books/:bookId/summary"
-          element={
-            summaryBook ? (
-              <Summary
-                book={summaryBook}
-                reviews={reviews}
-                nextBooks={getNextBooks(allBooks, summaryBook)}
-                onBack={handleSummaryBack}
-                onBookmark={handleBookmark}
-                onBookSelect={handleBookSelect}
-                onCategorySelect={handleCategorySelect}
-              />
-            ) : isLoading ? null : (
-              <Navigate to="/library" replace />
-            )
-          }
+          element={renderBookSummary()}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

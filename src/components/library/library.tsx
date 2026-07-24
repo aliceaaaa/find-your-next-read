@@ -29,6 +29,46 @@ export const Library = ({
       ? books
       : books.filter((b) => b.categories.includes(activeCategory));
 
+  const emptySubtitle =
+    activeCategory === 'All'
+      ? 'Books will appear here once they are added to the library.'
+      : `No books in the "${activeCategory}" category yet.`;
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className={styles.grid}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      );
+    }
+
+    if (filtered.length === 0) {
+      return (
+        <EmptyState
+          className={styles.empty}
+          title="No books here yet"
+          subtitle={emptySubtitle}
+        />
+      );
+    }
+
+    return (
+      <div className={styles.grid}>
+        {filtered.map((book) => (
+          <Card
+            key={book.id}
+            book={book}
+            onSelect={onBookSelect}
+            onBookmark={onBookmark}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.library}>
       <CategoryFilter
@@ -37,34 +77,7 @@ export const Library = ({
         onChange={onCategoryChange}
       />
 
-      {isLoading ? (
-        <div className={styles.grid}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          className={styles.empty}
-          title="No books here yet"
-          subtitle={
-            activeCategory === 'All'
-              ? 'Books will appear here once they are added to the library.'
-              : `No books in the "${activeCategory}" category yet.`
-          }
-        />
-      ) : (
-        <div className={styles.grid}>
-          {filtered.map((book) => (
-            <Card
-              key={book.id}
-              book={book}
-              onSelect={onBookSelect}
-              onBookmark={onBookmark}
-            />
-          ))}
-        </div>
-      )}
+      {renderContent()}
     </div>
   );
 };
