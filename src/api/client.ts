@@ -37,7 +37,7 @@ export type ApiBook = {
   author: string;
   cover_color: string;
   cover_text_color: string;
-  categories: string[] | null;
+  categories: ApiBookCategory[] | null;
   description: string | Record<string, unknown> | null;
   published: string | null;
   pages: number | null;
@@ -115,6 +115,15 @@ export const apiGetBooks = (
 
 export const apiGetBook = (id: number): Promise<ApiBook> =>
   request<ApiBook>(`/books/${id}`);
+
+export type ApiBookCategory = {
+  id: number;
+  name: string;
+  books_count?: number;
+  created_at?: string;
+  updated_at?: string;
+  pivot?: { book_id: number; category_id: number };
+};
 
 export type ApiCategory = {
   id: number;

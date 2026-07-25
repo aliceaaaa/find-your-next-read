@@ -87,7 +87,9 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   coverColor: apiBook.cover_color,
   coverTextColor: apiBook.cover_text_color,
   coverImage: apiBook.cover_image ?? null,
-  categories: apiBook.categories ?? [],
+  categories: (apiBook.categories ?? []).map((c) =>
+    typeof c === 'string' ? c : c.name,
+  ),
   description: descriptionToString(apiBook.description),
   published: apiBook.published ? new Date(apiBook.published).getFullYear() : 0,
   pages: apiBook.pages ?? 0,
