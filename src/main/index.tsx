@@ -58,7 +58,12 @@ export const AppContent = () => {
     useBooksStats(apiBooks, reviews, bookmarks);
 
   const { data: apiCategories = [] } = useCategories();
-  const categories = ['All', ...apiCategories.map((c) => c.name)];
+  const categories = [
+    'All',
+    ...apiCategories
+      .filter((c) => c.booksCount > 0)
+      .map((c) => c.name),
+  ];
 
   const handleBookmark = (id: number) => {
     setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
