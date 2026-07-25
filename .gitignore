@@ -26,3 +26,7 @@ yarn-error.log*
 storybook-static
 
 .claude
+
+# IDE
+.idea
+*.iml
