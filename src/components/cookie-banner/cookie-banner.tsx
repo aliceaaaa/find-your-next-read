@@ -6,6 +6,7 @@ import {
   ConsentSource,
   getConsent,
   setConsent,
+  subscribeConsent,
   subscribeConsentSettings,
 } from '../../lib';
 import styles from './cookie-banner.module.scss';
@@ -26,6 +27,15 @@ export const CookieBanner = () => {
         setSource('banner_reopen');
         setIsDetailed(true);
         setIsOpen(true);
+      }),
+    [],
+  );
+
+  useEffect(
+    () =>
+      subscribeConsent(() => {
+        setIsOpen(false);
+        setIsDetailed(false);
       }),
     [],
   );

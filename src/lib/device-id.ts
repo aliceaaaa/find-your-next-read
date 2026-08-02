@@ -1,5 +1,8 @@
 const DEVICE_ID_KEY = 'device_id';
 
+export const readDeviceId = (): string | null =>
+  localStorage.getItem(DEVICE_ID_KEY);
+
 export const getDeviceId = (): string => {
   let id = localStorage.getItem(DEVICE_ID_KEY);
 

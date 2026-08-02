@@ -1,10 +1,19 @@
-import { ConsentCategory, apiStoreConsent, apiWithdrawConsent } from 'api';
-import { getDeviceId } from './device-id';
+import {
+  ConsentCategory,
+  apiGetConsent,
+  apiStoreConsent,
+  apiWithdrawConsent,
+} from 'api';
+import { getDeviceId, readDeviceId } from './device-id';
 
 const STORAGE_KEY = 'cookie_consent';
 const CONSENT_VERSION = 1;
-const CONSENT_POLICY_VERSION = '1.0';
+const CONSENT_TTL_MS = 1000 * 60 * 60 * 24 * 365;
+const CONSENT_POLICY_VERSION =
+  process.env.REACT_APP_CONSENT_VERSION ?? '2026-08-01-v1';
 const GA_MEASUREMENT_ID = process.env.REACT_APP_GA_MEASUREMENT_ID ?? '';
+const CONSENT_VENDORS = ['google-analytics'];
+const CONSENT_PURPOSE = 'webanalytics';
 
 export type ConsentSource = 'banner_first' | 'banner_reopen' | 'settings_page';
 
@@ -109,6 +118,12 @@ export const getConsent = (): StoredConsent | null => {
       return null;
     }
 
+    const age = Date.now() - new Date(parsed.updatedAt ?? '').getTime();
+
+    if (!Number.isFinite(age) || age > CONSENT_TTL_MS) {
+      return null;
+    }
+
     return parsed as StoredConsent;
   } catch {
     return null;
@@ -154,22 +169,17 @@ const logConsent = (
     categories,
     consent_version: CONSENT_POLICY_VERSION,
     source,
-    vendors: choice.analytics ? ['google_analytics'] : null,
-    purpose: 'cookie_banner',
+    vendors: choice.analytics ? CONSENT_VENDORS : null,
+    purpose: CONSENT_PURPOSE,
   }).catch(() => {});
 };
 
-export const setConsent = (
-  choice: ConsentChoice,
-  source: ConsentSource = 'banner_first',
-): StoredConsent => {
-  const hadConsent = getConsent() !== null;
-
+const storeConsent = (choice: ConsentChoice, updatedAt: string) => {
   const record: StoredConsent = {
     analytics: choice.analytics,
     marketing: choice.marketing,
     version: CONSENT_VERSION,
-    updatedAt: new Date().toISOString(),
+    updatedAt,
   };
 
   try {
@@ -177,8 +187,19 @@ export const setConsent = (
   } catch {}
 
   applyConsent(record);
-  logConsent(record, source, hadConsent);
   consentListeners.forEach((listener) => listener(record));
+
+  return record;
+};
+
+export const setConsent = (
+  choice: ConsentChoice,
+  source: ConsentSource = 'banner_first',
+): StoredConsent => {
+  const hadConsent = getConsent() !== null;
+  const record = storeConsent(choice, new Date().toISOString());
+
+  logConsent(record, source, hadConsent);
 
   return record;
 };
@@ -201,6 +222,32 @@ export const subscribeConsentSettings = (listener: () => void) => {
   return () => {
     settingsListeners.delete(listener);
   };
+};
+
+const syncConsentFromServer = () => {
+  const subjectId = readDeviceId();
+
+  if (!subjectId) {
+    return;
+  }
+
+  apiGetConsent(subjectId)
+    .then(({ data }) => {
+      if (getConsent()) {
+        return;
+      }
+
+      const categories = data.categories ?? [];
+
+      storeConsent(
+        {
+          analytics: categories.includes('statistics'),
+          marketing: categories.includes('marketing'),
+        },
+        data.created_at ?? new Date().toISOString(),
+      );
+    })
+    .catch(() => {});
 };
 
 export const initConsent = () => {
@@ -227,5 +274,8 @@ export const initConsent = () => {
 
   if (stored) {
     applyConsent(stored);
+    return;
   }
+
+  syncConsentFromServer();
 };

@@ -7,7 +7,7 @@ export type Category = {
 
 const mapApiCategory = (c: ApiCategory): Category => ({
   name: c.name,
-  booksCount: c.books_count,
+  booksCount: c.books_count ?? 0,
 });
 
 export const fetchCategories = async (): Promise<Category[]> => {

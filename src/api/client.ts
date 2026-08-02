@@ -1,4 +1,5 @@
-const BASE_URL = 'https://api.findyournextread.com/api';
+const BASE_URL =
+  process.env.REACT_APP_API_BASE ?? 'https://api.findyournextread.com/api';
 const TOKEN_KEY = 'auth_token';
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
@@ -258,6 +259,11 @@ export const apiStoreConsent = (
     body: JSON.stringify(payload),
     keepalive: true,
   });
+
+export const apiGetConsent = (
+  subjectId: string,
+): Promise<{ data: ApiConsent }> =>
+  request<{ data: ApiConsent }>(`/consent/${encodeURIComponent(subjectId)}`);
 
 export const apiWithdrawConsent = (
   subjectId: string,
