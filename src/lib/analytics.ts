@@ -1,3 +1,4 @@
+import { hasAnalyticsConsent } from './consent';
 import { getDeviceId } from './device-id';
 
 const ANALYTICS_ENDPOINT = process.env.REACT_APP_ANALYTICS_ENDPOINT ?? '';
@@ -5,6 +6,10 @@ const ANALYTICS_ENDPOINT = process.env.REACT_APP_ANALYTICS_ENDPOINT ?? '';
 type EventProps = Record<string, unknown>;
 
 const send = (name: string, props?: EventProps) => {
+  if (!hasAnalyticsConsent()) {
+    return;
+  }
+
   const event = {
     name,
     props: props ?? {},

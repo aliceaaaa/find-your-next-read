@@ -60,9 +60,7 @@ export const AppContent = () => {
   const { data: apiCategories = [] } = useCategories();
   const categories = [
     'All',
-    ...apiCategories
-      .filter((c) => c.booksCount > 0)
-      .map((c) => c.name),
+    ...apiCategories.filter((c) => c.booksCount > 0).map((c) => c.name),
   ];
 
   const handleBookmark = (id: number) => {
@@ -241,10 +239,7 @@ export const AppContent = () => {
         />
         <Route path="/pages/:slug" element={<StaticPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/books/:bookId/summary"
-          element={renderBookSummary()}
-        />
+        <Route path="/books/:bookId/summary" element={renderBookSummary()} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Page>

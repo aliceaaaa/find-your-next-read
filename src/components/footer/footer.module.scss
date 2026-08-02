@@ -15,6 +15,7 @@
 
   @media (max-width: 768px) {
     padding: 12px 16px;
+    margin-bottom: calc(#{$mobile-nav-height} + env(safe-area-inset-bottom));
     justify-content: center;
     text-align: center;
   }
@@ -29,6 +30,20 @@
 .link {
   color: $color-text-secondary;
   text-decoration: none;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.link-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  font-family: $font-base;
+  color: $color-text-secondary;
+  cursor: pointer;
 
   &:hover {
     color: $color-primary;

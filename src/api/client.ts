@@ -28,6 +28,10 @@ const request = async <T>(
     throw new Error(`API error ${res.status}: ${res.statusText}`);
   }
 
+  if (res.status === 204 || res.headers.get('content-length') === '0') {
+    return undefined as T;
+  }
+
   return res.json();
 };
 
@@ -37,7 +41,7 @@ export type ApiBook = {
   author: string;
   cover_color: string;
   cover_text_color: string;
-  categories: ApiBookCategory[] | null;
+  categories: (string | ApiCategory)[] | null;
   description: string | Record<string, unknown> | null;
   published: string | null;
   pages: number | null;
@@ -48,7 +52,7 @@ export type ApiBook = {
   updated_at: string;
   ratings_sum: number | null;
   ratings_count: number | null;
-  rating_avg: number | null;
+  rating_avg: number | string | null;
 };
 
 export type ApiPaginatedResponse<T> = {
@@ -128,7 +132,7 @@ export type ApiBookCategory = {
 export type ApiCategory = {
   id: number;
   name: string;
-  books_count: number;
+  books_count?: number;
   created_at: string;
   updated_at: string;
 };
@@ -220,6 +224,50 @@ export const apiRemoveNextBook = (
   nextBookId: number,
 ): Promise<unknown> =>
   request(`/books/${id}/next-books/${nextBookId}`, { method: 'DELETE' });
+
+export type ConsentCategory = 'necessary' | 'statistics' | 'marketing';
+
+export type StoreConsentPayload = {
+  subject_id: string;
+  action: 'granted' | 'withdrawn' | 'updated';
+  categories: ConsentCategory[];
+  consent_version: string;
+  source?: 'banner_first' | 'banner_reopen' | 'settings_page';
+  vendors?: string[] | null;
+  purpose?: string | null;
+};
+
+export type ApiConsent = {
+  consent_id: string;
+  subject_id: string;
+  action: string;
+  categories: ConsentCategory[];
+  vendors: string[] | null;
+  purpose: string | null;
+  consent_version: string;
+  source: string | null;
+  expires_at: string;
+  created_at: string | null;
+};
+
+export const apiStoreConsent = (
+  payload: StoreConsentPayload,
+): Promise<{ data: ApiConsent }> =>
+  request<{ data: ApiConsent }>('/consent', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    keepalive: true,
+  });
+
+export const apiWithdrawConsent = (
+  subjectId: string,
+  reason?: string,
+): Promise<unknown> =>
+  request('/consent/withdraw', {
+    method: 'POST',
+    body: JSON.stringify({ subject_id: subjectId, reason }),
+    keepalive: true,
+  });
 
 export const apiTrackImpression = (id: number): Promise<unknown> =>
   request(`/events/impressions/${id}`, { method: 'POST' });

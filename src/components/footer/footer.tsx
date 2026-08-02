@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { openConsentSettings } from '../../lib';
 import styles from './footer.module.scss';
 
 const LINKS = [
@@ -19,6 +20,13 @@ export const Footer = () => (
           {link.label}
         </Link>
       ))}
+      <button
+        type="button"
+        className={styles['link-button']}
+        onClick={openConsentSettings}
+      >
+        Cookie settings
+      </button>
     </nav>
   </footer>
 );

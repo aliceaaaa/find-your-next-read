@@ -24,6 +24,7 @@ export const ReviewForm = ({ bookId }: ReviewFormProps) => {
         text: text.trim(),
         rating,
         book_id: bookId,
+        language: 'en',
       }),
     onSuccess: () => {
       track('add_review', { bookId, rating });

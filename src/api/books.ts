@@ -1,5 +1,11 @@
 import { Book } from 'types';
-import { ApiBook, BooksQuery, apiGetBook, apiGetBooks } from './client';
+import {
+  ApiBook,
+  ApiCategory,
+  BooksQuery,
+  apiGetBook,
+  apiGetBooks,
+} from './client';
 
 type RichTextNode = {
   type?: string;
@@ -80,6 +86,19 @@ const languageToName = (code: string): string => {
   }
 };
 
+const categoryToName = (category: string | ApiCategory): string =>
+  typeof category === 'string' ? category : category.name;
+
+const toRatingAvg = (value: ApiBook['rating_avg']): number | null => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 export const mapApiBook = (apiBook: ApiBook): Book => ({
   id: apiBook.id,
   title: apiBook.title,
@@ -87,16 +106,14 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   coverColor: apiBook.cover_color,
   coverTextColor: apiBook.cover_text_color,
   coverImage: apiBook.cover_image ?? null,
-  categories: (apiBook.categories ?? []).map((c) =>
-    typeof c === 'string' ? c : c.name,
-  ),
+  categories: (apiBook.categories ?? []).map(categoryToName),
   description: descriptionToString(apiBook.description),
   published: apiBook.published ? new Date(apiBook.published).getFullYear() : 0,
   pages: apiBook.pages ?? 0,
   language: languageToName(apiBook.language ?? ''),
   rating: 0,
   reviewCount: 0,
-  ratingAvg: apiBook.rating_avg,
+  ratingAvg: toRatingAvg(apiBook.rating_avg),
   ratingsCount: apiBook.ratings_count ?? 0,
   isBookmarked: false,
 });
