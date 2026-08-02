@@ -60,10 +60,16 @@ const loadGoogleAnalytics = () => {
   document.head.appendChild(script);
 
   gtag('js', new Date());
-  gtag('config', GA_MEASUREMENT_ID, { anonymize_ip: true });
+  gtag('config', GA_MEASUREMENT_ID, {
+    anonymize_ip: true,
+    allow_google_signals: false,
+    allow_ad_personalization_signals: false,
+  });
 };
 
 const clearAnalyticsCookies = () => {
+  isGaRequested = false;
+
   const host = window.location.hostname.replace(/^www\./, '');
 
   document.cookie.split(';').forEach((entry) => {
@@ -234,6 +240,20 @@ const syncConsentFromServer = () => {
   apiGetConsent(subjectId)
     .then(({ data }) => {
       if (getConsent()) {
+        return;
+      }
+
+      if (data.action === 'withdrawn') {
+        return;
+      }
+
+      if (data.consent_version !== CONSENT_POLICY_VERSION) {
+        return;
+      }
+
+      const expiresAt = new Date(data.expires_at).getTime();
+
+      if (Number.isFinite(expiresAt) && expiresAt < Date.now()) {
         return;
       }
 
