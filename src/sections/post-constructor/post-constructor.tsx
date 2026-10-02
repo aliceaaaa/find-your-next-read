@@ -22,6 +22,7 @@ type FormState = {
   published: string;
   pages: string;
   language: string;
+  isbn: string;
   categories: string[];
   description: string;
   image: string;
@@ -38,6 +39,7 @@ const makeInitial = (): FormState => ({
   published: '',
   pages: '',
   language: '',
+  isbn: '',
   categories: [],
   description: '',
   image: '',
@@ -80,6 +82,7 @@ export const PostConstructor = () => {
         published: form.published ? `${form.published}-01-01` : null,
         pages: form.pages ? Number(form.pages) : null,
         language: form.language.trim() || null,
+        isbn: form.isbn.trim() || null,
         categories: form.categories,
         description: form.description ? { en: form.description } : null,
         cover_color: form.coverColor,
@@ -195,6 +198,14 @@ export const PostConstructor = () => {
               value={form.language}
               onChange={set('language')}
               placeholder="English"
+            />
+            <FormField
+              label="ISBN"
+              id="isbn"
+              value={form.isbn}
+              onChange={set('isbn')}
+              placeholder="978-3-16-148410-0"
+              hint="ISBN-10 or ISBN-13"
             />
             <Select
               label="Categories"
