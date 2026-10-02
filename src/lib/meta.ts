@@ -1,4 +1,4 @@
-const BASE_TITLE = 'Find your next read';
+const BASE_TITLE = 'Find Your Next Read';
 
 const setMetaTag = (
   attr: 'name' | 'property',
@@ -18,17 +18,43 @@ const setMetaTag = (
   el.setAttribute('content', content);
 };
 
+const setRobotsMeta = (noindex: boolean) => {
+  const el = document.head.querySelector<HTMLMetaElement>(
+    'meta[name="robots"]',
+  );
+
+  if (!noindex) {
+    el?.remove();
+    return;
+  }
+
+  const tag = el ?? document.createElement('meta');
+
+  tag.setAttribute('name', 'robots');
+  tag.setAttribute('content', 'noindex');
+
+  if (!el) {
+    document.head.appendChild(tag);
+  }
+};
+
 type DocumentMeta = {
   title?: string;
   description?: string;
+  noindex?: boolean;
 };
 
-export const setDocumentMeta = ({ title, description }: DocumentMeta) => {
+export const setDocumentMeta = ({
+  title,
+  description,
+  noindex,
+}: DocumentMeta) => {
   const fullTitle =
     !title || title === BASE_TITLE ? BASE_TITLE : `${title} · ${BASE_TITLE}`;
 
   document.title = fullTitle;
   setMetaTag('property', 'og:title', fullTitle);
+  setRobotsMeta(Boolean(noindex));
 
   if (description) {
     setMetaTag('name', 'description', description);

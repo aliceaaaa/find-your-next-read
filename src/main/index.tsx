@@ -99,6 +99,7 @@ export const AppContent = () => {
       setDocumentMeta({
         title: q ? `Search: ${q}` : 'Search',
         description: 'Search books by title, author or genre.',
+        noindex: true,
       });
     } else if (pathname === '/create-post') {
       setDocumentMeta({
