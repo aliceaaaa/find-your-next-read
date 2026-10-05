@@ -82,17 +82,19 @@ export const AppContent = () => {
     if (pathname === '/') {
       setDocumentMeta({
         description:
-          'Discover your next favourite book — browse, search and save reads.',
+          'Find Your Next Read — discover your next favorite book. Personalized book recommendations, reader reviews and books similar to the ones you love.',
       });
     } else if (pathname === '/library') {
       setDocumentMeta({
         title: 'Library',
-        description: 'Browse the full catalogue of books.',
+        description:
+          'Browse the full Find Your Next Read catalogue of books by genre, rating and release.',
       });
     } else if (pathname === '/favorites') {
       setDocumentMeta({
         title: 'Favorites',
         description: 'The books you saved to read next.',
+        noindex: true,
       });
     } else if (pathname === '/search') {
       const q = new URLSearchParams(search).get('q') ?? '';
@@ -105,12 +107,15 @@ export const AppContent = () => {
       setDocumentMeta({
         title: 'Add Book',
         description: 'Add a new book to the catalogue.',
+        noindex: true,
       });
     } else if (pathname === '/login') {
-      setDocumentMeta({ title: 'Log in' });
+      setDocumentMeta({ title: 'Log in', noindex: true });
     } else if (pathname.startsWith('/books/') && summaryBook) {
       setDocumentMeta({
-        title: summaryBook.title,
+        title: summaryBook.author
+          ? `${summaryBook.title} by ${summaryBook.author}`
+          : summaryBook.title,
         description: summaryBook.description?.slice(0, 160) || undefined,
       });
     } else if (pathname.startsWith('/pages/')) {

@@ -25,6 +25,7 @@
     "start": "FAST_REFRESH=false react-scripts start",
     "build": "react-scripts build",
     "sitemap": "node scripts/generate-sitemap.mjs",
+    "prerender": "node scripts/prerender-books.mjs",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "storybook": "storybook dev -p 6006",
@@ -53,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@storybook/addon-a11y": "^10.3.5",
     "@storybook/addon-docs": "^10.3.5",
     "@storybook/addon-onboarding": "^10.3.5",

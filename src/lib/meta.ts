@@ -1,4 +1,6 @@
 const BASE_TITLE = 'Find Your Next Read';
+const HOME_TITLE = `${BASE_TITLE} — Personalized Book Recommendations`;
+const SITE_URL = 'https://findyournextread.com';
 
 const setMetaTag = (
   attr: 'name' | 'property',
@@ -38,26 +40,47 @@ const setRobotsMeta = (noindex: boolean) => {
   }
 };
 
+const setCanonical = (path: string) => {
+  const href = `${SITE_URL}${path === '/' ? '/' : path.replace(/\/+$/, '')}`;
+  let el = document.head.querySelector<HTMLLinkElement>(
+    'link[rel="canonical"]',
+  );
+
+  if (!el) {
+    el = document.createElement('link');
+    el.setAttribute('rel', 'canonical');
+    document.head.appendChild(el);
+  }
+
+  el.setAttribute('href', href);
+  setMetaTag('property', 'og:url', href);
+};
+
 type DocumentMeta = {
   title?: string;
   description?: string;
   noindex?: boolean;
+  path?: string;
 };
 
 export const setDocumentMeta = ({
   title,
   description,
   noindex,
+  path = window.location.pathname,
 }: DocumentMeta) => {
   const fullTitle =
-    !title || title === BASE_TITLE ? BASE_TITLE : `${title} · ${BASE_TITLE}`;
+    !title || title === BASE_TITLE ? HOME_TITLE : `${title} · ${BASE_TITLE}`;
 
   document.title = fullTitle;
   setMetaTag('property', 'og:title', fullTitle);
+  setMetaTag('name', 'twitter:title', fullTitle);
   setRobotsMeta(Boolean(noindex));
+  setCanonical(path);
 
   if (description) {
     setMetaTag('name', 'description', description);
     setMetaTag('property', 'og:description', description);
+    setMetaTag('name', 'twitter:description', description);
   }
 };

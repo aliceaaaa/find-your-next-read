@@ -1,7 +1,5 @@
 import { writeFile } from 'node:fs/promises';
-
-const SITE_URL = 'https://findyournextread.com';
-const API_URL = 'https://api.findyournextread.com/api';
+import { SITE_URL, bookPath, fetchAllBooks } from './lib/books.mjs';
 
 const STATIC_PATHS = [
   '/',
@@ -11,31 +9,6 @@ const STATIC_PATHS = [
   '/pages/privacy',
   '/pages/cookies',
 ];
-
-const fetchAllBooks = async () => {
-  const books = [];
-  let page = 1;
-
-  while (true) {
-    const res = await fetch(`${API_URL}/books?page=${page}&per_page=100`);
-
-    if (!res.ok) {
-      throw new Error(`API error ${res.status}: ${res.statusText}`);
-    }
-
-    const json = await res.json();
-
-    books.push(...json.data);
-
-    if (json.current_page >= json.last_page) {
-      break;
-    }
-
-    page++;
-  }
-
-  return books;
-};
 
 const toLastmod = (iso) => iso.slice(0, 10);
 
@@ -61,10 +34,15 @@ const main = async () => {
 
   const entries = [
     ...STATIC_PATHS.map((path) =>
-      urlEntry(path, path === '/' || path === '/library' ? toLastmod(latestUpdate) : undefined),
+      urlEntry(
+        path,
+        path === '/' || path === '/library'
+          ? toLastmod(latestUpdate)
+          : undefined,
+      ),
     ),
     ...books.map((book) =>
-      urlEntry(`/books/${book.id}/summary`, toLastmod(book.updated_at)),
+      urlEntry(bookPath(book), toLastmod(book.updated_at)),
     ),
   ];
 
@@ -78,7 +56,9 @@ const main = async () => {
 
   await writeFile(new URL('../public/sitemap.xml', import.meta.url), xml);
 
-  console.log(`sitemap.xml generated: ${STATIC_PATHS.length} static + ${books.length} book URLs`);
+  console.log(
+    `sitemap.xml generated: ${STATIC_PATHS.length} static + ${books.length} book URLs`,
+  );
 };
 
 main();

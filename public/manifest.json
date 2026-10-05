@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "FYNR",
+  "name": "Find Your Next Read",
+  "description": "Personalized book recommendations, reviews and books similar to the ones you love.",
   "icons": [
     {
       "src": "favicon.ico",

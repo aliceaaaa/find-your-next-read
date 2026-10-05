@@ -1,55 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="any" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Discover your next favorite book. Get personalized book recommendations, read reviews, and find books similar to the ones you love."
-    />
-    <title>Find Your Next Read — Personalized Book Recommendations</title>
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Find Your Next Read" />
-    <meta
-      property="og:title"
-      content="Find Your Next Read — Personalized Book Recommendations"
-    />
-    <meta
-      property="og:description"
-      content="Discover your next favorite book. Get personalized book recommendations, read reviews, and find books similar to the ones you love."
-    />
-    <meta property="og:url" content="https://findyournextread.com/" />
-    <meta
-      property="og:image"
-      content="https://findyournextread.com/logo512.png"
-    />
-    <meta
-      property="og:image:alt"
-      content="Find Your Next Read — personalized book recommendations"
-    />
-    <meta name="twitter:card" content="summary" />
-    <meta
-      name="twitter:title"
-      content="Find Your Next Read — Personalized Book Recommendations"
-    />
-    <meta
-      name="twitter:description"
-      content="Discover your next favorite book. Get personalized recommendations based on books you love."
-    />
-    <meta
-      name="twitter:image"
-      content="https://findyournextread.com/logo512.png"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="any" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description"
+    content="Discover your next favorite book. Get personalized book recommendations, read reviews, and find books similar to the ones you love." />
+  <title>Find Your Next Read — Personalized Book Recommendations</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Find Your Next Read" />
+  <meta property="og:title" content="Find Your Next Read — Personalized Book Recommendations" />
+  <meta property="og:description"
+    content="Discover your next favorite book. Get personalized book recommendations, read reviews, and find books similar to the ones you love." />
+  <meta property="og:url" content="https://findyournextread.com/" />
+  <link rel="canonical" href="https://findyournextread.com/" />
+  <meta property="og:image" content="https://findyournextread.com/logo512.png" />
+  <meta property="og:image:alt" content="Find Your Next Read — personalized book recommendations" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Find Your Next Read — Personalized Book Recommendations" />
+  <meta name="twitter:description" content="Discover your next favorite book. Get personalized recommendations based on books you love." />
+  <meta name="twitter:image" content="https://findyournextread.com/logo512.png" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <!--
+      Structured data: tells Google the site name ("Find Your Next Read") so the
+      brand query resolves to this site and the SERP shows the right site name.
+    -->
+  <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://findyournextread.com/#website",
+            "url": "https://findyournextread.com/",
+            "name": "Find Your Next Read",
+            "alternateName": ["FYNR", "Find your next read", "findyournextread.com"],
+            "description": "Discover your next favorite book. Get personalized book recommendations, read reviews, and find books similar to the ones you love.",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://findyournextread.com/#organization" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://findyournextread.com/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://findyournextread.com/#organization",
+            "name": "Find Your Next Read",
+            "alternateName": "FYNR",
+            "url": "https://findyournextread.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://findyournextread.com/logo512.png",
+              "width": 512,
+              "height": 512
+            }
+          }
+        ]
+      }
+    </script>
+  <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -58,11 +80,33 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <!--
+      Static fallback content: visible to crawlers before JS runs and replaced
+      by React on mount. Keeps the brand name and key links in the raw HTML.
+    -->
+  <div id="root">
+    <header>
+      <h1>Find Your Next Read</h1>
+      <p>
+        Find Your Next Read is a book discovery site: personalized book
+        recommendations, reader reviews, book of the day and books similar to
+        the ones you love.
+      </p>
+    </header>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/library">Library — browse all books</a>
+      <a href="/pages/about">About Find Your Next Read</a>
+      <a href="/pages/terms">Terms</a>
+      <a href="/pages/privacy">Privacy</a>
+      <a href="/pages/cookies">Cookie Policy</a>
+    </nav>
+  </div>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -72,5 +116,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
+</body>
+
 </html>
