@@ -23,7 +23,8 @@ import {
   useReviews,
 } from '../hooks';
 
-const getNextBooks = (allBooks: Book[], current: Book, limit = 6): Book[] => {
+// Enough to fill one row of tiles on wide screens; the shelf trims the rest.
+const getNextBooks = (allBooks: Book[], current: Book, limit = 12): Book[] => {
   const others = allBooks.filter((b) => b.id !== current.id);
 
   const sameCategory = others.filter((b) =>

@@ -2,7 +2,7 @@
 
 .skeletonCard {
   flex-shrink: 0;
-  width: 248px;
+  width: var(--card-width, 248px);
   border-radius: 16px;
   background: #ffffff;
   border: 1px solid #ebeef3;

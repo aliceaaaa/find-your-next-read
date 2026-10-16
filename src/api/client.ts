@@ -12,8 +12,9 @@ export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 const request = async <T>(
   path: string,
   options: RequestInit = {},
+  { auth = true }: { auth?: boolean } = {},
 ): Promise<T> => {
-  const token = getToken();
+  const token = auth ? getToken() : null;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
@@ -74,10 +75,16 @@ export const apiLogin = (
   email: string,
   password: string,
 ): Promise<LoginResponse> =>
-  request<LoginResponse>('/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  });
+  // Sent without the stored token: a stale one makes the API treat the
+  // request as already signed in instead of logging in.
+  request<LoginResponse>(
+    '/login',
+    {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    },
+    { auth: false },
+  );
 
 export const apiLogout = (): Promise<unknown> =>
   request('/logout', { method: 'POST' });

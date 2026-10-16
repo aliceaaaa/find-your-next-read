@@ -4,12 +4,16 @@ import App from './app';
 describe('App', () => {
   it('renders the main heading', () => {
     render(<App />);
-    expect(screen.getByText(/find your/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /find your next read/i }),
+    ).toBeInTheDocument();
   });
 
   it('renders the sidebar logo', () => {
     render(<App />);
-    expect(screen.getByText('Find your next read')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /find your next read — home/i }),
+    ).toBeInTheDocument();
   });
 
   it('renders Popular Picks section', () => {

@@ -107,3 +107,43 @@
   font-weight: 600;
   color: $color-text;
 }
+
+.compact {
+  padding: 10px;
+  border-radius: 14px;
+
+  .coverWrap {
+    margin-bottom: 10px;
+  }
+
+  .titleRow {
+    padding-right: 30px;
+    margin-bottom: 4px;
+  }
+
+  .bookmarkBtn {
+    width: 22px;
+    height: 22px;
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  .author {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .rating {
+    margin-bottom: 2px;
+  }
+
+  .star {
+    font-size: 16px;
+  }
+
+  .ratingNum {
+    font-size: 14px;
+  }
+}

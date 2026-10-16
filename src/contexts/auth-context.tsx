@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useContext, useState } from "react";
-import { apiLogin, apiLogout, clearToken, getToken, setToken } from "api";
+import { createContext, ReactNode, useContext, useState } from 'react';
+import { apiLogin, apiLogout, clearToken, getToken, setToken } from 'api';
 
 type AuthUser = {
   id: number;
@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextValue>({
   logout: () => {},
 });
 
-const USER_KEY = "auth_user";
+const USER_KEY = 'auth_user';
 
 const readStoredUser = (): AuthUser | null => {
   try {

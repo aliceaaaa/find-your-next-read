@@ -1,7 +1,9 @@
 @use '../../styles/variables' as *;
 
 .page {
+  width: 100%;
   max-width: 760px;
+  margin: 0 auto;
 }
 
 .header {

@@ -41,7 +41,11 @@ export const SearchBar = ({
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-        <button className={styles['submit-btn']} type="submit">
+        <button
+          className={styles['submit-btn']}
+          type="submit"
+          aria-label="Search"
+        >
           <SearchIcon size={18} color="white" />
         </button>
       </form>

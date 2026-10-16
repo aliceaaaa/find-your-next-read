@@ -11,7 +11,6 @@ export type GetBookOfTheDayParams = {
 };
 
 export type UseBookOfTheDayParams = {
-  popular: Book[];
-  releases: Book[];
+  books: Book[];
   reviews: Review[];
 };

@@ -1,6 +1,6 @@
-import cn from "classnames";
-import { PencilIcon } from "../../icons";
-import styles from "./edit-button.module.scss";
+import cn from 'classnames';
+import { PencilIcon } from '../../icons';
+import styles from './edit-button.module.scss';
 
 type EditButtonProps = {
   onClick: () => void;

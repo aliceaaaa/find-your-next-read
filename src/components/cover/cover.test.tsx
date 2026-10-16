@@ -49,12 +49,12 @@ describe('Cover', () => {
   it('adds size class "lg"', () => {
     render(<Cover book={book} size="lg" />);
     const cover = screen.getByTestId('cover');
-    expect(cover).toHaveClass('Cover', 'lg');
+    expect(cover).toHaveClass('cover', 'lg');
   });
 
   it('defaults to md size class', () => {
     render(<Cover book={book} />);
     const cover = screen.getByTestId('cover');
-    expect(cover).toHaveClass('Cover', 'md');
+    expect(cover).toHaveClass('cover', 'md');
   });
 });

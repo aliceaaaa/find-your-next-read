@@ -9,7 +9,7 @@ type HomeFeedProps = {
   isLoading?: boolean;
   popular: Book[];
   releases: Book[];
-  onBookSelect: (book: Book) => void;
+  onBookSelect: (book: Book, reviewId?: number) => void;
   onBookmark: (id: number) => void;
   onCategoryChange: (value: string) => void;
 };
@@ -44,6 +44,7 @@ export const HomeFeed = ({
       books={popular}
       isLoading={isLoading}
       cardType="full"
+      layout="stretch"
       emptyTitle="No popular picks yet"
       emptySubtitle="Check back soon — great reads are on the way."
       onBookSelect={onBookSelect}
@@ -54,6 +55,8 @@ export const HomeFeed = ({
       books={releases}
       isLoading={isLoading}
       cardType="full"
+      layout="grid"
+      maxRows={1}
       emptyTitle="No new releases yet"
       emptySubtitle="New books will appear here once added."
       onBookSelect={onBookSelect}

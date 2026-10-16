@@ -3,11 +3,9 @@ import { fetchBookOfTheDay } from 'api';
 import { UseBookOfTheDayParams } from 'types';
 
 export const useBookOfTheDay = ({
-  popular,
-  releases,
+  books: allBooks,
   reviews,
 }: UseBookOfTheDayParams) => {
-  const allBooks = [...popular, ...releases];
   const dayKey = new Date().toISOString().slice(0, 10);
 
   return useQuery({

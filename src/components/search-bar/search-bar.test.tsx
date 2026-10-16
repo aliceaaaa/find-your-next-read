@@ -27,7 +27,7 @@ describe('SearchBar', () => {
   it('renders submit button', () => {
     render(<SearchBar />);
     expect(
-      screen.getByRole('button', { name: /notifications/i }),
+      screen.getByRole('button', { name: /^search$/i }),
     ).toBeInTheDocument();
   });
 

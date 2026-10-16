@@ -1,12 +1,12 @@
-import { useState } from "react";
-import cn from "classnames";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiCreateReview, apiUpdateReview } from "api";
-import { Review } from "types";
-import { track } from "../../lib";
-import { useAuth } from "../../contexts/auth-context";
-import { Button } from "../button";
-import styles from "./review-form.module.scss";
+import { useState } from 'react';
+import cn from 'classnames';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiCreateReview, apiUpdateReview } from 'api';
+import { Review } from 'types';
+import { track } from '../../lib';
+import { useAuth } from '../../contexts/auth-context';
+import { Button } from '../button';
+import styles from './review-form.module.scss';
 
 type ReviewFormProps = {
   bookId: number;
@@ -24,8 +24,8 @@ export const ReviewForm = ({
 }: ReviewFormProps) => {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
-  const [author, setAuthor] = useState(review?.authorName ?? "");
-  const [text, setText] = useState(review?.text ?? "");
+  const [author, setAuthor] = useState(review?.authorName ?? '');
+  const [text, setText] = useState(review?.text ?? '');
   const [rating, setRating] = useState(review?.rating ?? 8);
 
   const mutation = useMutation({
@@ -39,19 +39,19 @@ export const ReviewForm = ({
 
       return review
         ? apiUpdateReview(review.id, payload)
-        : apiCreateReview({ ...payload, language: "en" });
+        : apiCreateReview({ ...payload, language: 'en' });
     },
     onSuccess: async () => {
-      track(review ? "edit_review" : "add_review", { bookId, rating });
-      await queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      track(review ? 'edit_review' : 'add_review', { bookId, rating });
+      await queryClient.invalidateQueries({ queryKey: ['reviews'] });
 
       if (review) {
         onSaved?.();
         return;
       }
 
-      setAuthor("");
-      setText("");
+      setAuthor('');
+      setText('');
       setRating(8);
     },
   });
@@ -73,7 +73,7 @@ export const ReviewForm = ({
       }}
     >
       <h3 className={styles.title}>
-        {review ? "Edit review" : "Write a review"}
+        {review ? 'Edit review' : 'Write a review'}
       </h3>
       <div className={styles.row}>
         <input
@@ -108,7 +108,7 @@ export const ReviewForm = ({
       />
       {mutation.isError && (
         <span className={styles.error}>
-          Could not {review ? "save" : "submit"} the review. Please try again.
+          Could not {review ? 'save' : 'submit'} the review. Please try again.
         </span>
       )}
       <div className={styles.actions}>
@@ -123,7 +123,7 @@ export const ReviewForm = ({
           disabled={!canSubmit}
           loading={mutation.isPending}
         >
-          {review ? "Save" : "Submit review"}
+          {review ? 'Save' : 'Submit review'}
         </Button>
       </div>
     </form>

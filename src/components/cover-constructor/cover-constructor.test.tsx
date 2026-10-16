@@ -81,7 +81,8 @@ describe('CoverConstructor', () => {
     fireEvent.change(screen.getByLabelText(/custom background color/i), {
       target: { value: '#FF0000' },
     });
-    expect(onCoverColorChange).toHaveBeenCalledWith('#FF0000');
+    // Color inputs normalise their value to lowercase hex.
+    expect(onCoverColorChange).toHaveBeenCalledWith('#ff0000');
   });
 
   it('calls onTextColorChange when custom text color input changes', () => {

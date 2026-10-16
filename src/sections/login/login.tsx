@@ -1,12 +1,12 @@
 import { FormEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from 'components';
 import { FormField } from '../../components/form-field';
 import { useAuth } from '../../contexts/auth-context';
 import styles from './login.module.scss';
 
 export const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,6 +26,10 @@ export const LoginPage = () => {
       setIsLoading(false);
     }
   };
+
+  if (isAuthenticated && !isLoading) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className={styles.page}>

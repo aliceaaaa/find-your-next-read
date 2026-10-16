@@ -34,8 +34,11 @@ export const useNavigation = (apiBooks: Book[]) => {
     navigate(navPathMap[id]);
   };
 
-  const handleBookSelect = (book: Book) => {
-    navigate(`/books/${book.id}/summary/`, {
+  // With a reviewId the book page scrolls to that review (see Summary).
+  const handleBookSelect = (book: Book, reviewId?: number) => {
+    const hash = reviewId != null ? `#review-${reviewId}` : '';
+
+    navigate(`/books/${book.id}/summary/${hash}`, {
       state: { from: location.pathname },
     });
   };

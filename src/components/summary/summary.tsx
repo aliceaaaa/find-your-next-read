@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
-import { apiTrackImpression } from "api";
-import { Book, Review } from "../../types";
-import { Cover } from "../cover";
-import { ArrowLeftIcon } from "../../icons";
-import { sanitizeHtml } from "../../lib";
+import { apiTrackImpression } from 'api';
+import { Book, Review } from '../../types';
+import { Cover } from '../cover';
+import { ArrowLeftIcon } from '../../icons';
+import { sanitizeHtml } from '../../lib';
 
-import { Reviews } from "../reviews";
-import { RateBook } from "../rate-book";
-import { ReviewForm } from "../review-form";
-import { BookShelf } from "../book-shelf";
-import { MainInfo } from "./main-info";
-import { SummaryMeta } from "./summary-meta";
+import { Reviews } from '../reviews';
+import { RateBook } from '../rate-book';
+import { ReviewForm } from '../review-form';
+import { BookShelf } from '../book-shelf';
+import { MainInfo } from './main-info';
+import { SummaryMeta } from './summary-meta';
 
-import styles from "./summary.module.scss";
+import styles from './summary.module.scss';
 
 interface SummaryProps {
   book: Book;
@@ -45,6 +46,31 @@ export const Summary = ({
   }, [book.id]);
 
   const bookReviews = reviews.filter((r) => r.bookId === book.id);
+
+  // `#review-<id>` in the URL (e.g. from Book of the Day): open that review,
+  // scroll to it and highlight it. Waits until reviews have loaded.
+  const { hash } = useLocation();
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+  const targetReviewId = Number(hash.match(/^#review-(\d+)$/)?.[1]) || null;
+  const hasTargetReview = bookReviews.some((r) => r.id === targetReviewId);
+
+  useEffect(() => {
+    if (!targetReviewId || !hasTargetReview) {
+      return;
+    }
+
+    setExpandedReviews((prev) => new Set(prev).add(targetReviewId));
+    setHighlightedId(targetReviewId);
+
+    // Let the expanded review render before scrolling to it.
+    const timer = setTimeout(() => {
+      document
+        .getElementById(`review-${targetReviewId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [targetReviewId, hasTargetReview]);
   const reviewCount = bookReviews.length;
 
   const reviewAverage = reviewCount
@@ -109,7 +135,7 @@ export const Summary = ({
       </div>
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>
-          Reviews{bookReviews.length > 0 ? ` (${bookReviews.length})` : ""}
+          Reviews{bookReviews.length > 0 ? ` (${bookReviews.length})` : ''}
         </h2>
         {bookReviews.length === 0 ? (
           <p className={styles.empty}>No reviews yet.</p>
@@ -118,6 +144,7 @@ export const Summary = ({
             reviews={bookReviews}
             expandedReviews={expandedReviews}
             onToggleReview={toggleReview}
+            highlightedId={highlightedId}
           />
         )}
         <ReviewForm bookId={book.id} />
@@ -128,6 +155,8 @@ export const Summary = ({
             title="Next books"
             books={nextBooks}
             cardType="full"
+            layout="grid"
+            maxRows={1}
             onBookSelect={onBookSelect}
             onBookmark={onBookmark}
           />

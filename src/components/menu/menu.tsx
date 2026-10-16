@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { NavItemId } from 'types';
-import { PlusCircleIcon } from '../../icons';
+import { LogOutIcon, PlusCircleIcon } from '../../icons';
 import { useAuth } from '../../contexts/auth-context';
 import { navItems } from './constants';
 import styles from './menu.module.scss';
@@ -17,7 +17,11 @@ export const Menu = ({
   isAdmin = false,
   onNavChange,
 }: MenuProps) => {
-  const { user } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+  // Sessions from before the user was stored only have a token; still show
+  // that someone is signed in.
+  const account =
+    user ?? (isAuthenticated ? { name: 'Admin', email: '' } : null);
 
   return (
     <aside className={styles.menu}>
@@ -47,13 +51,27 @@ export const Menu = ({
           </button>
         )}
       </nav>
-      {user && (
+      {account && (
         <div className={styles.user}>
-          <div className={styles.avatar}>{user.name[0]}</div>
+          <div className={styles.avatar}>{account.name[0]}</div>
           <div className={styles.info}>
-            <div className={styles.name}>{user.name}</div>
-            <div className={styles.email}>{user.email}</div>
+            <div className={styles.name}>{account.name}</div>
+            {account.email && (
+              <div className={styles.email}>{account.email}</div>
+            )}
           </div>
+          <button
+            type="button"
+            className={styles['admin-toggle']}
+            onClick={() => {
+              logout();
+              onNavChange('home');
+            }}
+            aria-label="Log out"
+            title="Log out"
+          >
+            <LogOutIcon size={16} />
+          </button>
         </div>
       )}
     </aside>

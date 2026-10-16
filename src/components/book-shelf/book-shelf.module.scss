@@ -66,3 +66,28 @@
     gap: 12px;
   }
 }
+
+.stretch {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(200px, 1fr);
+  padding-top: 4px;
+  --card-width: auto;
+
+  @media (max-width: 768px) {
+    grid-auto-columns: 168px;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  overflow-x: visible;
+  padding-top: 4px;
+  --card-width: auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    --card-width: auto;
+  }
+}

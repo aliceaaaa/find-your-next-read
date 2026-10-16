@@ -1,32 +1,32 @@
 // Tags the rich text editor can produce. Everything else is unwrapped to its
 // text, and every attribute is dropped, so the result is safe to render.
 const ALLOWED_TAGS = new Set([
-  "P",
-  "BR",
-  "B",
-  "STRONG",
-  "I",
-  "EM",
-  "U",
-  "UL",
-  "OL",
-  "LI",
+  'P',
+  'BR',
+  'B',
+  'STRONG',
+  'I',
+  'EM',
+  'U',
+  'UL',
+  'OL',
+  'LI',
 ]);
 
 const DROPPED_TAGS = new Set([
-  "SCRIPT",
-  "STYLE",
-  "IFRAME",
-  "OBJECT",
-  "TEMPLATE",
+  'SCRIPT',
+  'STYLE',
+  'IFRAME',
+  'OBJECT',
+  'TEMPLATE',
 ]);
 
 const escapeHtml = (text: string) =>
-  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 const cleanNode = (node: Node, doc: Document): Node[] => {
   if (node.nodeType === Node.TEXT_NODE) {
-    return [doc.createTextNode(node.textContent ?? "")];
+    return [doc.createTextNode(node.textContent ?? '')];
   }
 
   if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -54,12 +54,12 @@ const cleanNode = (node: Node, doc: Document): Node[] => {
 };
 
 export const sanitizeHtml = (html: string): string => {
-  if (typeof DOMParser === "undefined") {
-    return escapeHtml(html.replace(/<[^>]*>/g, ""));
+  if (typeof DOMParser === 'undefined') {
+    return escapeHtml(html.replace(/<[^>]*>/g, ''));
   }
 
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  const out = doc.createElement("div");
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const out = doc.createElement('div');
 
   Array.from(doc.body.childNodes)
     .flatMap((child) => cleanNode(child, doc))

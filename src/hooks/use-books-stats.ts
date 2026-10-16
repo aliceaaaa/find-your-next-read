@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { Book, Review } from 'types';
 import { useBookOfTheDay } from './use-book-of-the-day';
 
+const POPULAR_COUNT = 5;
+
 export const useBooksStats = (
   apiBooks: Book[],
   reviews: Review[],
@@ -35,9 +37,26 @@ export const useBooksStats = (
     [apiBooks, reviewStats, bookmarks],
   );
 
-  const half = Math.ceil(allBooks.length / 2);
-  const popular = allBooks.slice(0, half);
-  const releases = allBooks.slice(half);
+  // Newest first; the shelf shows as many as fit in one row.
+  const releases = useMemo(
+    () => [...allBooks].sort((a, b) => b.published - a.published),
+    [allBooks],
+  );
+
+  // Top rated by review score (what the card shows); visitor ratings and
+  // review count break ties so unrated books don't win by list order.
+  const popular = useMemo(
+    () =>
+      [...allBooks]
+        .sort(
+          (a, b) =>
+            b.rating - a.rating ||
+            (b.ratingAvg ?? 0) - (a.ratingAvg ?? 0) ||
+            b.reviewCount - a.reviewCount,
+        )
+        .slice(0, POPULAR_COUNT),
+    [allBooks],
+  );
 
   const categories = useMemo(
     () => [
@@ -50,8 +69,7 @@ export const useBooksStats = (
   const favoritesBooks = allBooks.filter((book) => book.isBookmarked);
 
   const { data: bookOfTheDayData } = useBookOfTheDay({
-    popular,
-    releases,
+    books: allBooks,
     reviews,
   });
 

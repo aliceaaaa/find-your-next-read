@@ -1,21 +1,25 @@
-import { useState } from "react";
-import { Review } from "types";
-import { useAuth } from "../../contexts/auth-context";
-import { StarRating } from "../star-rating";
-import { EditButton } from "../edit-button";
-import { ReviewForm } from "../review-form";
-import styles from "./reviews.module.scss";
+import { useState } from 'react';
+import cn from 'classnames';
+import { Review } from 'types';
+import { useAuth } from '../../contexts/auth-context';
+import { StarRating } from '../star-rating';
+import { EditButton } from '../edit-button';
+import { ReviewForm } from '../review-form';
+import styles from './reviews.module.scss';
 
 type ReviewsProps = {
   reviews: Review[];
   expandedReviews: Set<number>;
   onToggleReview: (id: number) => void;
+  /** Review to briefly highlight, e.g. after following a link to it. */
+  highlightedId?: number | null;
 };
 
 export const Reviews = ({
   reviews,
   expandedReviews,
   onToggleReview,
+  highlightedId,
 }: ReviewsProps) => {
   const { isAdmin } = useAuth();
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -39,11 +43,18 @@ export const Reviews = ({
         const isExpanded = expandedReviews.has(review.id);
         const displayText =
           isLong && !isExpanded
-            ? review.text.slice(0, 1000) + "..."
+            ? review.text.slice(0, 1000) + '...'
             : review.text;
 
         return (
-          <div key={review.id} className={styles.reviewCard}>
+          <div
+            key={review.id}
+            id={`review-${review.id}`}
+            className={cn(
+              styles.reviewCard,
+              highlightedId === review.id && styles.highlighted,
+            )}
+          >
             <div className={styles.reviewHeader}>
               <div className={styles.avatar}>{review.authorInitials}</div>
               <div className={styles.reviewMeta}>
@@ -65,7 +76,7 @@ export const Reviews = ({
                 className={styles.readMore}
                 onClick={() => onToggleReview(review.id)}
               >
-                {isExpanded ? "Show less" : "Read more"}
+                {isExpanded ? 'Show less' : 'Read more'}
               </button>
             )}
           </div>

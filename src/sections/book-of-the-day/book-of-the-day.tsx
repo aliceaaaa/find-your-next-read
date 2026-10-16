@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
-import { Card, StarRating } from "components";
-import { Book, Review } from "types";
-import styles from "./book-of-the-day.module.scss";
+import { useEffect, useRef } from 'react';
+import { Card, StarRating } from 'components';
+import { Book, Review } from 'types';
+import styles from './book-of-the-day.module.scss';
 
 type BookOfTheDayProps = {
   bookOfTheDay: Book;
   reviewsOfTheDay: Review[];
-  onBookSelect: (book: Book) => void;
+  onBookSelect: (book: Book, reviewId?: number) => void;
   onBookmark: (id: number) => void;
 };
 
@@ -19,7 +19,7 @@ const useFitLines = <T extends HTMLElement>(text: string) => {
     const el = ref.current;
     const container = el?.parentElement;
 
-    if (!el || !container || typeof ResizeObserver === "undefined") {
+    if (!el || !container || typeof ResizeObserver === 'undefined') {
       return;
     }
 
@@ -34,7 +34,7 @@ const useFitLines = <T extends HTMLElement>(text: string) => {
         1,
         Math.floor(container.clientHeight / lineHeight),
       );
-      el.style.setProperty("--description-lines", String(lines));
+      el.style.setProperty('--description-lines', String(lines));
     };
 
     const observer = new ResizeObserver(fit);
@@ -86,7 +86,7 @@ export const BookOfTheDay = ({
                 <p className={styles.reviewText}>{review.text}</p>
                 <button
                   className={styles.readMore}
-                  onClick={() => onBookSelect(bookOfTheDay)}
+                  onClick={() => onBookSelect(bookOfTheDay, review.id)}
                 >
                   Read the review →
                 </button>
