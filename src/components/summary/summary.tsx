@@ -1,24 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-import { apiTrackImpression } from 'api';
-import { Book, Review } from '../../types';
-import { Cover } from '../cover';
-import { ArrowLeftIcon } from '../../icons';
+import { apiTrackImpression } from "api";
+import { Book, Review } from "../../types";
+import { Cover } from "../cover";
+import { ArrowLeftIcon } from "../../icons";
+import { sanitizeHtml } from "../../lib";
 
-import { Reviews } from '../reviews';
-import { RateBook } from '../rate-book';
-import { ReviewForm } from '../review-form';
-import { BookShelf } from '../book-shelf';
-import { MainInfo } from './main-info';
-import { SummaryMeta } from './summary-meta';
+import { Reviews } from "../reviews";
+import { RateBook } from "../rate-book";
+import { ReviewForm } from "../review-form";
+import { BookShelf } from "../book-shelf";
+import { MainInfo } from "./main-info";
+import { SummaryMeta } from "./summary-meta";
 
-import styles from './summary.module.scss';
+import styles from "./summary.module.scss";
 
 interface SummaryProps {
   book: Book;
   reviews: Review[];
   nextBooks?: Book[];
   onBack: () => void;
+  onEdit?: () => void;
   onBookmark: (id: number) => void;
   onBookSelect?: (book: Book) => void;
   onCategorySelect?: (category: string) => void;
@@ -29,6 +31,7 @@ export const Summary = ({
   reviews,
   nextBooks = [],
   onBack,
+  onEdit,
   onBookmark,
   onBookSelect,
   onCategorySelect,
@@ -86,18 +89,27 @@ export const Summary = ({
           <MainInfo
             book={bookWithRating}
             onBookmark={onBookmark}
+            onEdit={onEdit}
             onCategorySelect={onCategorySelect}
           />
           <RateBook bookId={book.id} />
-          {book.description && (
-            <p className={styles.description}>{book.description}</p>
-          )}
+          {book.description &&
+            (book.descriptionHtml && /<[a-z]/i.test(book.descriptionHtml) ? (
+              <div
+                className={styles.description}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtml(book.descriptionHtml),
+                }}
+              />
+            ) : (
+              <p className={styles.description}>{book.description}</p>
+            ))}
           <SummaryMeta book={book} />
         </div>
       </div>
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>
-          Reviews{bookReviews.length > 0 ? ` (${bookReviews.length})` : ''}
+          Reviews{bookReviews.length > 0 ? ` (${bookReviews.length})` : ""}
         </h2>
         {bookReviews.length === 0 ? (
           <p className={styles.empty}>No reviews yet.</p>

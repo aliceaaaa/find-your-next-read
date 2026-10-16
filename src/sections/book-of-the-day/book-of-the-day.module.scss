@@ -136,19 +136,30 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 100%;
+  align-self: stretch;
+}
+
+// Takes the free height of the panel. The text inside is positioned
+// absolutely so it never makes the row taller than the column on the left;
+// the number of clamped lines is fitted to this height in JS.
+.infoDescriptionWrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: calc(13px * 1.65 * 4);
 }
 
 .infoDescription {
+  position: absolute;
+  inset: 0;
   font-size: 13px;
   line-height: 1.65;
   color: $color-text-secondary;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 6;
+  -webkit-line-clamp: var(--description-lines, 6);
+  white-space: pre-line;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 100%;
 }
 
 .infoStats {
@@ -214,6 +225,15 @@
     >article {
       justify-self: center;
     }
+  }
+
+  .infoDescriptionWrap {
+    min-height: 0;
+  }
+
+  .infoDescription {
+    position: static;
+    -webkit-line-clamp: 6;
   }
 }
 

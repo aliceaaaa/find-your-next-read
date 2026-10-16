@@ -250,7 +250,7 @@ const main = async () => {
   await mkdir(ogDir, { recursive: true });
 
   for (const book of books) {
-    const dir = new URL(`.${bookPath(book)}/`, BUILD_DIR);
+    const dir = new URL(`.${bookPath(book)}`, BUILD_DIR);
     await mkdir(dir, { recursive: true });
     await writeFile(new URL('index.html', dir), renderBookHtml(template, book));
 

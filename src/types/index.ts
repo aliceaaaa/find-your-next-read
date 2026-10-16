@@ -11,6 +11,8 @@ export type Book = {
   coverImage?: string | null;
   categories: string[];
   description: string;
+  /** Description markup as written in the editor; may be plain text. */
+  descriptionHtml?: string;
   published: number;
   pages: number;
   language: string;

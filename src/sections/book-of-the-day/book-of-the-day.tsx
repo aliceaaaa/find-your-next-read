@@ -1,6 +1,7 @@
-import { Card, StarRating } from 'components';
-import { Book, Review } from 'types';
-import styles from './book-of-the-day.module.scss';
+import { useEffect, useRef } from "react";
+import { Card, StarRating } from "components";
+import { Book, Review } from "types";
+import styles from "./book-of-the-day.module.scss";
 
 type BookOfTheDayProps = {
   bookOfTheDay: Book;
@@ -9,84 +10,131 @@ type BookOfTheDayProps = {
   onBookmark: (id: number) => void;
 };
 
+// Clamps the text to as many whole lines as fit into its container, so it
+// fills the available height without a half-cut line at the bottom.
+const useFitLines = <T extends HTMLElement>(text: string) => {
+  const ref = useRef<T>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    const container = el?.parentElement;
+
+    if (!el || !container || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const fit = () => {
+      const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+
+      if (!lineHeight) {
+        return;
+      }
+
+      const lines = Math.max(
+        1,
+        Math.floor(container.clientHeight / lineHeight),
+      );
+      el.style.setProperty("--description-lines", String(lines));
+    };
+
+    const observer = new ResizeObserver(fit);
+    observer.observe(container);
+    fit();
+
+    return () => observer.disconnect();
+  }, [text]);
+
+  return ref;
+};
+
 export const BookOfTheDay = ({
   bookOfTheDay,
   reviewsOfTheDay,
   onBookSelect,
   onBookmark,
-}: BookOfTheDayProps) => (
-  <div className={styles.wrapper}>
-    <h2>Book of the Day</h2>
-    <div className={styles.content}>
-      <Card
-        book={bookOfTheDay}
-        onSelect={onBookSelect}
-        onBookmark={onBookmark}
-      />
-      <div className={styles.reviewsWrap}>
-        {reviewsOfTheDay.length === 0 ? (
-          <section className={styles.reviewSection}>
-            <h3 className={styles.reviewTitle}>No reviews yet</h3>
-            <p className={styles.reviewText}>
-              Nobody has reviewed {bookOfTheDay.title} yet.
-            </p>
-          </section>
-        ) : (
-          reviewsOfTheDay.map((review) => (
-            <section key={review.id} className={styles.reviewSection}>
-              <div className={styles.reviewHeader}>
-                <div className={styles.avatar}>{review.authorInitials}</div>
-                <h3 className={styles.reviewTitle}>
-                  Review from {review.authorName}
-                </h3>
-              </div>
-              <p className={styles.reviewText}>{review.text}</p>
-              <button
-                className={styles.readMore}
-                onClick={() => onBookSelect(bookOfTheDay)}
-              >
-                Read the review →
-              </button>
-              <div className={styles.reviewMeta}>
-                <StarRating rating={review.rating} size={13} />
-                <span>{review.rating}/5</span>
-              </div>
+}: BookOfTheDayProps) => {
+  const descriptionRef = useFitLines<HTMLParagraphElement>(
+    bookOfTheDay.description,
+  );
+
+  return (
+    <div className={styles.wrapper}>
+      <h2>Book of the Day</h2>
+      <div className={styles.content}>
+        <Card
+          book={bookOfTheDay}
+          onSelect={onBookSelect}
+          onBookmark={onBookmark}
+        />
+        <div className={styles.reviewsWrap}>
+          {reviewsOfTheDay.length === 0 ? (
+            <section className={styles.reviewSection}>
+              <h3 className={styles.reviewTitle}>No reviews yet</h3>
+              <p className={styles.reviewText}>
+                Nobody has reviewed {bookOfTheDay.title} yet.
+              </p>
             </section>
-          ))
-        )}
+          ) : (
+            reviewsOfTheDay.map((review) => (
+              <section key={review.id} className={styles.reviewSection}>
+                <div className={styles.reviewHeader}>
+                  <div className={styles.avatar}>{review.authorInitials}</div>
+                  <h3 className={styles.reviewTitle}>
+                    Review from {review.authorName}
+                  </h3>
+                </div>
+                <p className={styles.reviewText}>{review.text}</p>
+                <button
+                  className={styles.readMore}
+                  onClick={() => onBookSelect(bookOfTheDay)}
+                >
+                  Read the review →
+                </button>
+                <div className={styles.reviewMeta}>
+                  <StarRating rating={review.rating} size={13} />
+                  <span>{review.rating}/5</span>
+                </div>
+              </section>
+            ))
+          )}
+        </div>
+        <aside className={styles.infoPanel}>
+          {bookOfTheDay.description && (
+            <div className={styles.infoDescriptionWrap}>
+              <p ref={descriptionRef} className={styles.infoDescription}>
+                {bookOfTheDay.description}
+              </p>
+            </div>
+          )}
+          <hr className={styles.infoDivider} />
+          <div className={styles.infoStats}>
+            <div className={styles.infoStat}>
+              <span className={styles.infoStatLabel}>Pages</span>
+              <span className={styles.infoStatValue}>{bookOfTheDay.pages}</span>
+            </div>
+            <div className={styles.infoStat}>
+              <span className={styles.infoStatLabel}>Published</span>
+              <span className={styles.infoStatValue}>
+                {bookOfTheDay.published}
+              </span>
+            </div>
+            <div className={styles.infoStat}>
+              <span className={styles.infoStatLabel}>Language</span>
+              <span className={styles.infoStatValue}>
+                {bookOfTheDay.language}
+              </span>
+            </div>
+          </div>
+          <hr className={styles.infoDivider} />
+          <div className={styles.infoTags}>
+            {bookOfTheDay.categories.map((cat) => (
+              <span key={cat} className={styles.infoTag}>
+                {cat}
+              </span>
+            ))}
+          </div>
+        </aside>
       </div>
-      <aside className={styles.infoPanel}>
-        {bookOfTheDay.description && (
-          <p className={styles.infoDescription}>{bookOfTheDay.description}</p>
-        )}
-        <hr className={styles.infoDivider} />
-        <div className={styles.infoStats}>
-          <div className={styles.infoStat}>
-            <span className={styles.infoStatLabel}>Pages</span>
-            <span className={styles.infoStatValue}>{bookOfTheDay.pages}</span>
-          </div>
-          <div className={styles.infoStat}>
-            <span className={styles.infoStatLabel}>Published</span>
-            <span className={styles.infoStatValue}>
-              {bookOfTheDay.published}
-            </span>
-          </div>
-          <div className={styles.infoStat}>
-            <span className={styles.infoStatLabel}>Language</span>
-            <span className={styles.infoStatValue}>
-              {bookOfTheDay.language}
-            </span>
-          </div>
-        </div>
-        <hr className={styles.infoDivider} />
-        <div className={styles.infoTags}>
-          {bookOfTheDay.categories.map((cat) => (
-            <span key={cat} className={styles.infoTag}>
-              {cat}
-            </span>
-          ))}
-        </div>
-      </aside>
     </div>
-  </div>
-);
+  );
+};

@@ -1,6 +1,14 @@
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiCreateBook } from 'api';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  ApiBook,
+  CreateBookPayload,
+  apiCreateBook,
+  apiGetBook,
+  apiUpdateBook,
+  categoryToName,
+  descriptionToString,
+} from 'api';
 import { PRESET_BG_COLORS, PRESET_TEXT_COLORS } from '../../constants';
 import { track } from '../../lib';
 import { useCategories } from '../../hooks';
@@ -47,13 +55,63 @@ const makeInitial = (): FormState => ({
   coverTextColor: pick(PRESET_TEXT_COLORS),
 });
 
-export const PostConstructor = () => {
+const fromApiBook = (book: ApiBook): FormState => ({
+  title: book.title ?? '',
+  author: book.author ?? '',
+  published: book.published
+    ? String(new Date(book.published).getFullYear())
+    : '',
+  pages: book.pages ? String(book.pages) : '',
+  language: book.language ?? '',
+  isbn: book.isbn ?? '',
+  categories: (book.categories ?? []).map(categoryToName),
+  description: descriptionToString(book.description),
+  image: book.cover_image ?? '',
+  coverColor: book.cover_color || pick(PRESET_BG_COLORS),
+  coverTextColor: book.cover_text_color || pick(PRESET_TEXT_COLORS),
+});
+
+type PostConstructorProps = {
+  /** When set, the form loads this book and saves changes to it. */
+  bookId?: number;
+  onSaved?: (bookId: number) => void;
+};
+
+export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { data: categories = [] } = useCategories();
+  const isEdit = bookId != null;
+
+  const {
+    data: editedBook,
+    isPending: isBookLoading,
+    isError: isBookError,
+  } = useQuery({
+    queryKey: ['books', 'raw', bookId],
+    queryFn: () => apiGetBook(bookId as number),
+    enabled: isEdit && isAdmin,
+  });
 
   const [form, setForm] = useState<FormState>(makeInitial);
+  const [formKey, setFormKey] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (editedBook) {
+      setForm(fromApiBook(editedBook));
+      setFormKey((k) => k + 1);
+    }
+  }, [editedBook]);
+
+  const initialDescription = editedBook
+    ? descriptionToString(editedBook.description)
+    : '';
+
+  const resetForm = () => {
+    setForm(editedBook ? fromApiBook(editedBook) : makeInitial());
+    setFormKey((k) => k + 1);
+  };
 
   const categoryOptions: SelectOption[] = categories.map((c) => ({
     value: c.name,
@@ -74,12 +132,28 @@ export const PostConstructor = () => {
     setForm((prev) => ({ ...prev, categories: next }));
   };
 
+  const toPublished = (): string | null => {
+    if (!form.published) {
+      return null;
+    }
+
+    // Keep the full original date when the year was not changed.
+    if (
+      editedBook?.published &&
+      String(new Date(editedBook.published).getFullYear()) === form.published
+    ) {
+      return editedBook.published;
+    }
+
+    return `${form.published}-01-01`;
+  };
+
   const mutation = useMutation({
-    mutationFn: () =>
-      apiCreateBook({
+    mutationFn: () => {
+      const payload: CreateBookPayload = {
         title: form.title.trim(),
         author: form.author.trim(),
-        published: form.published ? `${form.published}-01-01` : null,
+        published: toPublished(),
         pages: form.pages ? Number(form.pages) : null,
         language: form.language.trim() || null,
         isbn: form.isbn.trim() || null,
@@ -88,10 +162,21 @@ export const PostConstructor = () => {
         cover_color: form.coverColor,
         cover_text_color: form.coverTextColor,
         cover_image: form.image || null,
-      }),
-    onSuccess: () => {
-      track('add_book', { title: form.title.trim() });
-      queryClient.invalidateQueries({ queryKey: ['books'] });
+      };
+
+      return bookId != null
+        ? apiUpdateBook(bookId, payload)
+        : apiCreateBook(payload);
+    },
+    onSuccess: async (saved) => {
+      track(isEdit ? 'edit_book' : 'add_book', { title: form.title.trim() });
+      await queryClient.invalidateQueries({ queryKey: ['books'] });
+
+      if (isEdit && onSaved) {
+        onSaved(saved?.id ?? (bookId as number));
+        return;
+      }
+
       setSubmitted(true);
     },
   });
@@ -115,24 +200,40 @@ export const PostConstructor = () => {
     );
   }
 
+  if (isEdit && (isBookLoading || isBookError)) {
+    return (
+      <div className={styles.page}>
+        <p className={styles.subtitle} role={isBookError ? 'alert' : 'status'}>
+          {isBookError ? 'Could not load the book.' : 'Loading book…'}
+        </p>
+      </div>
+    );
+  }
+
   if (submitted) {
     return (
       <div className={styles.success} data-testid="success-message">
         <div className={styles.successIcon} aria-hidden="true">
           ✓
         </div>
-        <h2 className={styles.successTitle}>Book Added!</h2>
+        <h2 className={styles.successTitle}>
+          {isEdit ? 'Book Updated!' : 'Book Added!'}
+        </h2>
         <p className={styles.successText}>
-          The book has been successfully added to the catalog.
+          {isEdit
+            ? 'Your changes have been saved.'
+            : 'The book has been successfully added to the catalog.'}
         </p>
-        <Button
-          onClick={() => {
-            setForm(makeInitial());
-            setSubmitted(false);
-          }}
-        >
-          Add Another
-        </Button>
+        {!isEdit && (
+          <Button
+            onClick={() => {
+              resetForm();
+              setSubmitted(false);
+            }}
+          >
+            Add Another
+          </Button>
+        )}
       </div>
     );
   }
@@ -140,13 +241,16 @@ export const PostConstructor = () => {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Add Book</h1>
+        <h1 className={styles.title}>{isEdit ? 'Edit Book' : 'Add Book'}</h1>
         <p className={styles.subtitle}>
-          Fill in the details to add a new book to the catalog
+          {isEdit
+            ? 'Update the details of this book'
+            : 'Fill in the details to add a new book to the catalog'}
         </p>
       </div>
 
       <form
+        key={formKey}
         className={styles.form}
         onSubmit={(e) => {
           e.preventDefault();
@@ -154,7 +258,7 @@ export const PostConstructor = () => {
             mutation.mutate();
           }
         }}
-        aria-label="Add book form"
+        aria-label={isEdit ? 'Edit book form' : 'Add book form'}
       >
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Book Info</h2>
@@ -223,6 +327,7 @@ export const PostConstructor = () => {
           <RichTextEditor
             label="What I think"
             placeholder="Write a compelling description..."
+            initialValue={initialDescription}
             onChange={set('description')}
           />
         </section>
@@ -255,14 +360,14 @@ export const PostConstructor = () => {
 
         {mutation.isError && (
           <p role="alert" className={styles.subtitle}>
-            Could not add the book. Please check the fields and try again.
+            Could not {isEdit ? 'save' : 'add'} the book. Please check the fields and try again.
           </p>
         )}
         <div className={styles.actions}>
           <Button
             type="button"
             variant="ghost"
-            onClick={() => setForm(makeInitial())}
+            onClick={resetForm}
           >
             Reset
           </Button>
@@ -272,7 +377,7 @@ export const PostConstructor = () => {
             size="lg"
             loading={mutation.isPending}
           >
-            Publish
+            {isEdit ? 'Save changes' : 'Publish'}
           </Button>
         </div>
       </form>

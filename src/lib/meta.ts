@@ -41,7 +41,11 @@ const setRobotsMeta = (noindex: boolean) => {
 };
 
 const setCanonical = (path: string) => {
-  const href = `${SITE_URL}${path === '/' ? '/' : path.replace(/\/+$/, '')}`;
+  // Book pages are served as directories (prerendered index.html), so their
+  // canonical form keeps the trailing slash; everything else drops it.
+  const trimmed = path.replace(/\/+$/, '');
+  const normalized = trimmed.startsWith('/books/') ? `${trimmed}/` : trimmed;
+  const href = `${SITE_URL}${normalized || '/'}`;
   let el = document.head.querySelector<HTMLLinkElement>(
     'link[rel="canonical"]',
   );

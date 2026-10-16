@@ -57,6 +57,24 @@
   color: $color-text-secondary;
   margin: 0;
   max-width: 680px;
+  white-space: pre-line;
+
+  // Rendered editor markup
+  p,
+  ul,
+  ol {
+    margin: 0 0 0.75em;
+    white-space: normal;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.4em;
+  }
 }
 
 .section {

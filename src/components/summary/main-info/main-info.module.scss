@@ -21,6 +21,58 @@
   margin: 0;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.editBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: none;
+  border: none;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-primary;
+  }
+
+  // Tooltip
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translate(-50%, -4px);
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: $color-text;
+    color: $color-white;
+    font-family: $font-base;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 10;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 .bookmarkBtn {
   flex-shrink: 0;
   padding: 2px;

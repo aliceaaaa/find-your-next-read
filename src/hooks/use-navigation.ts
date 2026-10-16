@@ -35,7 +35,7 @@ export const useNavigation = (apiBooks: Book[]) => {
   };
 
   const handleBookSelect = (book: Book) => {
-    navigate(`/books/${book.id}/summary`, {
+    navigate(`/books/${book.id}/summary/`, {
       state: { from: location.pathname },
     });
   };

@@ -28,4 +28,6 @@ export const fetchAllBooks = async () => {
   return books;
 };
 
-export const bookPath = (book) => `/books/${book.id}/summary`;
+// Trailing slash matches how the web server serves the prerendered
+// books/{id}/summary/index.html (the slash-less URL 308-redirects to it).
+export const bookPath = (book) => `/books/${book.id}/summary/`;

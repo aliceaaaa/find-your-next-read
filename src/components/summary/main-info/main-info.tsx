@@ -1,31 +1,47 @@
 import { Book } from '../../../types';
 import { StarRating } from '../../star-rating';
 import { BookmarkButton } from '../../bookmark-button';
+import { PencilIcon } from '../../../icons';
 import styles from './main-info.module.scss';
 
 type MainInfoProps = {
   book: Book;
   onBookmark: (id: number) => void;
+  onEdit?: () => void;
   onCategorySelect?: (category: string) => void;
 };
 
 export const MainInfo = ({
   book,
   onBookmark,
+  onEdit,
   onCategorySelect,
 }: MainInfoProps) => (
   <div className={styles.mainInfo}>
     <div className={styles.titleRow}>
       <h1 className={styles.title}>{book.title}</h1>
-      <BookmarkButton
-        isBookmarked={book.isBookmarked}
-        onClick={() => onBookmark(book.id)}
-        size={22}
-        ariaLabel="Bookmark"
-        className={styles.bookmarkBtn}
-        iconClassName={styles.bookmarkIcon}
-        activeIconClassName={styles.bookmarkIconActive}
-      />
+      <div className={styles.actions}>
+        {onEdit && (
+          <button
+            type="button"
+            className={styles.editBtn}
+            onClick={onEdit}
+            aria-label="Edit book"
+            data-tooltip="Edit book"
+          >
+            <PencilIcon size={20} />
+          </button>
+        )}
+        <BookmarkButton
+          isBookmarked={book.isBookmarked}
+          onClick={() => onBookmark(book.id)}
+          size={22}
+          ariaLabel="Bookmark"
+          className={styles.bookmarkBtn}
+          iconClassName={styles.bookmarkIcon}
+          activeIconClassName={styles.bookmarkIconActive}
+        />
+      </div>
     </div>
     <div className={styles.ratingRow}>
       <StarRating rating={book.ratingAvg ?? 0} outOf={10} size={16} />

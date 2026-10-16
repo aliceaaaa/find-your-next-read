@@ -30,7 +30,7 @@ const createLanguageNames = (): Intl.DisplayNames | null => {
 
 const languageNames = createLanguageNames();
 
-const descriptionToString = (desc: ApiBook['description']): string => {
+export const descriptionToString = (desc: ApiBook['description']): string => {
   if (!desc) {
     return '';
   }
@@ -70,6 +70,41 @@ const descriptionToString = (desc: ApiBook['description']): string => {
   return text.join(' ');
 };
 
+// Descriptions written in the rich text editor are stored as HTML. Turn them
+// into plain text for display, keeping paragraph and list breaks as newlines.
+export const htmlToText = (html: string): string => {
+  if (!/<[a-z!/][\s\S]*>/i.test(html)) {
+    return html;
+  }
+
+  const withBreaks = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h[1-6]|blockquote)>/gi, '\n');
+
+  let text: string;
+
+  if (typeof DOMParser !== 'undefined') {
+    text =
+      new DOMParser().parseFromString(withBreaks, 'text/html').body
+        .textContent ?? '';
+  } else {
+    text = withBreaks
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#0?39;|&apos;/g, "'")
+      .replace(/&amp;/g, '&');
+  }
+
+  return text
+    .split('\n')
+    .map((line) => line.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .join('\n');
+};
+
 const languageToName = (code: string): string => {
   if (!code) {
     return '';
@@ -86,7 +121,7 @@ const languageToName = (code: string): string => {
   }
 };
 
-const categoryToName = (category: string | ApiCategory): string =>
+export const categoryToName = (category: string | ApiCategory): string =>
   typeof category === 'string' ? category : category.name;
 
 const toRatingAvg = (value: ApiBook['rating_avg']): number | null => {
@@ -107,7 +142,8 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   coverTextColor: apiBook.cover_text_color,
   coverImage: apiBook.cover_image ?? null,
   categories: (apiBook.categories ?? []).map(categoryToName),
-  description: descriptionToString(apiBook.description),
+  description: htmlToText(descriptionToString(apiBook.description)),
+  descriptionHtml: descriptionToString(apiBook.description),
   published: apiBook.published ? new Date(apiBook.published).getFullYear() : 0,
   pages: apiBook.pages ?? 0,
   language: languageToName(apiBook.language ?? ''),

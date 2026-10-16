@@ -5,6 +5,7 @@ import {
   Routes,
   useNavigate,
   useLocation,
+  useParams,
 } from 'react-router-dom';
 import { Book } from 'types';
 import { HomeFeed, SearchResults, StaticPage, PostConstructor } from 'sections';
@@ -32,6 +33,26 @@ const getNextBooks = (allBooks: Book[], current: Book, limit = 6): Book[] => {
   const rest = others.filter((b) => !sameCategory.includes(b));
 
   return [...sameCategory, ...rest].slice(0, limit);
+};
+
+const EditBookRoute = () => {
+  const { bookId } = useParams();
+  const navigate = useNavigate();
+  const id = Number(bookId);
+
+  if (!Number.isFinite(id)) {
+    return <Navigate to="/library" replace />;
+  }
+
+  return (
+    <PostConstructor
+      key={id}
+      bookId={id}
+      onSaved={(savedId) =>
+        navigate(`/books/${savedId}/summary/`, { replace: true })
+      }
+    />
+  );
 };
 
 export const AppContent = () => {
@@ -109,6 +130,8 @@ export const AppContent = () => {
         description: 'Add a new book to the catalogue.',
         noindex: true,
       });
+    } else if (/^\/books\/[^/]+\/edit\/?$/.test(pathname)) {
+      setDocumentMeta({ title: 'Edit Book', noindex: true });
     } else if (pathname === '/login') {
       setDocumentMeta({ title: 'Log in', noindex: true });
     } else if (pathname.startsWith('/books/') && summaryBook) {
@@ -116,7 +139,9 @@ export const AppContent = () => {
         title: summaryBook.author
           ? `${summaryBook.title} by ${summaryBook.author}`
           : summaryBook.title,
-        description: summaryBook.description?.slice(0, 160) || undefined,
+        description:
+          summaryBook.description?.replace(/\s+/g, ' ').slice(0, 160) ||
+          undefined,
       });
     } else if (pathname.startsWith('/pages/')) {
       const meta = getStaticPageMeta(pathname.split('/')[2] ?? '');
@@ -167,6 +192,11 @@ export const AppContent = () => {
           reviews={reviews}
           nextBooks={getNextBooks(allBooks, summaryBook)}
           onBack={handleSummaryBack}
+          onEdit={
+            isAdmin
+              ? () => navigate(`/books/${summaryBook.id}/edit`)
+              : undefined
+          }
           onBookmark={handleBookmark}
           onBookSelect={handleBookSelect}
           onCategorySelect={handleCategorySelect}
@@ -246,6 +276,7 @@ export const AppContent = () => {
         <Route path="/pages/:slug" element={<StaticPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/books/:bookId/summary" element={renderBookSummary()} />
+        <Route path="/books/:bookId/edit" element={<EditBookRoute />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Page>
