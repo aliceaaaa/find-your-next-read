@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from 'components';
 import { FormField } from '../../components/form-field';
 import { useAuth } from '../../contexts/auth-context';
@@ -6,6 +7,7 @@ import styles from './login.module.scss';
 
 export const LoginPage = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,6 +19,7 @@ export const LoginPage = () => {
     setIsLoading(true);
     try {
       await login(email, password);
+      navigate('/', { replace: true });
     } catch {
       setError('Invalid email or password. Please try again.');
     } finally {

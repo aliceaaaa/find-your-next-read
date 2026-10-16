@@ -1,0 +1,49 @@
+@use "../../styles/variables" as *;
+
+.button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: none;
+  border: none;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-primary;
+  }
+
+  // Tooltip. Anchored to the right edge so it opens leftwards: the button
+  // usually sits at the right edge of a card and would get clipped otherwise.
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    transform: translateY(-4px);
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: $color-text;
+    color: $color-white;
+    font-family: $font-base;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 0.15s,
+      transform 0.15s;
+    z-index: 10;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

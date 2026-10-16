@@ -91,8 +91,8 @@ export const BookOfTheDay = ({
                   Read the review →
                 </button>
                 <div className={styles.reviewMeta}>
-                  <StarRating rating={review.rating} size={13} />
-                  <span>{review.rating}/5</span>
+                  <StarRating rating={review.rating} outOf={10} size={13} />
+                  <span>{review.rating}/10</span>
                 </div>
               </section>
             ))

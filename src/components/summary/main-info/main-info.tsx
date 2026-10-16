@@ -1,7 +1,7 @@
 import { Book } from '../../../types';
 import { StarRating } from '../../star-rating';
 import { BookmarkButton } from '../../bookmark-button';
-import { PencilIcon } from '../../../icons';
+import { EditButton } from '../../edit-button';
 import styles from './main-info.module.scss';
 
 type MainInfoProps = {
@@ -22,15 +22,7 @@ export const MainInfo = ({
       <h1 className={styles.title}>{book.title}</h1>
       <div className={styles.actions}>
         {onEdit && (
-          <button
-            type="button"
-            className={styles.editBtn}
-            onClick={onEdit}
-            aria-label="Edit book"
-            data-tooltip="Edit book"
-          >
-            <PencilIcon size={20} />
-          </button>
+          <EditButton onClick={onEdit} label="Edit book" />
         )}
         <BookmarkButton
           isBookmarked={book.isBookmarked}

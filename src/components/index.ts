@@ -6,6 +6,7 @@ export * from './category-filter';
 export * from './cookie-banner';
 export * from './cover';
 export * from './cover-constructor';
+export * from './edit-button';
 export * from './empty-state';
 export * from './footer';
 export * from './form-field';
