@@ -1,0 +1,24 @@
+{
+  "library": {
+    "title": "Library",
+    "description": "Browse the full Find Your Next Read catalogue of books by genre, rating and release."
+  },
+  "pages": {
+    "about": {
+      "title": "About",
+      "description": "What Find your next read is and who it is for."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "description": "The terms that govern your use of Find your next read."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How Find your next read handles your data."
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "description": "How and why Find your next read uses cookies."
+    }
+  }
+}

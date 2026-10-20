@@ -2,19 +2,26 @@ import { NavItemId } from 'types';
 
 export const navPathMap: Record<NavItemId, string> = {
   home: '/',
-  library: '/library',
+  library: '/library/',
   favorites: '/favorites',
   'post-constructor': '/create-post',
 };
 
+// Prerendered pages are served with a trailing slash ("/library/"), routes
+// are matched without one.
+export const normalizePathname = (pathname: string) =>
+  pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
+
 export const navFromPath = (pathname: string): NavItemId => {
-  if (pathname === '/library') {
+  const path = normalizePathname(pathname);
+
+  if (path === '/library') {
     return 'library';
   }
-  if (pathname === '/favorites') {
+  if (path === '/favorites') {
     return 'favorites';
   }
-  if (pathname === '/create-post') {
+  if (path === '/create-post') {
     return 'post-constructor';
   }
   return 'home';

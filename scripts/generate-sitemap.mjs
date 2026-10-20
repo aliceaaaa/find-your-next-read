@@ -1,14 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 import { SITE_URL, bookPath, fetchAllBooks } from './lib/books.mjs';
-
-const STATIC_PATHS = [
-  '/',
-  '/library',
-  '/pages/about',
-  '/pages/terms',
-  '/pages/privacy',
-  '/pages/cookies',
-];
+import { loadStaticPages } from './lib/pages.mjs';
 
 const toLastmod = (iso) => iso.slice(0, 10);
 
@@ -26,6 +18,10 @@ const urlEntry = (path, lastmod) => {
 
 const main = async () => {
   const books = await fetchAllBooks();
+  const staticPaths = [
+    '/',
+    ...(await loadStaticPages()).map((page) => page.path),
+  ];
 
   const latestUpdate = books.reduce(
     (acc, book) => (book.updated_at > acc ? book.updated_at : acc),
@@ -33,10 +29,10 @@ const main = async () => {
   );
 
   const entries = [
-    ...STATIC_PATHS.map((path) =>
+    ...staticPaths.map((path) =>
       urlEntry(
         path,
-        path === '/' || path === '/library'
+        path === '/' || path === '/library/'
           ? toLastmod(latestUpdate)
           : undefined,
       ),
@@ -57,7 +53,7 @@ const main = async () => {
   await writeFile(new URL('../public/sitemap.xml', import.meta.url), xml);
 
   console.log(
-    `sitemap.xml generated: ${STATIC_PATHS.length} static + ${books.length} book URLs`,
+    `sitemap.xml generated: ${staticPaths.length} static + ${books.length} book URLs`,
   );
 };
 

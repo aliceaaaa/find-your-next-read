@@ -40,11 +40,14 @@ const setRobotsMeta = (noindex: boolean) => {
   }
 };
 
+// Book, library and static pages are served as directories (prerendered
+// index.html), so their canonical form keeps the trailing slash; everything
+// else drops it.
+const PRERENDERED_PATH = /^\/(books|library|pages)(\/|$)/;
+
 const setCanonical = (path: string) => {
-  // Book pages are served as directories (prerendered index.html), so their
-  // canonical form keeps the trailing slash; everything else drops it.
   const trimmed = path.replace(/\/+$/, '');
-  const normalized = trimmed.startsWith('/books/') ? `${trimmed}/` : trimmed;
+  const normalized = PRERENDERED_PATH.test(trimmed) ? `${trimmed}/` : trimmed;
   const href = `${SITE_URL}${normalized || '/'}`;
   let el = document.head.querySelector<HTMLLinkElement>(
     'link[rel="canonical"]',
@@ -80,7 +83,13 @@ export const setDocumentMeta = ({
   setMetaTag('property', 'og:title', fullTitle);
   setMetaTag('name', 'twitter:title', fullTitle);
   setRobotsMeta(Boolean(noindex));
-  setCanonical(path);
+
+  if (noindex) {
+    // A canonical on a noindex page sends Google conflicting signals.
+    document.head.querySelector('link[rel="canonical"]')?.remove();
+  } else {
+    setCanonical(path);
+  }
 
   if (description) {
     setMetaTag('name', 'description', description);

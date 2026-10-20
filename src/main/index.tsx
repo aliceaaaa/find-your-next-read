@@ -8,9 +8,17 @@ import {
   useParams,
 } from 'react-router-dom';
 import { Book } from 'types';
-import { HomeFeed, SearchResults, StaticPage, PostConstructor } from 'sections';
+import {
+  HomeFeed,
+  NotFound,
+  SearchResults,
+  StaticPage,
+  PostConstructor,
+} from 'sections';
 import { getStaticPageMeta } from '../sections/static-page';
 import { Summary, Library, Page } from 'components';
+import { normalizePathname } from '../constants';
+import pageMeta from '../constants/page-meta.json';
 import { setDocumentMeta, trackPageView } from '../lib';
 import { LoginPage } from '../sections/login/login';
 import { useAuth } from '../contexts/auth-context';
@@ -22,6 +30,8 @@ import {
   useCategories,
   useReviews,
 } from '../hooks';
+
+const NOT_FOUND_META = { title: 'Page not found', noindex: true };
 
 // Enough to fill one row of tiles on wide screens; the shelf trims the rest.
 const getNextBooks = (allBooks: Book[], current: Book, limit = 12): Book[] => {
@@ -42,7 +52,7 @@ const EditBookRoute = () => {
   const id = Number(bookId);
 
   if (!Number.isFinite(id)) {
-    return <Navigate to="/library" replace />;
+    return <Navigate to="/library/" replace />;
   }
 
   return (
@@ -61,7 +71,11 @@ export const AppContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { data: apiBooks = [], isPending: isLoading } = useBooks();
+  const {
+    data: apiBooks = [],
+    isPending: isLoading,
+    isError: isBooksError,
+  } = useBooks();
   const { data: reviews = [] } = useReviews();
   const { bookmarks, setBookmarks } = useBookmarks();
 
@@ -98,62 +112,71 @@ export const AppContent = () => {
   };
 
   useEffect(() => {
-    const { pathname, search } = location;
-    trackPageView(pathname);
+    trackPageView(location.pathname);
+  }, [location]);
 
-    if (pathname === '/') {
+  useEffect(() => {
+    const { pathname, search } = location;
+    const path = normalizePathname(pathname);
+
+    if (path === '/') {
       setDocumentMeta({
         description:
           'Find Your Next Read — discover your next favorite book. Personalized book recommendations, reader reviews and books similar to the ones you love.',
       });
-    } else if (pathname === '/library') {
-      setDocumentMeta({
-        title: 'Library',
-        description:
-          'Browse the full Find Your Next Read catalogue of books by genre, rating and release.',
-      });
-    } else if (pathname === '/favorites') {
+    } else if (path === '/library') {
+      setDocumentMeta(pageMeta.library);
+    } else if (path === '/favorites') {
       setDocumentMeta({
         title: 'Favorites',
         description: 'The books you saved to read next.',
         noindex: true,
       });
-    } else if (pathname === '/search') {
+    } else if (path === '/search') {
       const q = new URLSearchParams(search).get('q') ?? '';
       setDocumentMeta({
         title: q ? `Search: ${q}` : 'Search',
         description: 'Search books by title, author or genre.',
         noindex: true,
       });
-    } else if (pathname === '/create-post') {
+    } else if (path === '/create-post') {
       setDocumentMeta({
         title: 'Add Book',
         description: 'Add a new book to the catalogue.',
         noindex: true,
       });
-    } else if (/^\/books\/[^/]+\/edit\/?$/.test(pathname)) {
+    } else if (/^\/books\/[^/]+\/edit$/.test(path)) {
       setDocumentMeta({ title: 'Edit Book', noindex: true });
-    } else if (pathname === '/login') {
+    } else if (path === '/login') {
       setDocumentMeta({ title: 'Log in', noindex: true });
-    } else if (pathname.startsWith('/books/') && summaryBook) {
-      setDocumentMeta({
-        title: summaryBook.author
-          ? `${summaryBook.title} by ${summaryBook.author}`
-          : summaryBook.title,
-        description:
-          summaryBook.description?.replace(/\s+/g, ' ').slice(0, 160) ||
-          undefined,
-      });
-    } else if (pathname.startsWith('/pages/')) {
-      const meta = getStaticPageMeta(pathname.split('/')[2] ?? '');
-      setDocumentMeta({
-        title: meta?.title ?? 'Page',
-        description: meta?.description,
-      });
+    } else if (path.startsWith('/books/')) {
+      if (summaryBook) {
+        setDocumentMeta({
+          title: summaryBook.author
+            ? `${summaryBook.title} by ${summaryBook.author}`
+            : summaryBook.title,
+          description:
+            summaryBook.description?.replace(/\s+/g, ' ').slice(0, 160) ||
+            undefined,
+        });
+      } else if (!isLoading && !isBooksError) {
+        // Only a successful load proves the book is gone; a failed API call
+        // must not noindex a real book page.
+        setDocumentMeta(NOT_FOUND_META);
+      }
+    } else if (path.startsWith('/pages/')) {
+      const meta = getStaticPageMeta(path.split('/')[2] ?? '');
+      setDocumentMeta(
+        meta
+          ? { title: meta.title, description: meta.description }
+          : NOT_FOUND_META,
+      );
     } else {
-      setDocumentMeta({});
+      // The server answers every unknown URL with 200 and the SPA shell, so
+      // noindex is what keeps them out of the index as soft 404s.
+      setDocumentMeta(NOT_FOUND_META);
     }
-  }, [location, summaryBook]);
+  }, [location, summaryBook, isLoading, isBooksError]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -209,7 +232,7 @@ export const AppContent = () => {
       return null;
     }
 
-    return <Navigate to="/library" replace />;
+    return isBooksError ? <Navigate to="/library/" replace /> : <NotFound />;
   };
 
   return (
@@ -278,7 +301,7 @@ export const AppContent = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/books/:bookId/summary" element={renderBookSummary()} />
         <Route path="/books/:bookId/edit" element={<EditBookRoute />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Page>
   );

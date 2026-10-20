@@ -1,4 +1,5 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import pageMeta from '../../constants/page-meta.json';
 import styles from './static-page.module.scss';
 
 type StaticContent = {
@@ -70,8 +71,7 @@ const CookiesTable = () => (
 
 const PAGES: Record<string, StaticContent> = {
   about: {
-    title: 'About',
-    description: 'What Find your next read is and who it is for.',
+    ...pageMeta.pages.about,
     body: [
       <h1>Impressum</h1>,
       <h2> Impressum / Legal Notice </h2>,
@@ -99,8 +99,7 @@ const PAGES: Record<string, StaticContent> = {
     ],
   },
   terms: {
-    title: 'Terms of Service',
-    description: 'The terms that govern your use of Find your next read.',
+    ...pageMeta.pages.terms,
     body: [
       <>Last updated: <b>July 2026</b></>,
       'Welcome to Find your next read (hereinafter referred to as "the Website"). By accessing or using this Website, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use the Website.',
@@ -129,8 +128,7 @@ const PAGES: Record<string, StaticContent> = {
     ],
   },
   privacy: {
-    title: 'Privacy Policy',
-    description: 'How Find your next read handles your data.',
+    ...pageMeta.pages.privacy,
     body: [
       <>Last updated: <b>August 2026</b></>,
       'This Privacy Policy describes how we, as the controller, process personal data when you visit the Website Find your next read. It fulfils our information duties under Articles 13 and 14 of the General Data Protection Regulation (GDPR/DSGVO) and § 5 of the German Digitale-Dienste-Gesetz (DDG).',
@@ -252,8 +250,7 @@ const PAGES: Record<string, StaticContent> = {
     ],
   },
   cookies: {
-    title: 'Cookie Policy',
-    description: 'How and why Find your next read uses cookies.',
+    ...pageMeta.pages.cookies,
     body: [
       <>Last updated: <b>August 2026</b></>,
       'This Cookie Policy explains what cookies and similar storage technologies (collectively, "cookies") are used on the Website Find your next read, why they are used, and how you can manage them. It should be read together with our Privacy Policy.',
@@ -288,17 +285,21 @@ const PAGES: Record<string, StaticContent> = {
   },
 };
 
+export const NotFound = () => (
+  <div className={styles.page}>
+    <h1 className={styles.title}>Page not found</h1>
+    <p className={styles.paragraph}>
+      This page does not exist. <Link to="/">Go to the home page</Link>.
+    </p>
+  </div>
+);
+
 export const StaticPage = () => {
   const { slug = '' } = useParams();
   const content = PAGES[slug];
 
   if (!content) {
-    return (
-      <div className={styles.page}>
-        <h1 className={styles.title}>Page not found</h1>
-        <p className={styles.paragraph}>This page does not exist yet.</p>
-      </div>
-    );
+    return <NotFound />;
   }
 
   return (

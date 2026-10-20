@@ -2,83 +2,99 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://findyournextread.com/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/library/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/pages/about/</loc>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/pages/terms/</loc>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/pages/privacy/</loc>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/pages/cookies/</loc>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/books/25/summary/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/books/24/summary/</loc>
     <lastmod>2026-10-16</lastmod>
   </url>
   <url>
-    <loc>https://findyournextread.com/library</loc>
+    <loc>https://findyournextread.com/books/23/summary/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://findyournextread.com/books/22/summary/</loc>
     <lastmod>2026-10-16</lastmod>
-  </url>
-  <url>
-    <loc>https://findyournextread.com/pages/about</loc>
-  </url>
-  <url>
-    <loc>https://findyournextread.com/pages/terms</loc>
-  </url>
-  <url>
-    <loc>https://findyournextread.com/pages/privacy</loc>
-  </url>
-  <url>
-    <loc>https://findyournextread.com/pages/cookies</loc>
   </url>
   <url>
     <loc>https://findyournextread.com/books/21/summary/</loc>
-    <lastmod>2026-10-16</lastmod>
+    <lastmod>2026-10-18</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/20/summary/</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-16</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/19/summary/</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/18/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/17/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/16/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/15/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/14/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/13/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/12/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/11/summary/</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-10-16</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/10/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/9/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/8/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/7/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/6/summary/</loc>
@@ -86,7 +102,7 @@
   </url>
   <url>
     <loc>https://findyournextread.com/books/5/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/4/summary/</loc>
@@ -94,14 +110,14 @@
   </url>
   <url>
     <loc>https://findyournextread.com/books/3/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/2/summary/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-16</lastmod>
   </url>
   <url>
     <loc>https://findyournextread.com/books/1/summary/</loc>
-    <lastmod>2026-10-16</lastmod>
+    <lastmod>2026-10-19</lastmod>
   </url>
 </urlset>

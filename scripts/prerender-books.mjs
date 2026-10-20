@@ -1,7 +1,10 @@
 // Runs after `react-scripts build`. For every book writes
 // build/books/{id}/summary/index.html with book-specific <title>, description,
 // Open Graph / Twitter tags, canonical, Book JSON-LD and static fallback
-// content, plus a 1200×630 PNG preview at build/og/books/{id}.png.
+// content, plus a 1200×630 PNG preview at build/og/books/{id}.png. The library
+// and static pages get the same treatment at build/library/index.html and
+// build/pages/{slug}/index.html, so they stop inheriting the home page's
+// title and canonical from build/index.html.
 //
 // Crawlers that don't execute JS (Telegram, VK, Facebook, Slack, Yandex)
 // read these tags directly. The web server must serve $uri/index.html before
@@ -9,6 +12,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { Resvg } from '@resvg/resvg-js';
 import { SITE_NAME, SITE_URL, bookPath, fetchAllBooks } from './lib/books.mjs';
+import { loadStaticPages } from './lib/pages.mjs';
 
 const BUILD_DIR = new URL('../build/', import.meta.url);
 const OG_WIDTH = 1200;
@@ -179,6 +183,29 @@ const replaceOnce = (html, pattern, replacement, label) => {
   return html.replace(pattern, replacement);
 };
 
+// Swaps the home page's title, description, social tags, canonical and
+// #root fallback in build/index.html for the page's own.
+const renderPage = (template, tags, fallback) => {
+  let html = template;
+
+  html = replaceOnce(html, /<title>[\s\S]*?<\/title>/, '', 'title');
+  html = html
+    .replace(
+      /<meta\s+(?:name|property)="(?:description|og:[\w:]+|twitter:\w+)"[^>]*>/g,
+      '',
+    )
+    .replace(/<link\s+rel="canonical"[^>]*>/g, '');
+  html = replaceOnce(html, /<\/head>/, `${tags}</head>`, '</head>');
+  html = replaceOnce(
+    html,
+    /<div id="root">[\s\S]*<\/div>(\s*<\/body>)/,
+    `${fallback}$1`,
+    '#root',
+  );
+
+  return html;
+};
+
 const renderBookHtml = (template, book) => {
   const url = `${SITE_URL}${bookPath(book)}`;
   const fullText = descriptionToText(book.description);
@@ -220,27 +247,51 @@ const renderBookHtml = (template, book) => {
     `<script type="application/ld+json">${bookJsonLd(book, { url, image, description })}</script>`,
   ].join('');
 
-  const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a></p><h1>${escapeHtml(book.title)}</h1><p>by ${escapeHtml(book.author)}</p></header><main><p>${escapeHtml(fullText)}</p></main><nav><a href="/library">Browse all books</a></nav></div>`;
+  const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a></p><h1>${escapeHtml(book.title)}</h1><p>by ${escapeHtml(book.author)}</p></header><main><p>${escapeHtml(fullText)}</p></main><nav><a href="/library/">Browse all books</a></nav></div>`;
 
-  let html = template;
-
-  html = replaceOnce(html, /<title>[\s\S]*?<\/title>/, '', 'title');
-  html = html
-    .replace(
-      /<meta\s+(?:name|property)="(?:description|og:[\w:]+|twitter:\w+)"[^>]*>/g,
-      '',
-    )
-    .replace(/<link\s+rel="canonical"[^>]*>/g, '');
-  html = replaceOnce(html, /<\/head>/, `${tags}</head>`, '</head>');
-  html = replaceOnce(
-    html,
-    /<div id="root">[\s\S]*<\/div>(\s*<\/body>)/,
-    `${fallback}$1`,
-    '#root',
-  );
-
-  return html;
+  return renderPage(template, tags, fallback);
 };
+
+// Same title format as setDocumentMeta in src/lib/meta.ts.
+const renderStaticPageHtml = (template, page, staticPages, mainHtml = '') => {
+  const url = `${SITE_URL}${page.path}`;
+  const title = `${page.title} · ${SITE_NAME}`;
+  const image = `${SITE_URL}/logo512.png`;
+
+  const tags = [
+    `<title>${escapeHtml(title)}</title>`,
+    `<meta name="description" content="${escapeHtml(page.description)}">`,
+    `<link rel="canonical" href="${url}">`,
+    `<meta property="og:type" content="website">`,
+    `<meta property="og:site_name" content="${SITE_NAME}">`,
+    `<meta property="og:title" content="${escapeHtml(title)}">`,
+    `<meta property="og:description" content="${escapeHtml(page.description)}">`,
+    `<meta property="og:url" content="${url}">`,
+    `<meta property="og:image" content="${image}">`,
+    `<meta property="og:image:alt" content="${SITE_NAME} — personalized book recommendations">`,
+    `<meta name="twitter:card" content="summary">`,
+    `<meta name="twitter:title" content="${escapeHtml(title)}">`,
+    `<meta name="twitter:description" content="${escapeHtml(page.description)}">`,
+    `<meta name="twitter:image" content="${image}">`,
+  ].join('');
+
+  const nav = staticPages
+    .map((p) => `<a href="${p.path}">${escapeHtml(p.title)}</a>`)
+    .join(' ');
+  const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a></p><h1>${escapeHtml(page.title)}</h1><p>${escapeHtml(page.description)}</p></header>${mainHtml}<nav>${nav}</nav></div>`;
+
+  return renderPage(template, tags, fallback);
+};
+
+// Raw-HTML links to every book, so crawlers reach them from the library
+// without running JS.
+const libraryMainHtml = (books) =>
+  `<main><ul>${books
+    .map(
+      (book) =>
+        `<li><a href="${bookPath(book)}">${escapeHtml(book.title)}</a> by ${escapeHtml(book.author)}</li>`,
+    )
+    .join('')}</ul></main>`;
 
 const main = async () => {
   const template = await readFile(new URL('index.html', BUILD_DIR), 'utf8');
@@ -259,7 +310,21 @@ const main = async () => {
     }
   }
 
-  console.log(`prerendered ${books.length} book pages`);
+  const staticPages = await loadStaticPages();
+
+  for (const page of staticPages) {
+    const dir = new URL(`.${page.path}`, BUILD_DIR);
+    const mainHtml = page.path === '/library/' ? libraryMainHtml(books) : '';
+    await mkdir(dir, { recursive: true });
+    await writeFile(
+      new URL('index.html', dir),
+      renderStaticPageHtml(template, page, staticPages, mainHtml),
+    );
+  }
+
+  console.log(
+    `prerendered ${books.length} book pages and ${staticPages.length} static pages`,
+  );
 };
 
 main().catch((error) => {

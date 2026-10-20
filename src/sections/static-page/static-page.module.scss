@@ -16,6 +16,11 @@
   line-height: 1.7;
   color: $color-text-secondary;
   margin: 0 0 16px;
+
+  a {
+    color: $color-primary;
+    text-decoration: underline;
+  }
 }
 
 .block {

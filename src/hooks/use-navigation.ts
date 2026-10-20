@@ -21,7 +21,7 @@ export const useNavigation = (apiBooks: Book[]) => {
     : null;
 
   const activeNavFromRoute = location.pathname.startsWith('/books/')
-    ? navFromPath(locationState?.from || '/library')
+    ? navFromPath(locationState?.from || '/library/')
     : navFromPath(location.pathname);
 
   const activeCategory = searchParams.get('category') || 'All';
@@ -46,13 +46,13 @@ export const useNavigation = (apiBooks: Book[]) => {
   const handleCategorySelect = (category: string) => {
     navigate(
       category === 'All'
-        ? '/library'
-        : `/library?category=${encodeURIComponent(category)}`,
+        ? '/library/'
+        : `/library/?category=${encodeURIComponent(category)}`,
     );
   };
 
   const handleSummaryBack = () => {
-    navigate(locationState?.from || '/library');
+    navigate(locationState?.from || '/library/');
   };
 
   return {

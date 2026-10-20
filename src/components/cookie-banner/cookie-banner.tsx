@@ -65,7 +65,7 @@ export const CookieBanner = () => {
         cookies are only used if you allow them — nothing is loaded before you
         choose. You can change your choice at any time via “Cookie settings” in
         the footer. See our{' '}
-        <Link to="/pages/cookies" className={styles.link}>
+        <Link to="/pages/cookies/" className={styles.link}>
           Cookie Policy
         </Link>
         .
