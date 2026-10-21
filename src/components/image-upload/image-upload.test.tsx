@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ImageUpload } from './image-upload';
 
 describe('ImageUpload', () => {
@@ -43,6 +43,21 @@ describe('ImageUpload', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /remove image/i }));
     expect(onRemove).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes a preview data URL and the picked file to onChange', async () => {
+    const onChange = jest.fn();
+    render(<ImageUpload onChange={onChange} />);
+    const file = new File(['png'], 'cover.png', { type: 'image/png' });
+    fireEvent.change(screen.getByTestId('file-input'), {
+      target: { files: [file] },
+    });
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith(
+        expect.stringMatching(/^data:image\/png;base64,/),
+        file,
+      ),
+    );
   });
 
   it('renders hidden file input', () => {

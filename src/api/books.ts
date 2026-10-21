@@ -140,7 +140,7 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   author: apiBook.author,
   coverColor: apiBook.cover_color,
   coverTextColor: apiBook.cover_text_color,
-  coverImage: apiBook.cover_image ?? null,
+  coverImage: apiBook.cover?.url ?? null,
   categories: (apiBook.categories ?? []).map(categoryToName),
   description: htmlToText(descriptionToString(apiBook.description)),
   descriptionHtml: descriptionToString(apiBook.description),

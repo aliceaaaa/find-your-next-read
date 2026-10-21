@@ -6,7 +6,8 @@ type ImageUploadProps = {
   accept?: string;
   label?: string;
   value?: string;
-  onChange?: (dataUrl: string) => void;
+  /** Receives a data URL for previewing and the picked file for uploading. */
+  onChange?: (dataUrl: string, file: File) => void;
   onRemove?: () => void;
 };
 
@@ -31,7 +32,7 @@ export const ImageUpload = ({
       reader.onload = (e) => {
         const result = e.target?.result;
         if (typeof result === 'string') {
-          onChange?.(result);
+          onChange?.(result, file);
         }
       };
 
@@ -116,7 +117,7 @@ export const ImageUpload = ({
           <p className={styles.dropText}>
             {isDragging ? 'Drop image here' : 'Click or drag image here'}
           </p>
-          <p className={styles.dropHint}>PNG, JPG, WEBP up to 10 MB</p>
+          <p className={styles.dropHint}>PNG, JPG, WEBP up to 5 MB</p>
         </div>
       )}
       <input

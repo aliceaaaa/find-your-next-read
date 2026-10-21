@@ -69,6 +69,11 @@ const truncate = (text, limit) => {
   return `${cut.slice(0, cut.lastIndexOf(' ')) || cut}…`;
 };
 
+// Uploaded cover URL, or null when the book has none and needs a generated
+// og image.
+const coverUrl = (book) =>
+  /^https?:\/\//.test(book.cover?.url ?? '') ? book.cover.url : null;
+
 const wrapText = (text, maxChars, maxLines) => {
   const lines = [];
   let line = '';
@@ -214,9 +219,7 @@ const renderBookHtml = (template, book) => {
     DESCRIPTION_LIMIT,
   );
   const title = `${book.title} by ${book.author} · ${SITE_NAME}`;
-  const image = /^https?:\/\//.test(book.cover_image ?? '')
-    ? book.cover_image
-    : `${SITE_URL}/og/books/${book.id}.png`;
+  const image = coverUrl(book) ?? `${SITE_URL}/og/books/${book.id}.png`;
   const hasGeneratedImage = image.startsWith(`${SITE_URL}/og/`);
 
   const tags = [
@@ -305,7 +308,7 @@ const main = async () => {
     await mkdir(dir, { recursive: true });
     await writeFile(new URL('index.html', dir), renderBookHtml(template, book));
 
-    if (!/^https?:\/\//.test(book.cover_image ?? '')) {
+    if (!coverUrl(book)) {
       await writeFile(new URL(`${book.id}.png`, ogDir), renderOgImage(book));
     }
   }

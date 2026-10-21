@@ -15,8 +15,12 @@ const request = async <T>(
   { auth = true }: { auth?: boolean } = {},
 ): Promise<T> => {
   const token = auth ? getToken() : null;
+  // Uploads must let the browser set the multipart Content-Type with its
+  // boundary; forcing JSON makes the API see no file at all.
+  const isUpload = options.body instanceof FormData;
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...(isUpload ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers as Record<string, string>),
   };
 
@@ -37,6 +41,14 @@ const request = async <T>(
   return res.json();
 };
 
+export type ApiAttachment = {
+  id: number;
+  url: string;
+  original_name: string;
+  mime_type: string;
+  size: number;
+};
+
 export type ApiBook = {
   id: number;
   title: string;
@@ -49,7 +61,7 @@ export type ApiBook = {
   pages: number | null;
   language: string | null;
   isbn: string | null;
-  cover_image: string | null;
+  cover?: ApiAttachment | null;
   created_at: string;
   updated_at: string;
   ratings_sum: number | null;
@@ -193,7 +205,6 @@ export type CreateBookPayload = {
   description?: { en: string } | null;
   cover_color: string;
   cover_text_color: string;
-  cover_image?: string | null;
   isbn?: string | null;
 };
 
@@ -214,6 +225,17 @@ export const apiUpdateBook = (
 
 export const apiDeleteBook = (id: number): Promise<unknown> =>
   request(`/books/${id}`, { method: 'DELETE' });
+
+// Replaces any existing cover. The API limits the file to 5 MB.
+export const apiUploadBookCover = (id: number, file: Blob): Promise<ApiBook> => {
+  const body = new FormData();
+  body.append('cover', file);
+
+  return request<ApiBook>(`/books/${id}/cover`, { method: 'POST', body });
+};
+
+export const apiDeleteBookCover = (id: number): Promise<unknown> =>
+  request(`/books/${id}/cover`, { method: 'DELETE' });
 
 export const apiRestoreBook = (id: number): Promise<ApiBook> =>
   request<ApiBook>(`/books/${id}/restore`, { method: 'POST' });

@@ -4,8 +4,10 @@ import {
   ApiBook,
   CreateBookPayload,
   apiCreateBook,
+  apiDeleteBookCover,
   apiGetBook,
   apiUpdateBook,
+  apiUploadBookCover,
   categoryToName,
   descriptionToString,
 } from 'api';
@@ -33,7 +35,10 @@ type FormState = {
   isbn: string;
   categories: string[];
   description: string;
+  /** Cover preview: the saved cover's URL or a data URL of a picked file. */
   image: string;
+  /** A newly picked cover, uploaded after the book is saved. */
+  coverFile: File | null;
   coverColor: string;
   coverTextColor: string;
 };
@@ -51,6 +56,7 @@ const makeInitial = (): FormState => ({
   categories: [],
   description: '',
   image: '',
+  coverFile: null,
   coverColor: pick(PRESET_BG_COLORS),
   coverTextColor: pick(PRESET_TEXT_COLORS),
 });
@@ -66,7 +72,8 @@ const fromApiBook = (book: ApiBook): FormState => ({
   isbn: book.isbn ?? '',
   categories: (book.categories ?? []).map(categoryToName),
   description: descriptionToString(book.description),
-  image: book.cover_image ?? '',
+  image: book.cover?.url ?? '',
+  coverFile: null,
   coverColor: book.cover_color || pick(PRESET_BG_COLORS),
   coverTextColor: book.cover_text_color || pick(PRESET_TEXT_COLORS),
 });
@@ -96,6 +103,7 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
   const [form, setForm] = useState<FormState>(makeInitial);
   const [formKey, setFormKey] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [coverFailed, setCoverFailed] = useState(false);
 
   useEffect(() => {
     if (editedBook) {
@@ -111,6 +119,7 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
   const resetForm = () => {
     setForm(editedBook ? fromApiBook(editedBook) : makeInitial());
     setFormKey((k) => k + 1);
+    setCoverFailed(false);
   };
 
   const categoryOptions: SelectOption[] = categories.map((c) => ({
@@ -149,7 +158,8 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
   };
 
   const mutation = useMutation({
-    mutationFn: () => {
+    onMutate: () => setCoverFailed(false),
+    mutationFn: async () => {
       const payload: CreateBookPayload = {
         title: form.title.trim(),
         author: form.author.trim(),
@@ -161,19 +171,43 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         description: form.description ? { en: form.description } : null,
         cover_color: form.coverColor,
         cover_text_color: form.coverTextColor,
-        cover_image: form.image || null,
       };
 
-      return bookId != null
-        ? apiUpdateBook(bookId, payload)
-        : apiCreateBook(payload);
+      const saved =
+        bookId != null
+          ? await apiUpdateBook(bookId, payload)
+          : await apiCreateBook(payload);
+      const savedId = saved?.id ?? (bookId as number);
+
+      // The cover has its own endpoint, so it can only go up once the book
+      // exists. Its failure is reported apart from the book's: the book is
+      // already saved, and publishing again would create a duplicate.
+      let coverSaved = true;
+
+      try {
+        if (form.coverFile) {
+          await apiUploadBookCover(savedId, form.coverFile);
+        } else if (!form.image && editedBook?.cover) {
+          await apiDeleteBookCover(savedId);
+        }
+      } catch {
+        coverSaved = false;
+      }
+
+      return { savedId, coverSaved };
     },
-    onSuccess: async (saved) => {
+    onSuccess: async ({ savedId, coverSaved }) => {
       track(isEdit ? 'edit_book' : 'add_book', { title: form.title.trim() });
+      setCoverFailed(!coverSaved);
       await queryClient.invalidateQueries({ queryKey: ['books'] });
 
+      // Stay on the edit form so the cover can be tried again.
+      if (isEdit && !coverSaved) {
+        return;
+      }
+
       if (isEdit && onSaved) {
-        onSaved(saved?.id ?? (bookId as number));
+        onSaved(savedId);
         return;
       }
 
@@ -224,6 +258,12 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
             ? 'Your changes have been saved.'
             : 'The book has been successfully added to the catalog.'}
         </p>
+        {coverFailed && (
+          <p role="alert" className={styles.successText}>
+            The cover image could not be uploaded. You can add it later by
+            editing the book.
+          </p>
+        )}
         {!isEdit && (
           <Button
             onClick={() => {
@@ -337,8 +377,12 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
           <ImageUpload
             label="Upload Cover Image"
             value={form.image || undefined}
-            onChange={set('image')}
-            onRemove={() => set('image')('')}
+            onChange={(image, coverFile) =>
+              setForm((prev) => ({ ...prev, image, coverFile }))
+            }
+            onRemove={() =>
+              setForm((prev) => ({ ...prev, image: '', coverFile: null }))
+            }
           />
         </section>
 
@@ -358,6 +402,12 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
           />
         </section>
 
+        {coverFailed && (
+          <p role="alert" className={styles.subtitle}>
+            The book was saved, but the cover image could not be uploaded.
+            Please try again.
+          </p>
+        )}
         {mutation.isError && (
           <p role="alert" className={styles.subtitle}>
             Could not {isEdit ? 'save' : 'add'} the book. Please check the fields and try again.
