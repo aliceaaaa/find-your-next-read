@@ -60,6 +60,25 @@
       }
     }
 
+    &.random {
+      color: $color-primary;
+
+      .icon {
+        color: $color-primary;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        background: $color-primary-light;
+        color: $color-primary;
+
+        .icon {
+          color: $color-primary;
+          transform: rotate(180deg);
+        }
+      }
+    }
+
     &.active {
       background: $color-primary-light;
       color: $color-text;

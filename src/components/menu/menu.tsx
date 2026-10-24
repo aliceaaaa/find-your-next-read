@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { NavItemId } from 'types';
-import { LogOutIcon, PlusCircleIcon } from '../../icons';
+import { LogOutIcon, PlusCircleIcon, ShuffleIcon } from '../../icons';
 import { useAuth } from '../../contexts/auth-context';
 import { navItems } from './constants';
 import styles from './menu.module.scss';
@@ -10,12 +10,15 @@ type MenuProps = {
   activeNav: NavItemId;
   isAdmin?: boolean;
   onNavChange: (id: NavItemId) => void;
+  /** Opens a random book; the button is hidden when not provided. */
+  onRandomBook?: () => void;
 };
 
 export const Menu = ({
   activeNav,
   isAdmin = false,
   onNavChange,
+  onRandomBook,
 }: MenuProps) => {
   const { user, isAuthenticated, logout } = useAuth();
   // Sessions from before the user was stored only have a token; still show
@@ -39,6 +42,16 @@ export const Menu = ({
             {label}
           </button>
         ))}
+        {onRandomBook && (
+          <button
+            type="button"
+            className={cn(styles['nav-item'], styles.random)}
+            onClick={onRandomBook}
+          >
+            <ShuffleIcon className={styles.icon} />
+            Random book
+          </button>
+        )}
         {isAdmin && (
           <button
             className={cn(styles['nav-item'], {

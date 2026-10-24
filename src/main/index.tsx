@@ -14,6 +14,7 @@ import {
   SearchResults,
   StaticPage,
   PostConstructor,
+  ReviewsPage,
 } from 'sections';
 import { getStaticPageMeta } from '../sections/static-page';
 import { Summary, Library, Page } from 'components';
@@ -34,8 +35,28 @@ import {
 const NOT_FOUND_META = { title: 'Page not found', noindex: true };
 
 // Enough to fill one row of tiles on wide screens; the shelf trims the rest.
-const getNextBooks = (allBooks: Book[], current: Book, limit = 12): Book[] => {
-  const others = allBooks.filter((b) => b.id !== current.id);
+// Reading order from the "read next" links: books this one links to, and
+// books that link to it.
+const getReadingOrder = (allBooks: Book[], current: Book) => {
+  const byId = new Map(allBooks.map((b) => [b.id, b]));
+
+  return {
+    readNext: (current.nextBookIds ?? [])
+      .map((id) => byId.get(id))
+      .filter((b): b is Book => !!b),
+    readBefore: allBooks.filter((b) => b.nextBookIds?.includes(current.id)),
+  };
+};
+
+const getNextBooks = (
+  allBooks: Book[],
+  current: Book,
+  exclude: Book[] = [],
+  limit = 12,
+): Book[] => {
+  const others = allBooks.filter(
+    (b) => b.id !== current.id && !exclude.some((e) => e.id === b.id),
+  );
 
   const sameCategory = others.filter((b) =>
     b.categories.some((c) => current.categories.includes(c)),
@@ -103,6 +124,16 @@ export const AppContent = () => {
     setBookmarks((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleRandomBook = () => {
+    const candidates = allBooks.filter((book) => book.id !== summaryBook?.id);
+
+    if (candidates.length > 0) {
+      handleBookSelect(
+        candidates[Math.floor(Math.random() * candidates.length)],
+      );
+    }
+  };
+
   const handleSearch = (query: string) => {
     const trimmed = query.trim();
 
@@ -131,6 +162,12 @@ export const AppContent = () => {
         title: 'Favorites',
         description: 'The books you saved to read next.',
         noindex: true,
+      });
+    } else if (path === '/reviews') {
+      const author = new URLSearchParams(search).get('author') ?? '';
+      setDocumentMeta({
+        title: author ? `Reviews by ${author}` : 'Reviews',
+        description: 'Reader reviews of books on Find Your Next Read.',
       });
     } else if (path === '/search') {
       const q = new URLSearchParams(search).get('q') ?? '';
@@ -210,11 +247,18 @@ export const AppContent = () => {
 
   const renderBookSummary = () => {
     if (summaryBook) {
+      const { readNext, readBefore } = getReadingOrder(allBooks, summaryBook);
+
       return (
         <Summary
           book={summaryBook}
           reviews={reviews}
-          nextBooks={getNextBooks(allBooks, summaryBook)}
+          readNext={readNext}
+          readBefore={readBefore}
+          nextBooks={getNextBooks(allBooks, summaryBook, [
+            ...readNext,
+            ...readBefore,
+          ])}
           onBack={handleSummaryBack}
           onEdit={
             isAdmin
@@ -240,6 +284,7 @@ export const AppContent = () => {
       activeNav={activeNavFromRoute}
       isAdmin={isAdmin}
       onNavChange={handleNavChange}
+      onRandomBook={allBooks.length > 0 ? handleRandomBook : undefined}
       onSearch={handleSearch}
     >
       <Routes>
@@ -284,6 +329,12 @@ export const AppContent = () => {
               onBookSelect={handleBookSelect}
               onBookmark={handleBookmark}
             />
+          }
+        />
+        <Route
+          path="/reviews"
+          element={
+            <ReviewsPage books={allBooks} onBookSelect={handleBookSelect} />
           }
         />
         <Route path="/create-post" element={<PostConstructor />} />

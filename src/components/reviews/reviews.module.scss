@@ -50,6 +50,14 @@
   font-size: 13px;
   font-weight: 600;
   color: $color-text;
+  text-decoration: none;
+  align-self: flex-start;
+  max-width: 100%;
+
+  &:hover {
+    color: $color-primary;
+  }
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

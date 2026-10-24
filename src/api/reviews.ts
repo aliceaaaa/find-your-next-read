@@ -1,5 +1,5 @@
 import { Review } from 'types';
-import { ApiReview, apiGetReviews } from './client';
+import { ApiReview, ReviewsQuery, apiGetReviews } from './client';
 
 const toInitials = (name: string): string =>
   name
@@ -39,4 +39,25 @@ export const fetchReviews = async (): Promise<Review[]> => {
   }
 
   return allReviews;
+};
+
+export type ReviewPage = {
+  reviews: Review[];
+  page: number;
+  lastPage: number;
+  total: number;
+};
+
+export const fetchReviewPage = async (
+  page = 1,
+  query: ReviewsQuery = {},
+): Promise<ReviewPage> => {
+  const res = await apiGetReviews(page, query);
+
+  return {
+    reviews: res.data.map(mapApiReview),
+    page: res.current_page,
+    lastPage: res.last_page,
+    total: res.total,
+  };
 };

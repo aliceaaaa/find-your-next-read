@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { NavItemId } from 'types';
-import { HomeIcon, LibraryIcon, HeartIcon } from '../../icons';
+import { HomeIcon, LibraryIcon, HeartIcon, MessageIcon } from '../../icons';
 
 type NavItem = {
   id: NavItemId;
@@ -12,4 +12,5 @@ export const navItems: NavItem[] = [
   { id: 'home', label: 'Home', Icon: HomeIcon },
   { id: 'library', label: 'Library', Icon: LibraryIcon },
   { id: 'favorites', label: 'Favorites', Icon: HeartIcon },
+  { id: 'reviews', label: 'Reviews', Icon: MessageIcon },
 ];

@@ -6,6 +6,8 @@ import {
   apiCreateBook,
   apiDeleteBookCover,
   apiGetBook,
+  apiRemoveNextBook,
+  apiSetNextBooks,
   apiUpdateBook,
   apiUploadBookCover,
   categoryToName,
@@ -13,7 +15,7 @@ import {
 } from 'api';
 import { PRESET_BG_COLORS, PRESET_TEXT_COLORS } from '../../constants';
 import { track } from '../../lib';
-import { useCategories } from '../../hooks';
+import { useBooks, useCategories } from '../../hooks';
 import { useAuth } from '../../contexts/auth-context';
 import {
   FormField,
@@ -41,6 +43,8 @@ type FormState = {
   coverFile: File | null;
   coverColor: string;
   coverTextColor: string;
+  /** "Read next" links: books to read after this one, in order. */
+  nextBookIds: number[];
 };
 
 const pick = <T,>(list: T[]): T =>
@@ -59,6 +63,7 @@ const makeInitial = (): FormState => ({
   coverFile: null,
   coverColor: pick(PRESET_BG_COLORS),
   coverTextColor: pick(PRESET_TEXT_COLORS),
+  nextBookIds: [],
 });
 
 const fromApiBook = (book: ApiBook): FormState => ({
@@ -76,6 +81,7 @@ const fromApiBook = (book: ApiBook): FormState => ({
   coverFile: null,
   coverColor: book.cover_color || pick(PRESET_BG_COLORS),
   coverTextColor: book.cover_text_color || pick(PRESET_TEXT_COLORS),
+  nextBookIds: (book.next_books ?? []).map((next) => next.id),
 });
 
 type PostConstructorProps = {
@@ -88,6 +94,7 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { data: categories = [] } = useCategories();
+  const { data: allBooks = [] } = useBooks();
   const isEdit = bookId != null;
 
   const {
@@ -96,7 +103,7 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
     isError: isBookError,
   } = useQuery({
     queryKey: ['books', 'raw', bookId],
-    queryFn: () => apiGetBook(bookId as number),
+    queryFn: () => apiGetBook(bookId as number, 'nextBooks'),
     enabled: isEdit && isAdmin,
   });
 
@@ -104,6 +111,7 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
   const [formKey, setFormKey] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [coverFailed, setCoverFailed] = useState(false);
+  const [linksFailed, setLinksFailed] = useState(false);
 
   useEffect(() => {
     if (editedBook) {
@@ -120,6 +128,29 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
     setForm(editedBook ? fromApiBook(editedBook) : makeInitial());
     setFormKey((k) => k + 1);
     setCoverFailed(false);
+    setLinksFailed(false);
+  };
+
+  const nextBookOptions: SelectOption[] = allBooks
+    .filter((book) => book.id !== bookId)
+    .map((book) => ({
+      value: book.id,
+      label: book.title,
+      sublabel: book.author,
+    }));
+
+  const handleNextBooksChange = (
+    value: SelectOption['value'] | SelectOption['value'][] | null,
+  ) => {
+    let next: number[] = [];
+
+    if (Array.isArray(value)) {
+      next = value.map(Number);
+    } else if (value != null) {
+      next = [Number(value)];
+    }
+
+    setForm((prev) => ({ ...prev, nextBookIds: next }));
   };
 
   const categoryOptions: SelectOption[] = categories.map((c) => ({
@@ -158,7 +189,10 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
   };
 
   const mutation = useMutation({
-    onMutate: () => setCoverFailed(false),
+    onMutate: () => {
+      setCoverFailed(false);
+      setLinksFailed(false);
+    },
     mutationFn: async () => {
       const payload: CreateBookPayload = {
         title: form.title.trim(),
@@ -194,15 +228,32 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         coverSaved = false;
       }
 
-      return { savedId, coverSaved };
+      // "Read next" links also have their own endpoints; sync only the
+      // difference. Reported apart from the book for the same reason.
+      let linksSaved = true;
+      const savedLinks = (editedBook?.next_books ?? []).map((b) => b.id);
+      const added = form.nextBookIds.filter((id) => !savedLinks.includes(id));
+      const removed = savedLinks.filter((id) => !form.nextBookIds.includes(id));
+
+      try {
+        if (added.length > 0) {
+          await apiSetNextBooks(savedId, added);
+        }
+        await Promise.all(removed.map((id) => apiRemoveNextBook(savedId, id)));
+      } catch {
+        linksSaved = false;
+      }
+
+      return { savedId, coverSaved, linksSaved };
     },
-    onSuccess: async ({ savedId, coverSaved }) => {
+    onSuccess: async ({ savedId, coverSaved, linksSaved }) => {
       track(isEdit ? 'edit_book' : 'add_book', { title: form.title.trim() });
       setCoverFailed(!coverSaved);
+      setLinksFailed(!linksSaved);
       await queryClient.invalidateQueries({ queryKey: ['books'] });
 
-      // Stay on the edit form so the cover can be tried again.
-      if (isEdit && !coverSaved) {
+      // Stay on the edit form so the cover or links can be tried again.
+      if (isEdit && (!coverSaved || !linksSaved)) {
         return;
       }
 
@@ -262,6 +313,12 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
           <p role="alert" className={styles.successText}>
             The cover image could not be uploaded. You can add it later by
             editing the book.
+          </p>
+        )}
+        {linksFailed && (
+          <p role="alert" className={styles.successText}>
+            The “Read next” links could not be saved. You can add them later
+            by editing the book.
           </p>
         )}
         {!isEdit && (
@@ -363,6 +420,22 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         </section>
 
         <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Reading Order</h2>
+          <p className={styles.sectionSubtitle}>
+            Books to read after this one, e.g. the next part of a series. They
+            appear as “Read next” on the book page.
+          </p>
+          <Select
+            label="Read next"
+            options={nextBookOptions}
+            value={form.nextBookIds}
+            placeholder="Select books..."
+            multiple
+            onChange={handleNextBooksChange}
+          />
+        </section>
+
+        <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Description</h2>
           <RichTextEditor
             label="What I think"
@@ -405,6 +478,12 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         {coverFailed && (
           <p role="alert" className={styles.subtitle}>
             The book was saved, but the cover image could not be uploaded.
+            Please try again.
+          </p>
+        )}
+        {linksFailed && (
+          <p role="alert" className={styles.subtitle}>
+            The book was saved, but the “Read next” links could not be saved.
             Please try again.
           </p>
         )}

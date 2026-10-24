@@ -17,6 +17,8 @@ export type Book = {
   pages: number;
   language: string;
   isBookmarked?: boolean;
+  /** Books linked as "read next" after this one, in order. */
+  nextBookIds?: number[];
 };
 
 export type User = {
@@ -50,6 +52,11 @@ export type Review = {
   date: string;
 };
 
-export type NavItemId = 'home' | 'library' | 'favorites' | 'post-constructor';
+export type NavItemId =
+  | 'home'
+  | 'library'
+  | 'favorites'
+  | 'reviews'
+  | 'post-constructor';
 
 export * from './book-of-the-day';

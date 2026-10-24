@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import cn from 'classnames';
+import { Link } from 'react-router-dom';
 import { Review } from 'types';
 import { useAuth } from '../../contexts/auth-context';
 import { StarRating } from '../star-rating';
@@ -58,7 +59,13 @@ export const Reviews = ({
             <div className={styles.reviewHeader}>
               <div className={styles.avatar}>{review.authorInitials}</div>
               <div className={styles.reviewMeta}>
-                <span className={styles.reviewAuthor}>{review.authorName}</span>
+                <Link
+                  className={styles.reviewAuthor}
+                  to={`/reviews?author=${encodeURIComponent(review.authorName)}`}
+                  title={`All reviews by ${review.authorName}`}
+                >
+                  {review.authorName}
+                </Link>
                 <span className={styles.reviewDate}>{review.date}</span>
               </div>
               <StarRating rating={review.rating} outOf={10} size={13} />

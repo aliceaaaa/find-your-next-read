@@ -1,0 +1,131 @@
+@use '../../../styles/variables' as *;
+
+.readingOrder {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+
+  &:empty {
+    display: none;
+  }
+}
+
+// With only "next" links, keep them on the right so the direction reads
+// naturally; on mobile everything stacks.
+.columnNext {
+  grid-column: 2;
+
+  @media (max-width: 768px) {
+    grid-column: auto;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  background: $color-white;
+  font-family: $font-base;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08);
+    transform: translateY(-2px);
+
+    .arrow {
+      color: $color-primary;
+    }
+  }
+}
+
+.itemNext {
+  background: linear-gradient(135deg, $color-white 0%, $color-primary-light 100%);
+
+  .label {
+    color: $color-primary;
+  }
+}
+
+.thumb {
+  flex-shrink: 0;
+  // The small cover (90px) scaled down as a whole, so its text keeps the
+  // same layout instead of re-wrapping in a narrower box.
+  width: 52px;
+  height: calc(52px * 297 / 210);
+
+  > div {
+    transform: scale(calc(52 / 90));
+    transform-origin: top left;
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: $color-text-secondary;
+}
+
+.bookTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: $color-text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.author {
+  font-size: 13px;
+  color: $color-text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow {
+  flex-shrink: 0;
+  color: $color-text-secondary;
+  transition: color 0.15s;
+}

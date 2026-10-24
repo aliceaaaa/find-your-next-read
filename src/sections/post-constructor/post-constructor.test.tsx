@@ -4,6 +4,8 @@ import {
   apiCreateBook,
   apiDeleteBookCover,
   apiGetBook,
+  apiRemoveNextBook,
+  apiSetNextBooks,
   apiUpdateBook,
   apiUploadBookCover,
 } from 'api';
@@ -17,6 +19,10 @@ jest.mock('api', () => ({
   apiUpdateBook: jest.fn(),
   apiUploadBookCover: jest.fn(),
   apiDeleteBookCover: jest.fn(),
+  apiSetNextBooks: jest.fn(),
+  apiRemoveNextBook: jest.fn(),
+  // Book list for the "Read next" picker; keeps tests off the network.
+  fetchBooks: jest.fn(() => Promise.resolve([])),
 }));
 
 beforeEach(() => {
@@ -24,6 +30,8 @@ beforeEach(() => {
   (apiUpdateBook as jest.Mock).mockResolvedValue({ id: 5 });
   (apiUploadBookCover as jest.Mock).mockResolvedValue({ id: 1 });
   (apiDeleteBookCover as jest.Mock).mockResolvedValue(undefined);
+  (apiSetNextBooks as jest.Mock).mockResolvedValue(undefined);
+  (apiRemoveNextBook as jest.Mock).mockResolvedValue(undefined);
 });
 
 const renderWith = (
@@ -285,6 +293,26 @@ describe('PostConstructor', () => {
         await waitFor(() => expect(onSaved).toHaveBeenCalledWith(5));
         expect(apiDeleteBookCover).not.toHaveBeenCalled();
         expect(apiUploadBookCover).not.toHaveBeenCalled();
+      });
+
+      it('loads the book with its "read next" links', async () => {
+        renderWith(true, { bookId: 5 });
+        await screen.findByAltText('Upload preview');
+        expect(apiGetBook).toHaveBeenCalledWith(5, 'nextBooks');
+      });
+
+      it('leaves unchanged "read next" links alone on save', async () => {
+        (apiGetBook as jest.Mock).mockResolvedValue({
+          ...book,
+          next_books: [{ ...book, id: 7 }],
+        });
+        const onSaved = jest.fn();
+        renderWith(true, { bookId: 5, onSaved });
+        await screen.findByAltText('Upload preview');
+        fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+        await waitFor(() => expect(onSaved).toHaveBeenCalledWith(5));
+        expect(apiSetNextBooks).not.toHaveBeenCalled();
+        expect(apiRemoveNextBook).not.toHaveBeenCalled();
       });
 
       it('stays on the form when the new cover fails to upload', async () => {

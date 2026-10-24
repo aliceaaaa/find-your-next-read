@@ -67,6 +67,8 @@ export type ApiBook = {
   ratings_sum: number | null;
   ratings_count: number | null;
   rating_avg: number | string | null;
+  /** Present when requested with `include=nextBooks`. */
+  next_books?: ApiBook[];
 };
 
 export type ApiPaginatedResponse<T> = {
@@ -116,13 +118,19 @@ export type BooksQuery = {
   search?: string;
   perPage?: number;
   sort?: string;
+  /** Relations to embed, e.g. `nextBooks`. */
+  include?: string;
 };
 
 export const apiGetBooks = (
   page = 1,
-  { search, perPage, sort }: BooksQuery = {},
+  { search, perPage, sort, include }: BooksQuery = {},
 ): Promise<ApiPaginatedResponse<ApiBook>> => {
   const params = new URLSearchParams({ page: String(page) });
+
+  if (include) {
+    params.set('include', include);
+  }
 
   if (search) {
     params.set('filter[search]', search);
@@ -137,8 +145,10 @@ export const apiGetBooks = (
   return request<ApiPaginatedResponse<ApiBook>>(`/books?${params.toString()}`);
 };
 
-export const apiGetBook = (id: number): Promise<ApiBook> =>
-  request<ApiBook>(`/books/${id}`);
+export const apiGetBook = (id: number, include?: string): Promise<ApiBook> =>
+  request<ApiBook>(
+    `/books/${id}${include ? `?include=${encodeURIComponent(include)}` : ''}`,
+  );
 
 export type ApiBookCategory = {
   id: number;
@@ -162,10 +172,33 @@ export const apiGetCategories = (
 ): Promise<ApiPaginatedResponse<ApiCategory>> =>
   request<ApiPaginatedResponse<ApiCategory>>(`/categories?page=${page}`);
 
+export type ReviewsQuery = {
+  /** Reviewer name, case-insensitive partial match. */
+  author?: string;
+  bookId?: number;
+  perPage?: number;
+};
+
 export const apiGetReviews = (
   page = 1,
-): Promise<ApiPaginatedResponse<ApiReview>> =>
-  request<ApiPaginatedResponse<ApiReview>>(`/reviews?page=${page}`);
+  { author, bookId, perPage }: ReviewsQuery = {},
+): Promise<ApiPaginatedResponse<ApiReview>> => {
+  const params = new URLSearchParams({ page: String(page) });
+
+  if (author) {
+    params.set('author', author);
+  }
+  if (bookId) {
+    params.set('book_id', String(bookId));
+  }
+  if (perPage) {
+    params.set('per_page', String(perPage));
+  }
+
+  return request<ApiPaginatedResponse<ApiReview>>(
+    `/reviews?${params.toString()}`,
+  );
+};
 
 export type CreateReviewPayload = {
   author: string;

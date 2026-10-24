@@ -4,6 +4,7 @@ export const navPathMap: Record<NavItemId, string> = {
   home: '/',
   library: '/library/',
   favorites: '/favorites',
+  reviews: '/reviews',
   'post-constructor': '/create-post',
 };
 
@@ -20,6 +21,9 @@ export const navFromPath = (pathname: string): NavItemId => {
   }
   if (path === '/favorites') {
     return 'favorites';
+  }
+  if (path === '/reviews') {
+    return 'reviews';
   }
   if (path === '/create-post') {
     return 'post-constructor';

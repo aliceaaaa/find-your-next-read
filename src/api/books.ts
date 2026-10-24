@@ -152,6 +152,7 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   ratingAvg: toRatingAvg(apiBook.rating_avg),
   ratingsCount: apiBook.ratings_count ?? 0,
   isBookmarked: false,
+  nextBookIds: (apiBook.next_books ?? []).map((next) => next.id),
 });
 
 export const fetchBooks = async (search?: string): Promise<Book[]> => {
@@ -159,7 +160,9 @@ export const fetchBooks = async (search?: string): Promise<Book[]> => {
   let page = 1;
 
   while (true) {
-    const res = await apiGetBooks(page, { search });
+    // nextBooks: the "read next" links, so the book page can show the
+    // reading order without an extra request per book.
+    const res = await apiGetBooks(page, { search, include: 'nextBooks' });
 
     allBooks.push(...res.data.map(mapApiBook));
 

@@ -13,6 +13,7 @@ import { ReviewForm } from '../review-form';
 import { BookShelf } from '../book-shelf';
 import { MainInfo } from './main-info';
 import { SummaryMeta } from './summary-meta';
+import { ReadingOrder } from './reading-order';
 
 import styles from './summary.module.scss';
 
@@ -20,6 +21,9 @@ interface SummaryProps {
   book: Book;
   reviews: Review[];
   nextBooks?: Book[];
+  /** Reading order: books linked before / after this one. */
+  readBefore?: Book[];
+  readNext?: Book[];
   onBack: () => void;
   onEdit?: () => void;
   onBookmark: (id: number) => void;
@@ -31,6 +35,8 @@ export const Summary = ({
   book,
   reviews,
   nextBooks = [],
+  readBefore = [],
+  readNext = [],
   onBack,
   onEdit,
   onBookmark,
@@ -133,6 +139,13 @@ export const Summary = ({
           <SummaryMeta book={book} />
         </div>
       </div>
+      {onBookSelect && (
+        <ReadingOrder
+          before={readBefore}
+          next={readNext}
+          onBookSelect={onBookSelect}
+        />
+      )}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>
           Reviews{bookReviews.length > 0 ? ` (${bookReviews.length})` : ''}
@@ -152,7 +165,7 @@ export const Summary = ({
       {nextBooks.length > 0 && onBookSelect && (
         <section className={styles.section}>
           <BookShelf
-            title="Next books"
+            title="More like this"
             books={nextBooks}
             cardType="full"
             layout="grid"

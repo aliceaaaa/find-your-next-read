@@ -11,6 +11,7 @@ type PageProps = {
   activeNav: NavItemId;
   isAdmin?: boolean;
   onNavChange: (id: NavItemId) => void;
+  onRandomBook?: () => void;
   onSearch?: (query: string) => void;
   rightPanel?: ReactNode;
   children: ReactNode;
@@ -20,6 +21,7 @@ export const Page = ({
   activeNav,
   isAdmin = false,
   onNavChange,
+  onRandomBook,
   onSearch,
   rightPanel,
   children,
@@ -41,6 +43,7 @@ export const Page = ({
           activeNav={activeNav}
           isAdmin={isAdmin}
           onNavChange={onNavChange}
+          onRandomBook={onRandomBook}
         />
         <div className={styles.content} ref={contentRef}>
           <header className={styles.header}>
