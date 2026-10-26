@@ -126,7 +126,7 @@ describe('PostConstructor', () => {
 
     it('renders Language field', () => {
       renderAsAdmin();
-      expect(screen.getByLabelText(/^language/i)).toBeInTheDocument();
+      expect(screen.getByText(/^language$/i)).toBeInTheDocument();
     });
 
     it('renders Categories field', () => {

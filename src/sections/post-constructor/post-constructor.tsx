@@ -12,6 +12,7 @@ import {
   apiUploadBookCover,
   categoryToName,
   descriptionToString,
+  languageToName,
 } from 'api';
 import { PRESET_BG_COLORS, PRESET_TEXT_COLORS } from '../../constants';
 import { track } from '../../lib';
@@ -65,6 +66,23 @@ const makeInitial = (): FormState => ({
   coverTextColor: pick(PRESET_TEXT_COLORS),
   nextBookIds: [],
 });
+
+// ISO 639-1 codes, which is what the API stores.
+const LANGUAGE_CODES = [
+  'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'he', 'hi', 'hu',
+  'it', 'ja', 'ko', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sv', 'tr', 'uk',
+  'zh',
+];
+
+const toLanguageOption = (code: string): SelectOption => ({
+  value: code,
+  label: languageToName(code),
+  sublabel: code,
+});
+
+const LANGUAGE_OPTIONS = LANGUAGE_CODES.map(toLanguageOption).sort((a, b) =>
+  a.label.localeCompare(b.label),
+);
 
 const fromApiBook = (book: ApiBook): FormState => ({
   title: book.title ?? '',
@@ -266,6 +284,12 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
     },
   });
 
+  // Keep a saved code that is not in the list selectable.
+  const languageOptions =
+    form.language && !LANGUAGE_CODES.includes(form.language)
+      ? [toLanguageOption(form.language), ...LANGUAGE_OPTIONS]
+      : LANGUAGE_OPTIONS;
+
   const set =
     (field: keyof FormState) =>
     (value: string): void =>
@@ -393,12 +417,14 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
               onChange={set('pages')}
               placeholder="350"
             />
-            <FormField
+            <Select
               label="Language"
-              id="language"
-              value={form.language}
-              onChange={set('language')}
-              placeholder="English"
+              options={languageOptions}
+              value={form.language || null}
+              placeholder="Select language..."
+              onChange={(value) =>
+                set('language')(value == null ? '' : String(value))
+              }
             />
             <FormField
               label="ISBN"

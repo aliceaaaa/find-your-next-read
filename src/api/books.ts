@@ -105,7 +105,7 @@ export const htmlToText = (html: string): string => {
     .join('\n');
 };
 
-const languageToName = (code: string): string => {
+export const languageToName = (code: string): string => {
   if (!code) {
     return '';
   }
