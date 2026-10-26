@@ -124,6 +124,13 @@ export const ConnectionsPage = ({
 
   useEffect(() => setActive(null), [sky]);
 
+  // Signing out mid-edit ends edit mode too.
+  useEffect(() => {
+    if (!canEdit) {
+      setEditing(false);
+    }
+  }, [canEdit]);
+
   const clearSelection = () => {
     setSelectedId(null);
     setSelectedLink(null);
