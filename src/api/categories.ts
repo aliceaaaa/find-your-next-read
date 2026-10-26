@@ -1,11 +1,13 @@
 import { ApiCategory, apiGetCategories } from './client';
 
 export type Category = {
+  id: number;
   name: string;
   booksCount: number;
 };
 
 const mapApiCategory = (c: ApiCategory): Category => ({
+  id: c.id,
   name: c.name,
   booksCount: c.books_count ?? 0,
 });

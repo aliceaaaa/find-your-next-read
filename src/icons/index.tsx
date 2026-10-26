@@ -146,3 +146,19 @@ export const ShuffleIcon = createIcon(
   </>,
   'ShuffleIcon',
 );
+
+export const XIcon = createIcon(
+  <path d="M18 6L6 18M6 6l12 12" />,
+  'XIcon',
+);
+
+export const ConstellationIcon = createIcon(
+  <>
+    <path d="M5 18l5-7 5 3 4-8" />
+    <circle cx="5" cy="18" r="1.6" />
+    <circle cx="10" cy="11" r="1.6" />
+    <circle cx="15" cy="14" r="1.6" />
+    <circle cx="19" cy="6" r="1.6" />
+  </>,
+  'ConstellationIcon',
+);

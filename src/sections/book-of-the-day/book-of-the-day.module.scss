@@ -22,6 +22,19 @@
   }
 }
 
+// Without reviews the description takes the freed space.
+.content.noReviews {
+  grid-template-columns: 190px 1fr;
+
+  .infoDescription {
+    font-size: 15px;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .reviewsWrap {
   display: flex;
   flex-direction: column;

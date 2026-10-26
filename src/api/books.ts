@@ -2,7 +2,6 @@ import { Book } from 'types';
 import {
   ApiBook,
   ApiCategory,
-  BooksQuery,
   apiGetBook,
   apiGetBooks,
 } from './client';
@@ -174,31 +173,6 @@ export const fetchBooks = async (search?: string): Promise<Book[]> => {
   }
 
   return allBooks;
-};
-
-export type BookPage = {
-  books: Book[];
-  page: number;
-  lastPage: number;
-  total: number;
-};
-
-export const fetchBookPage = async (
-  page = 1,
-  query: BooksQuery = {},
-): Promise<BookPage> => {
-  const res = await apiGetBooks(page, query);
-
-  return {
-    books: res.data.map(mapApiBook),
-    page: res.current_page,
-    lastPage: res.last_page,
-    total: res.total,
-  };
-};
-
-export const searchBooks = (query: string, page = 1): Promise<BookPage> => {
-  return fetchBookPage(page, { search: query });
 };
 
 export const fetchBook = async (id: number): Promise<Book> => {

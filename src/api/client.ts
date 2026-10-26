@@ -234,7 +234,7 @@ export type CreateBookPayload = {
   published?: string | null;
   pages?: number | null;
   language?: string | null;
-  categories?: string[];
+  category_ids?: number[];
   description?: { en: string } | null;
   cover_color: string;
   cover_text_color: string;

@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { normalizePathname } from '../../constants';
 import { NavItemId } from 'types';
 import { Menu } from '../menu';
 import { SearchBar } from '../search-bar';
@@ -27,6 +28,11 @@ export const Page = ({
   children,
 }: PageProps) => {
   const location = useLocation();
+  // Outside the results page the search bar starts empty again.
+  const searchQuery =
+    normalizePathname(location.pathname) === '/search'
+      ? new URLSearchParams(location.search).get('q') ?? ''
+      : '';
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,7 +56,11 @@ export const Page = ({
             <h1 className={styles.title}>
               Find your next <em>read</em>
             </h1>
-            <SearchBar onSearch={onSearch} className={styles.search} />
+            <SearchBar
+              value={searchQuery}
+              onSearch={onSearch}
+              className={styles.search}
+            />
           </header>
           <div className={styles.body}>
             <main className={styles.main}> {children}</main>

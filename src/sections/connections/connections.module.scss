@@ -1,0 +1,386 @@
+@use '../../styles/variables' as *;
+
+$serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+$mono: 'SFMono-Regular', Menlo, Consolas, monospace;
+$sky-top: #2a4b94;
+$sky-mid: #142a63;
+$sky-deep: #091634;
+$starlight: #fdf6e3;
+$gold: #ffd76a;
+$link: #ff8f8f;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// ---------- Header ----------
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kicker {
+  margin: 0;
+  font-family: $mono;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: $color-primary;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: $color-text;
+
+  em {
+    font-family: $serif;
+    font-weight: 400;
+    color: $color-primary;
+  }
+}
+
+.subtitle {
+  max-width: 640px;
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: $color-text-secondary;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: $mono;
+  font-size: 12px;
+  color: $color-text-secondary;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.swatch-link {
+  width: 22px;
+  height: 2px;
+  border-radius: 1px;
+  background: $link;
+}
+
+.swatch-star {
+  width: 10px;
+  height: 10px;
+  background: $sky-mid;
+  box-shadow: 0 0 0 3px rgba($sky-mid, 0.18);
+}
+
+.swatch-lone {
+  width: 7px;
+  height: 7px;
+  background: rgba($sky-mid, 0.45);
+}
+
+// ---------- Sky ----------
+
+.sky-wrap {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(60% 50% at 75% 15%, rgba(#7aa2ff, 0.18), transparent 70%),
+    linear-gradient(
+      160deg,
+      transparent 35%,
+      rgba(#b9c8ff, 0.07) 50%,
+      transparent 65%
+    ),
+    radial-gradient(120% 100% at 20% 0%, $sky-top 0%, $sky-mid 45%, $sky-deep 100%);
+  box-shadow: inset 0 0 120px rgba($sky-deep, 0.6);
+}
+
+.empty {
+  margin: 0;
+  padding: 48px;
+  font-family: $serif;
+  font-size: 18px;
+  font-style: italic;
+  text-align: center;
+  color: rgba($starlight, 0.7);
+}
+
+.sky {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.dust circle {
+  fill: $starlight;
+  opacity: 0.28;
+}
+
+.arrow {
+  fill: $link;
+}
+
+.link {
+  fill: none;
+  stroke: $link;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 3px rgba($link, 0.6));
+  transition:
+    opacity 0.3s ease,
+    stroke-width 0.3s ease;
+}
+
+// Hovering a constellation draws its paths again, in reading order.
+.constellation:hover .link {
+  animation: draw 1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.name {
+  font-family: $mono;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  fill: rgba($starlight, 0.45);
+  pointer-events: none;
+  transition: fill 0.3s ease;
+}
+
+.constellation:hover .name,
+.current .name {
+  fill: $gold;
+}
+
+.focused {
+  .constellation:not(.current) {
+    .link,
+    .name {
+      opacity: 0.2;
+    }
+  }
+
+  .current .link {
+    opacity: 0.45;
+  }
+
+  .current .link.lit {
+    stroke-width: 2.2;
+    opacity: 1;
+  }
+}
+
+.horizon {
+  pointer-events: none;
+
+  line {
+    stroke: rgba($starlight, 0.18);
+    stroke-width: 1;
+    stroke-dasharray: 2 6;
+  }
+
+  text {
+    font-family: $mono;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-anchor: middle;
+    text-transform: uppercase;
+    fill: rgba($starlight, 0.45);
+  }
+}
+
+.star {
+  cursor: pointer;
+  outline: none;
+  transition: opacity 0.3s ease;
+
+  circle {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+}
+
+.star-name {
+  font-family: $serif;
+  font-size: 12px;
+  font-style: italic;
+  fill: rgba($starlight, 0.72);
+  paint-order: stroke;
+  stroke: rgba($sky-deep, 0.55);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.lone .star-name {
+  fill: rgba($starlight, 0.5);
+}
+
+.hit {
+  fill: transparent;
+}
+
+.halo {
+  fill: $starlight;
+  opacity: 0.1;
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s ease;
+}
+
+.ring {
+  fill: none;
+  stroke: $gold;
+  stroke-width: 1;
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.core {
+  fill: $starlight;
+  filter: drop-shadow(0 0 4px rgba($starlight, 0.9));
+  animation: twinkle 4s ease-in-out infinite;
+  transition:
+    fill 0.3s ease,
+    transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+// Stars without a reading path sit further away.
+.lone {
+  .core {
+    opacity: 0.6;
+    filter: none;
+  }
+
+  .halo {
+    opacity: 0.04;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.active {
+  .core {
+    fill: $gold;
+    opacity: 1;
+    transform: scale(1.7);
+    animation: none;
+  }
+
+  .halo {
+    opacity: 0.25;
+    transform: scale(1.4);
+  }
+
+  .ring {
+    animation: pulse 1.4s ease-out infinite;
+  }
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+.dim {
+  opacity: 0.35;
+}
+
+.label {
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: $sky-deep;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  animation: rise 0.25s ease-out both;
+}
+
+.label-title {
+  font-family: $serif;
+  font-size: 15px;
+  font-style: italic;
+  fill: $starlight;
+}
+
+.label-author {
+  font-family: $mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  fill: rgba($starlight, 0.65);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .core,
+  .active .ring,
+  .constellation:hover .link,
+  .label {
+    animation: none;
+  }
+}

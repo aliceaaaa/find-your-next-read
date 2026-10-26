@@ -43,6 +43,28 @@
       }
     }
 
+    .clear-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      margin-right: -6px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: #9CA3AF;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+
+      &:hover {
+        background: $color-hover;
+        color: $color-text;
+      }
+    }
+
     .submit-btn {
       width: 52px;
       height: 52px;

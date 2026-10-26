@@ -1,21 +1,31 @@
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import cn from 'classnames';
-import { SearchIcon } from '../../icons';
+import { SearchIcon, XIcon } from '../../icons';
 import styles from './search-bar.module.scss';
 
 type SearchBarProps = {
+  /** Also called with an empty string when the query is cleared. */
   onSearch?: (query: string) => void;
+  /** Current query, e.g. from the URL; the input follows it when it changes. */
+  value?: string;
   className?: string;
   autoFocus?: boolean;
 };
 
 export const SearchBar = ({
   onSearch,
+  value,
   className,
   autoFocus,
 }: SearchBarProps) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(value ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (value !== undefined) {
+      setQuery(value);
+    }
+  }, [value]);
 
   useEffect(() => {
     if (autoFocus) {
@@ -28,6 +38,19 @@ export const SearchBar = ({
     onSearch?.(query);
   };
 
+  const handleChange = (next: string) => {
+    setQuery(next);
+
+    if (!next) {
+      onSearch?.('');
+    }
+  };
+
+  const handleClear = () => {
+    handleChange('');
+    inputRef.current?.focus();
+  };
+
   return (
     <div className={cn(styles['search-bar'], className)}>
       <form onSubmit={handleSubmit}>
@@ -38,8 +61,18 @@ export const SearchBar = ({
             type="text"
             placeholder="Search by title, author, or genre..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleChange(e.target.value)}
           />
+          {query && (
+            <button
+              type="button"
+              className={styles['clear-btn']}
+              onClick={handleClear}
+              aria-label="Clear search"
+            >
+              <XIcon size={16} />
+            </button>
+          )}
         </div>
         <button
           className={styles['submit-btn']}

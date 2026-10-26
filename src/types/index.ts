@@ -57,6 +57,7 @@ export type NavItemId =
   | 'library'
   | 'favorites'
   | 'reviews'
+  | 'connections'
   | 'who-we-are'
   | 'post-constructor';
 

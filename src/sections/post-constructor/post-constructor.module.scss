@@ -59,11 +59,32 @@
   gap: 20px;
 }
 
+// Floats at the bottom of the scroll area so the form can be saved from
+// anywhere, not only after scrolling to the end.
 .actions {
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
-  padding-top: 8px;
+  // Only the buttons float; the empty part of the row lets clicks through.
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+    box-shadow: 0 6px 20px rgba($color-dark, 0.18);
+  }
+
+  // The ghost Reset button is transparent; keep it readable over the form.
+  > button[type='button'] {
+    background: $color-white;
+  }
+
+  @media (max-width: 768px) {
+    bottom: calc($mobile-nav-height + 12px + env(safe-area-inset-bottom));
+  }
 }
 
 .accessDenied {

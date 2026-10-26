@@ -15,6 +15,7 @@ import {
   StaticPage,
   PostConstructor,
   ReviewsPage,
+  ConnectionsPage,
   WhoWeArePage,
 } from 'sections';
 import { getStaticPageMeta } from '../sections/static-page';
@@ -135,11 +136,21 @@ export const AppContent = () => {
     }
   };
 
+  const isSearchPage = normalizePathname(location.pathname) === '/search';
+  // The page the search was started from, to return to when it is cleared.
+  const searchFrom: string = isSearchPage
+    ? (location.state as { from?: string } | null)?.from ?? '/'
+    : `${location.pathname}${location.search}`;
+
   const handleSearch = (query: string) => {
     const trimmed = query.trim();
 
     if (trimmed) {
-      navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+      navigate(`/search?q=${encodeURIComponent(trimmed)}`, {
+        state: { from: searchFrom },
+      });
+    } else if (isSearchPage) {
+      navigate(searchFrom);
     }
   };
 
@@ -169,6 +180,12 @@ export const AppContent = () => {
       setDocumentMeta({
         title: author ? `Reviews by ${author}` : 'Reviews',
         description: 'Reader reviews of books on Find Your Next Read.',
+      });
+    } else if (path === '/connections') {
+      setDocumentMeta({
+        title: 'Connections',
+        description:
+          'Book constellations: how the books on Find Your Next Read connect by genre and reading order.',
       });
     } else if (path === '/search') {
       const q = new URLSearchParams(search).get('q') ?? '';
@@ -336,6 +353,16 @@ export const AppContent = () => {
           path="/reviews"
           element={
             <ReviewsPage books={allBooks} onBookSelect={handleBookSelect} />
+          }
+        />
+        <Route
+          path="/connections"
+          element={
+            <ConnectionsPage
+              books={allBooks}
+              isLoading={isLoading}
+              onBookSelect={handleBookSelect}
+            />
           }
         />
         <Route path="/create-post" element={<PostConstructor />} />

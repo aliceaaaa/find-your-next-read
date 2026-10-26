@@ -219,7 +219,10 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         pages: form.pages ? Number(form.pages) : null,
         language: form.language.trim() || null,
         isbn: form.isbn.trim() || null,
-        categories: form.categories,
+        // The API takes category ids; names are what the form works with.
+        category_ids: categories
+          .filter((c) => form.categories.includes(c.name))
+          .map((c) => c.id),
         description: form.description ? { en: form.description } : null,
         cover_color: form.coverColor,
         cover_text_color: form.coverTextColor,

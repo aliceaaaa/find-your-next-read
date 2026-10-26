@@ -1,4 +1,5 @@
 export * from './book-of-the-day';
+export * from './connections';
 export * from './home-feed';
 export * from './post-constructor';
 export * from './reviews-page';

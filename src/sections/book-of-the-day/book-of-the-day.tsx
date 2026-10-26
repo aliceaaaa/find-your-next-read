@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import cn from 'classnames';
 import { Card, StarRating } from 'components';
 import { Book, Review } from 'types';
 import styles from './book-of-the-day.module.scss';
@@ -56,26 +57,22 @@ export const BookOfTheDay = ({
   const descriptionRef = useFitLines<HTMLParagraphElement>(
     bookOfTheDay.description,
   );
+  const hasReviews = reviewsOfTheDay.length > 0;
 
   return (
     <div className={styles.wrapper}>
       <h2>Book of the Day</h2>
-      <div className={styles.content}>
+      <div
+        className={cn(styles.content, { [styles.noReviews]: !hasReviews })}
+      >
         <Card
           book={bookOfTheDay}
           onSelect={onBookSelect}
           onBookmark={onBookmark}
         />
-        <div className={styles.reviewsWrap}>
-          {reviewsOfTheDay.length === 0 ? (
-            <section className={styles.reviewSection}>
-              <h3 className={styles.reviewTitle}>No reviews yet</h3>
-              <p className={styles.reviewText}>
-                Nobody has reviewed {bookOfTheDay.title} yet.
-              </p>
-            </section>
-          ) : (
-            reviewsOfTheDay.map((review) => (
+        {hasReviews && (
+          <div className={styles.reviewsWrap}>
+            {reviewsOfTheDay.map((review) => (
               <section key={review.id} className={styles.reviewSection}>
                 <div className={styles.reviewHeader}>
                   <div className={styles.avatar}>{review.authorInitials}</div>
@@ -95,9 +92,9 @@ export const BookOfTheDay = ({
                   <span>{review.rating}/10</span>
                 </div>
               </section>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
         <aside className={styles.infoPanel}>
           {bookOfTheDay.description && (
             <div className={styles.infoDescriptionWrap}>

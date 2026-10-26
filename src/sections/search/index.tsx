@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Book } from 'types';
-import { Button, Card, EmptyState, SkeletonCard } from 'components';
+import { Card, EmptyState, SkeletonCard } from 'components';
 import { useBookSearch } from '../../hooks';
 import styles from './search-results.module.scss';
 
@@ -19,33 +19,23 @@ export const SearchResults = ({
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') ?? '';
 
-  const {
-    data,
-    isFetching,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useBookSearch(query);
-
-  const total = data?.pages[0]?.total;
+  const { results: found, isLoading } = useBookSearch(query);
 
   const results = useMemo(
     () =>
-      (data?.pages.flatMap((page) => page.books) ?? []).map((book) => ({
+      found.map((book) => ({
         ...book,
         isBookmarked: bookmarks[book.id] ?? false,
       })),
-    [data, bookmarks],
+    [found, bookmarks],
   );
-
-  const isInitialLoading = isFetching && !isFetchingNextPage;
 
   const emptySubtitle = query
     ? `We couldn't find anything for “${query}”. Try another title, author, or genre.`
     : 'Type something in the search bar to find your next read.';
 
   const renderResults = () => {
-    if (isInitialLoading) {
+    if (isLoading) {
       return (
         <div className={styles.grid}>
           {Array.from({ length: 8 }).map((_, i) => (
@@ -67,31 +57,16 @@ export const SearchResults = ({
     }
 
     return (
-      <>
-        <div className={styles.grid}>
-          {results.map((book) => (
-            <Card
-              key={book.id}
-              book={book}
-              onSelect={onBookSelect}
-              onBookmark={onBookmark}
-            />
-          ))}
-        </div>
-
-        {hasNextPage && (
-          <div className={styles.loadMore}>
-            <Button
-              variant="secondary"
-              onClick={() => fetchNextPage()}
-              loading={isFetchingNextPage}
-              disabled={isFetchingNextPage}
-            >
-              Load more
-            </Button>
-          </div>
-        )}
-      </>
+      <div className={styles.grid}>
+        {results.map((book) => (
+          <Card
+            key={book.id}
+            book={book}
+            onSelect={onBookSelect}
+            onBookmark={onBookmark}
+          />
+        ))}
+      </div>
     );
   };
 
@@ -99,8 +74,8 @@ export const SearchResults = ({
     <div className={styles.results}>
       <h2 className={styles.heading}>
         Results for <em>“{query}”</em>
-        {typeof total === 'number' && !isInitialLoading && (
-          <span className={styles.count}> · {total}</span>
+        {!isLoading && (
+          <span className={styles.count}> · {results.length}</span>
         )}
       </h2>
 
