@@ -44,6 +44,8 @@ const request = async <T>(
 export type ApiAttachment = {
   id: number;
   url: string;
+  /** WebP renditions keyed by width in px, e.g. { '200': url, '400': url, '800': url }. */
+  variants?: Record<string, string>;
   original_name: string;
   mime_type: string;
   size: number;

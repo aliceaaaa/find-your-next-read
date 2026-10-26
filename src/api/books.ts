@@ -139,7 +139,9 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   author: apiBook.author,
   coverColor: apiBook.cover_color,
   coverTextColor: apiBook.cover_text_color,
-  coverImage: apiBook.cover?.url ?? null,
+  // Prefer the 800px WebP rendition; older covers may not have variants yet.
+  coverImage:
+    apiBook.cover?.variants?.['800'] ?? apiBook.cover?.url ?? null,
   categories: (apiBook.categories ?? []).map(categoryToName),
   description: htmlToText(descriptionToString(apiBook.description)),
   descriptionHtml: descriptionToString(apiBook.description),
