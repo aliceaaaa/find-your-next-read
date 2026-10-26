@@ -22,7 +22,7 @@ const TEAM: Member[] = [
     photo: '/team/nikolai.jpg',
   },
   {
-    name: 'Alisa',
+    name: 'Alice',
     caption: 'lives in a fairy forest',
     photo: '/team/alisa.jpg',
   },
