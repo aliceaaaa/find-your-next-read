@@ -3,12 +3,15 @@ export const SITE_NAME = 'Find Your Next Read';
 export const API_URL =
   process.env.REACT_APP_API_BASE || 'https://api.findyournextread.com/api';
 
-export const fetchAllBooks = async () => {
+export const fetchAllBooks = async ({ include } = {}) => {
   const books = [];
   let page = 1;
+  const includeParam = include ? `&include=${include}` : '';
 
   while (true) {
-    const res = await fetch(`${API_URL}/books?page=${page}&per_page=100`);
+    const res = await fetch(
+      `${API_URL}/books?page=${page}&per_page=100${includeParam}`,
+    );
 
     if (!res.ok) {
       throw new Error(`API error ${res.status}: ${res.statusText}`);
