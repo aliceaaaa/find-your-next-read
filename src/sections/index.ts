@@ -4,3 +4,4 @@ export * from './post-constructor';
 export * from './reviews-page';
 export * from './search';
 export * from './static-page';
+export * from './who-we-are';

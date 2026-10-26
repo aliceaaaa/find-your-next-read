@@ -5,6 +5,7 @@ export const navPathMap: Record<NavItemId, string> = {
   library: '/library/',
   favorites: '/favorites',
   reviews: '/reviews',
+  'who-we-are': '/pages/who-we-are/',
   'post-constructor': '/create-post',
 };
 
@@ -24,6 +25,9 @@ export const navFromPath = (pathname: string): NavItemId => {
   }
   if (path === '/reviews') {
     return 'reviews';
+  }
+  if (path === '/pages/who-we-are') {
+    return 'who-we-are';
   }
   if (path === '/create-post') {
     return 'post-constructor';

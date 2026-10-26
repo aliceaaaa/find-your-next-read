@@ -15,6 +15,7 @@ import {
   StaticPage,
   PostConstructor,
   ReviewsPage,
+  WhoWeArePage,
 } from 'sections';
 import { getStaticPageMeta } from '../sections/static-page';
 import { Summary, Library, Page } from 'components';
@@ -348,6 +349,7 @@ export const AppContent = () => {
             />
           }
         />
+        <Route path="/pages/who-we-are" element={<WhoWeArePage />} />
         <Route path="/pages/:slug" element={<StaticPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/books/:bookId/summary" element={renderBookSummary()} />

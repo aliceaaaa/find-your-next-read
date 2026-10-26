@@ -57,6 +57,7 @@ export type NavItemId =
   | 'library'
   | 'favorites'
   | 'reviews'
+  | 'who-we-are'
   | 'post-constructor';
 
 export * from './book-of-the-day';

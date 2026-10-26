@@ -25,7 +25,9 @@ const CookiesTable = () => (
           <code>cookie_consent</code>
         </td>
         <td>findyournextread.com (first-party)</td>
-        <td>Stores your cookie consent choice (which categories you accepted).</td>
+        <td>
+          Stores your cookie consent choice (which categories you accepted).
+        </td>
         <td>12 months</td>
         <td>Necessary</td>
       </tr>
@@ -81,12 +83,18 @@ const PAGES: Record<string, StaticContent> = {
       'Braunstr. 21',
       '24145, Kiel, Germany',
       'Contact Information:',
-      <>Email: <a href="mailto:infawn@gmail.com">infawn@gmail.com</a></>,
-      <h2>Responsible for content pursuant to § 18 (2) Medienstaatsvertrag (MStV)</h2>,
+      <>
+        Email: <a href="mailto:infawn@gmail.com">infawn@gmail.com</a>
+      </>,
+      <h2>
+        Responsible for content pursuant to § 18 (2) Medienstaatsvertrag (MStV)
+      </h2>,
       'Nikolai Surovegin',
       'Braunstr. 21',
       '24145 Kiel, Germany',
-      <>Email: <a href="mailto:infawn@gmail.com">infawn@gmail.com</a></>,
+      <>
+        Email: <a href="mailto:infawn@gmail.com">infawn@gmail.com</a>
+      </>,
       <h2>Liability for Contents (Haftung für Inhalte)</h2>,
       'As a service provider, we are responsible for our own content on these pages in accordance with general laws pursuant to § 7 Abs. 1 DDG. According to §§ 8 to 10 DDG, however, we as a service provider are not obliged to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.',
       'Obligations to remove or block the use of information in accordance with general laws remain unaffected by this. However, liability in this regard is only possible from the moment of knowledge of a specific infringement. Upon notification of corresponding rights violations, we will remove this content immediately.',
@@ -101,7 +109,9 @@ const PAGES: Record<string, StaticContent> = {
   terms: {
     ...pageMeta.pages.terms,
     body: [
-      <>Last updated: <b>July 2026</b></>,
+      <>
+        Last updated: <b>July 2026</b>
+      </>,
       'Welcome to Find your next read (hereinafter referred to as "the Website"). By accessing or using this Website, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use the Website.',
       <h2>1. Content & Intellectual Property</h2>,
       'All content published on this Website—including book reviews, articles, summaries, text, logos, and overall design—is the intellectual property of the Website owner unless stated otherwise.',
@@ -130,14 +140,18 @@ const PAGES: Record<string, StaticContent> = {
   privacy: {
     ...pageMeta.pages.privacy,
     body: [
-      <>Last updated: <b>August 2026</b></>,
+      <>
+        Last updated: <b>August 2026</b>
+      </>,
       'This Privacy Policy describes how we, as the controller, process personal data when you visit the Website Find your next read. It fulfils our information duties under Articles 13 and 14 of the General Data Protection Regulation (GDPR/DSGVO) and § 5 of the German Digitale-Dienste-Gesetz (DDG).',
       <h2>1. Controller (Verantwortlicher)</h2>,
       'The controller responsible for the processing of personal data on this Website within the meaning of Art. 4 (7) GDPR is:',
       'Nikolai Surovegin',
       'Braunstr. 21',
       '24145 Kiel, Germany',
-      <>Email: <a href="mailto:infawn@gmail.com">infawn@gmail.com</a></>,
+      <>
+        Email: <a href="mailto:infawn@gmail.com">infawn@gmail.com</a>
+      </>,
       <h2>2. Data Protection Officer</h2>,
       'As a small-scale controller, we are not legally required to appoint a Data Protection Officer. For any data protection matters, please use the contact details above.',
       <h2>3. Data Processing in connection with Google Analytics 4</h2>,
@@ -155,9 +169,7 @@ const PAGES: Record<string, StaticContent> = {
           A pseudonymous Client ID assigned by Google and stored in the{' '}
           <code>_ga</code> cookie, used to recognise your browser across pages.
         </li>
-        <li>
-          Information about your device, browser, and operating system.
-        </li>
+        <li>Information about your device, browser, and operating system.</li>
         <li>
           The pages you visit on our Website, the duration of your visit, the
           referral source, and your approximate geographic region (derived from
@@ -173,17 +185,13 @@ const PAGES: Record<string, StaticContent> = {
       'The legal basis for the processing of data via GA4 is:',
       <ul>
         <li>
-          <strong>
-            Art. 6 (1) (a) GDPR
-          </strong>{' '}
-          — your explicit consent, which you give via our cookie consent banner.
+          <strong>Art. 6 (1) (a) GDPR</strong> — your explicit consent, which
+          you give via our cookie consent banner.
         </li>
         <li>
-          <strong>
-            § 25 (2) TTDSG
-          </strong>{' '}
-          (Telekommunikation-Telemedien-Datenschutz-Gesetz) — your consent to the
-          storage of, or access to, information in your end device
+          <strong>§ 25 (2) TTDSG</strong>{' '}
+          (Telekommunikation-Telemedien-Datenschutz-Gesetz) — your consent to
+          the storage of, or access to, information in your end device
           (cookies/localStorage).
         </li>
       </ul>,
@@ -202,11 +210,18 @@ const PAGES: Record<string, StaticContent> = {
       <h2>9. Technical and Organisational Measures (Art. 32 GDPR)</h2>,
       'We and Google have implemented appropriate technical and organisational measures to ensure a level of security appropriate to the risk:',
       <ul>
-        <li>IP anonymisation (<code>anonymize_ip</code>) is enabled.</li>
+        <li>
+          IP anonymisation (<code>anonymize_ip</code>) is enabled.
+        </li>
         <li>Google Signals are disabled.</li>
-        <li>Advertising reporting features and ad personalisation signals are disabled.</li>
+        <li>
+          Advertising reporting features and ad personalisation signals are
+          disabled.
+        </li>
         <li>User-ID data collection is not used.</li>
-        <li>Data is transmitted exclusively over encrypted HTTPS connections.</li>
+        <li>
+          Data is transmitted exclusively over encrypted HTTPS connections.
+        </li>
         <li>Cookies are set only after your explicit consent.</li>
       </ul>,
       'A description of the comprehensive security measures implemented by Google is available at <a href="https://safe.google.com/security/" target="_blank" rel="noopener noreferrer">https://safe.google.com/security/</a>.',
@@ -220,14 +235,25 @@ const PAGES: Record<string, StaticContent> = {
         <li>Right to data portability (Art. 20 GDPR)</li>
         <li>Right to object (Art. 21 GDPR)</li>
         <li>Right to withdraw consent at any time (Art. 7 (3) GDPR)</li>
-        <li>Right to lodge a complaint with a supervisory authority (Art. 77 GDPR)</li>
+        <li>
+          Right to lodge a complaint with a supervisory authority (Art. 77 GDPR)
+        </li>
       </ul>,
       <h2>11. Right to Lodge a Complaint</h2>,
       'Without prejudice to any other administrative or judicial remedy, you have the right to lodge a complaint with a supervisory authority in the EU member state of your habitual residence, your place of work, or the place of the alleged infringement. The competent supervisory authority for us is:',
       'Unabhängiges Landeszentrum für Datenschutz Schleswig-Holstein (ULD)',
       'Postfach 71 16',
       '24171 Kiel, Germany',
-      <>Website: <a href="https://www.datenschutzzentrum.de" target="_blank" rel="noopener noreferrer">https://www.datenschutzzentrum.de</a></>,
+      <>
+        Website:{' '}
+        <a
+          href="https://www.datenschutzzentrum.de"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          https://www.datenschutzzentrum.de
+        </a>
+      </>,
       <h2>12. Withdrawal of Consent</h2>,
       'You can withdraw your consent to GA4 at any time with effect for the future. To do so, open "Cookie settings" in the footer of any page and uncheck the "Analytics" option. Upon withdrawal, Google Analytics will stop collecting new data, the GA4 cookies will be removed from your device, and we will initiate deletion of your pseudonymous data via the GA4 User Deletion API. Withdrawal does not affect the lawfulness of processing that took place before the withdrawal.',
       <h2>13. No Automated Decision-Making or Profiling</h2>,
@@ -239,7 +265,10 @@ const PAGES: Record<string, StaticContent> = {
         <li>The categories of cookies you have consented to.</li>
         <li>The timestamp of your choice.</li>
         <li>The version of the policies you agreed to.</li>
-        <li>The source of the choice (first banner, re-opened banner, settings page).</li>
+        <li>
+          The source of the choice (first banner, re-opened banner, settings
+          page).
+        </li>
       </ul>,
       'Your IP address is stored only in truncated and salted hashed form; the raw IP address is never persisted. The consent record is retained for the duration of the consent validity plus 6 months after withdrawal or expiry.',
       <h2>15. Updates to this Privacy Policy</h2>,
@@ -252,10 +281,35 @@ const PAGES: Record<string, StaticContent> = {
   cookies: {
     ...pageMeta.pages.cookies,
     body: [
-      <>Last updated: <b>August 2026</b></>,
+      <>
+        Last updated: <b>August 2026</b>
+      </>,
       'This Cookie Policy explains what cookies and similar storage technologies (collectively, "cookies") are used on the Website Find your next read, why they are used, and how you can manage them. It should be read together with our Privacy Policy.',
       <h2>1. What are cookies?</h2>,
-      <p className={styles.paragraph}>Cookies are small text files placed on your device by the websites you visit. They are widely used to make websites work more efficiently and to provide information to the owners of the site. On this Website, cookies are set either in your browser&apos;s cookie storage or in <code>localStorage</code>. For general information about cookies, you can visit <a href="https://www.aboutcookies.org" target="_blank" rel="noopener noreferrer">www.aboutcookies.org</a> or <a href="https://www.allaboutcookies.org" target="_blank" rel="noopener noreferrer">www.allaboutcookies.org</a>.</p>,
+      <p className={styles.paragraph}>
+        Cookies are small text files placed on your device by the websites you
+        visit. They are widely used to make websites work more efficiently and
+        to provide information to the owners of the site. On this Website,
+        cookies are set either in your browser&apos;s cookie storage or in{' '}
+        <code>localStorage</code>. For general information about cookies, you
+        can visit{' '}
+        <a
+          href="https://www.aboutcookies.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          www.aboutcookies.org
+        </a>{' '}
+        or{' '}
+        <a
+          href="https://www.allaboutcookies.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          www.allaboutcookies.org
+        </a>
+        .
+      </p>,
       <h2>2. Types of cookies we use</h2>,
       <h3>2.1 Strictly necessary cookies</h3>,
       'These cookies are required for the Website to function correctly — for example, to remember your cookie consent choice. They are set without requiring consent and cannot be disabled. Legal basis: Art. 6 (1) (f) GDPR (legitimate interests).',
@@ -269,8 +323,22 @@ const PAGES: Record<string, StaticContent> = {
       <h2>4. Managing cookies</h2>,
       'You can manage your cookie preferences at any time:',
       <ul>
-        <li>Click "Cookie settings" in the footer of any page to open the consent manager.</li>
-        <li>You can also delete cookies already stored on your device via your browser settings. Instructions for common browsers are available at <a href="https://www.aboutcookies.org" target="_blank" rel="noopener noreferrer">www.aboutcookies.org</a>.</li>
+        <li>
+          Click "Cookie settings" in the footer of any page to open the consent
+          manager.
+        </li>
+        <li>
+          You can also delete cookies already stored on your device via your
+          browser settings. Instructions for common browsers are available at{' '}
+          <a
+            href="https://www.aboutcookies.org"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            www.aboutcookies.org
+          </a>
+          .
+        </li>
       </ul>,
       'Disabling analytics cookies does not affect the functionality of the Website, but limits our ability to understand how the site is used.',
       <h2>5. Cookie lifetime</h2>,
@@ -323,4 +391,9 @@ export const StaticPage = () => {
   );
 };
 
-export const getStaticPageMeta = (slug: string) => PAGES[slug];
+// Meta comes from page-meta.json so pages with their own section (Who we
+// are) get it too.
+export const getStaticPageMeta = (slug: string) =>
+  (pageMeta.pages as Record<string, { title: string; description: string }>)[
+    slug
+  ];

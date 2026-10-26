@@ -3,6 +3,7 @@ import { openConsentSettings } from '../../lib';
 import styles from './footer.module.scss';
 
 const LINKS = [
+  { to: '/pages/who-we-are/', label: 'Who we are' },
   { to: '/pages/about/', label: 'About & Impressum' },
   { to: '/pages/terms/', label: 'Terms' },
   { to: '/pages/privacy/', label: 'Privacy' },
