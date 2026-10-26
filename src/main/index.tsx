@@ -361,6 +361,7 @@ export const AppContent = () => {
             <ConnectionsPage
               books={allBooks}
               isLoading={isLoading}
+              canEdit={isAdmin}
               onBookSelect={handleBookSelect}
             />
           }

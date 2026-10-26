@@ -137,36 +137,85 @@ const findGroups = (books: Book[]) => {
 };
 
 /**
- * Lays one group out in reading order: each book one column
- * after the furthest book that leads to it. Returns positions around (0, 0).
+ * The links of a group minus the ones that close a loop (A → B → … → A).
+ * A loop has no first book, so ordering by it would push the books
+ * further and further apart.
+ */
+const acyclicLinks = (group: Book[]) => {
+  const ids = new Set(group.map((book) => book.id));
+  const byId = new Map(group.map((book) => [book.id, book]));
+  const state = new Map<number, 'open' | 'done'>();
+  const links: [number, number][] = [];
+
+  const visit = (id: number) => {
+    state.set(id, 'open');
+
+    (byId.get(id)?.nextBookIds ?? []).forEach((nextId) => {
+      if (!ids.has(nextId) || state.get(nextId) === 'open') {
+        return;
+      }
+
+      links.push([id, nextId]);
+
+      if (!state.has(nextId)) {
+        visit(nextId);
+      }
+    });
+
+    state.set(id, 'done');
+  };
+
+  // Start from books nothing leads to, so a loop is cut at its far end.
+  const targets = new Set(group.flatMap((book) => book.nextBookIds ?? []));
+  const sorted = [...group].sort((a, b) => a.id - b.id);
+
+  [
+    ...sorted.filter((book) => !targets.has(book.id)),
+    ...sorted,
+  ].forEach((book) => {
+    if (!state.has(book.id)) {
+      visit(book.id);
+    }
+  });
+
+  return links;
+};
+
+/**
+ * Lays one group out in reading order: each book one step after the
+ * furthest book that leads to it, left to right, or top to bottom when the
+ * order is too long for the width. Returns positions around (0, 0).
  */
 const shapeGroup = (
   group: Book[],
   random: () => number,
-  vertical: boolean,
+  maxWidth: number,
+  forceVertical: boolean,
 ) => {
   const ids = new Set(group.map((book) => book.id));
+  const links = acyclicLinks(group);
   const depth = new Map(group.map((book) => [book.id, 0]));
 
-  // Longest path from a start; capped so a cycle cannot loop forever.
+  // Longest path from a start; the links have no loops, so this settles.
   for (let round = 0; round < group.length; round++) {
     let changed = false;
 
-    group.forEach((book) => {
-      (book.nextBookIds ?? []).forEach((nextId) => {
-        const next = (depth.get(book.id) ?? 0) + 1;
+    links.forEach(([from, to]) => {
+      const next = (depth.get(from) ?? 0) + 1;
 
-        if (ids.has(nextId) && next > (depth.get(nextId) ?? 0)) {
-          depth.set(nextId, next);
-          changed = true;
-        }
-      });
+      if (next > (depth.get(to) ?? 0)) {
+        depth.set(to, next);
+        changed = true;
+      }
     });
 
     if (!changed) {
       break;
     }
   }
+
+  const longest = Math.max(...Array.from(depth.values()));
+  const vertical = forceVertical || longest * COLUMN_GAP > maxWidth;
 
   const columns = new Map<number, Book[]>();
   group.forEach((book) => {
@@ -184,9 +233,9 @@ const shapeGroup = (
     // Put each book level with the books that lead to it, which keeps
     // the lines from crossing.
     const parentLevel = (book: Book) => {
-      const levels = group
-        .filter((p) => p.nextBookIds?.includes(book.id) && points.has(p.id))
-        .map((p) => (points.get(p.id) as Point).y);
+      const levels = links
+        .filter(([from, to]) => to === book.id && points.has(from))
+        .map(([from]) => (points.get(from) as Point).y);
 
       return levels.length
         ? levels.reduce((sum, y) => sum + y, 0) / levels.length
@@ -317,9 +366,9 @@ export const buildSky = (books: Book[], width: number): Sky => {
   const rows: { index: number; right: number }[][] = [[]];
 
   linked.forEach((group) => {
-    const points = shapeGroup(group, random, width < 600);
-    const name = dominantGenre(group);
     const maxWidth = width - margin * 2;
+    const points = shapeGroup(group, random, maxWidth, width < 600);
+    const name = dominantGenre(group);
     const raw = bounds(Array.from(points.values()));
 
     // Squeeze a chain that is wider than a narrow screen.

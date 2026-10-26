@@ -94,6 +94,28 @@ describe('buildSky', () => {
     expect(Math.hypot(b.x - q.x, b.y - q.y)).toBeGreaterThan(30);
   });
 
+  it('keeps a reading loop compact instead of stretching it', () => {
+    // 1 → 2 → 3 → 4 → 1, plus a book leading into the loop.
+    const loop = [
+      book(1, [2]),
+      book(2, [3]),
+      book(3, [4]),
+      book(4, [1]),
+      book(5, [1]),
+    ];
+    const sky = buildSky(loop, 1200);
+    const xs = sky.stars.map((s) => s.x);
+    const ys = sky.stars.map((s) => s.y);
+    const spread = Math.max(
+      Math.max(...xs) - Math.min(...xs),
+      Math.max(...ys) - Math.min(...ys),
+    );
+
+    // Five steps at most, never one per pass over the loop.
+    expect(spread).toBeLessThan(5 * 200);
+    expect(sky.constellations[0].links).toHaveLength(5);
+  });
+
   it('keeps every star inside the sky, even on a narrow screen', () => {
     const sky = buildSky(books, 320);
 

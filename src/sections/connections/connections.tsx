@@ -1,17 +1,28 @@
-import { KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import cn from 'classnames';
 import { Book } from 'types';
+import { Button } from 'components';
 import {
   LABEL_MAX_CHARS,
   STAR_LABEL_MAX_CHARS,
   Star,
   buildSky,
 } from './layout';
+import { Link, useLinkEditor } from './use-link-editor';
 import styles from './connections.module.scss';
 
 type ConnectionsPageProps = {
   books: Book[];
   isLoading?: boolean;
+  /** Admins can add, reverse and remove "read next" links here. */
+  canEdit?: boolean;
   onBookSelect: (book: Book) => void;
 };
 
@@ -93,10 +104,18 @@ const StarLabel = ({ star, width }: { star: Star; width: number }) => {
 export const ConnectionsPage = ({
   books,
   isLoading = false,
+  canEdit = false,
   onBookSelect,
 }: ConnectionsPageProps) => {
   const { ref, width } = useWidth();
+  const svgRef = useRef<SVGSVGElement>(null);
   const [active, setActive] = useState<number | null>(null);
+  const [editing, setEditing] = useState(false);
+  // Book ids, so a selection survives the sky being laid out again.
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedLink, setSelectedLink] = useState<Link | null>(null);
+  const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);
+  const editor = useLinkEditor();
 
   const sky = useMemo(
     () => (width > 0 && books.length > 0 ? buildSky(books, width) : null),
@@ -104,6 +123,150 @@ export const ConnectionsPage = ({
   );
 
   useEffect(() => setActive(null), [sky]);
+
+  const clearSelection = () => {
+    setSelectedId(null);
+    setSelectedLink(null);
+    setPointer(null);
+  };
+
+  useEffect(() => {
+    if (!editing) {
+      return;
+    }
+
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        clearSelection();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [editing]);
+
+  const hasLink = (from: number, to: number) =>
+    books.find((book) => book.id === from)?.nextBookIds?.includes(to) ?? false;
+
+  const starOf = (bookId: number) =>
+    sky?.stars.find((star) => star.book.id === bookId) ?? null;
+
+  const selectedBook = selectedId === null ? null : starOf(selectedId)?.book;
+
+  // Outside edit mode a click opens the book. In edit mode the first click
+  // picks a book and the second one the book to read after it.
+  const handleStarClick = (book: Book) => {
+    if (!editing) {
+      onBookSelect(book);
+      return;
+    }
+
+    setSelectedLink(null);
+
+    if (selectedId === null) {
+      setSelectedId(book.id);
+      return;
+    }
+
+    const from = selectedId;
+    const to = book.id;
+    clearSelection();
+
+    if (from === to || hasLink(from, to)) {
+      return;
+    }
+
+    // Linking the other way round turns the existing link around.
+    editor.mutate(
+      hasLink(to, from)
+        ? { remove: [to, from], add: [from, to] }
+        : { add: [from, to] },
+    );
+  };
+
+  const toggleEditing = () => {
+    clearSelection();
+    editor.reset();
+    setEditing((value) => !value);
+  };
+
+  const handlePointerMove = (event: MouseEvent<SVGSVGElement>) => {
+    const ctm = svgRef.current?.getScreenCTM();
+
+    if (!editing || selectedId === null || !ctm) {
+      return;
+    }
+
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+      ctm.inverse(),
+    );
+    setPointer({ x: point.x, y: point.y });
+  };
+
+  const renderLinkToolbar = () => {
+    const from = selectedLink && starOf(selectedLink[0]);
+    const to = selectedLink && starOf(selectedLink[1]);
+    const svg = svgRef.current;
+
+    if (!selectedLink || !from || !to || !sky || !svg) {
+      return null;
+    }
+
+    const scale = svg.clientWidth / sky.width;
+
+    return (
+      <div
+        className={styles.toolbar}
+        style={{
+          left: ((from.x + to.x) / 2) * scale,
+          top: ((from.y + to.y) / 2) * scale,
+        }}
+      >
+        <span className={styles['toolbar-text']}>
+          {truncate(from.book.title, 22)} → {truncate(to.book.title, 22)}
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            editor.mutate({
+              remove: selectedLink,
+              add: [selectedLink[1], selectedLink[0]],
+            });
+            clearSelection();
+          }}
+        >
+          ⇄ Reverse
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            editor.mutate({ remove: selectedLink });
+            clearSelection();
+          }}
+        >
+          Remove
+        </button>
+        <button type="button" aria-label="Close" onClick={clearSelection}>
+          ×
+        </button>
+      </div>
+    );
+  };
+
+  const renderEditHint = () => {
+    if (editor.isError) {
+      return 'Could not save that change. Please try again.';
+    }
+    if (editor.isPending) {
+      return 'Saving…';
+    }
+    if (selectedBook) {
+      return `Now click the book to read after “${selectedBook.title}”. Esc to cancel.`;
+    }
+
+    return 'Click a book, then the book to read after it. Click a line to reverse or remove it.';
+  };
 
   const activeStar = sky && active !== null ? sky.stars[active] : null;
   const activeConstellation = activeStar?.constellation ?? null;
@@ -123,6 +286,7 @@ export const ConnectionsPage = ({
       className={cn(styles.star, {
         [styles.lone]: star.constellation === null,
         [styles.active]: index === active,
+        [styles.selected]: star.book.id === selectedId,
         [styles.dim]:
           activeStar !== null &&
           index !== active &&
@@ -137,11 +301,11 @@ export const ConnectionsPage = ({
       onMouseLeave={() => setActive(null)}
       onFocus={() => setActive(index)}
       onBlur={() => setActive(null)}
-      onClick={() => onBookSelect(star.book)}
+      onClick={() => handleStarClick(star.book)}
       onKeyDown={(event: KeyboardEvent) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          onBookSelect(star.book);
+          handleStarClick(star.book);
         }
       }}
     >
@@ -174,8 +338,8 @@ export const ConnectionsPage = ({
         </h1>
         <p className={styles.subtitle}>
           Every book is a star. When we say which book to read next, the two
-          stars are joined, and a reading order becomes a constellation. Hover
-          a star to light up its path, click it to open the book.
+          stars are joined, and a reading order becomes a constellation. Hover a
+          star to light up its path, click it to open the book.
         </p>
         <ul className={styles.legend}>
           <li>
@@ -191,6 +355,28 @@ export const ConnectionsPage = ({
             No path yet
           </li>
         </ul>
+        {canEdit && (
+          <div className={styles['edit-bar']}>
+            <Button
+              type="button"
+              variant={editing ? 'primary' : 'ghost'}
+              size="sm"
+              onClick={toggleEditing}
+            >
+              {editing ? 'Done' : 'Edit connections'}
+            </Button>
+            {editing && (
+              <p
+                className={cn(styles['edit-hint'], {
+                  [styles['edit-error']]: editor.isError,
+                })}
+                role="status"
+              >
+                {renderEditHint()}
+              </p>
+            )}
+          </div>
+        )}
       </header>
 
       <div ref={ref} className={styles['sky-wrap']}>
@@ -200,12 +386,15 @@ export const ConnectionsPage = ({
 
         {sky && (
           <svg
+            ref={svgRef}
             viewBox={`0 0 ${sky.width} ${sky.height}`}
             width={sky.width}
             height={sky.height}
             className={cn(styles.sky, {
               [styles.focused]: activeStar !== null,
+              [styles.editing]: editing,
             })}
+            onMouseMove={handlePointerMove}
             role="group"
             aria-label="Book constellations"
           >
@@ -236,17 +425,39 @@ export const ConnectionsPage = ({
                   [styles.current]: ci === activeConstellation,
                 })}
               >
-                {constellation.links.map(([from, to]) => (
-                  <line
-                    key={`${from}-${to}`}
-                    className={cn(styles.link, {
-                      [styles.lit]: from === active || to === active,
-                    })}
-                    {...trim(sky.stars[from], sky.stars[to])}
-                    pathLength={1}
-                    markerEnd="url(#read-next-arrow)"
-                  />
-                ))}
+                {constellation.links.map(([from, to]) => {
+                  const link: Link = [
+                    sky.stars[from].book.id,
+                    sky.stars[to].book.id,
+                  ];
+                  const chosen =
+                    selectedLink?.[0] === link[0] &&
+                    selectedLink?.[1] === link[1];
+
+                  return (
+                    <g key={`${from}-${to}`}>
+                      <line
+                        className={cn(styles.link, {
+                          [styles.lit]: from === active || to === active,
+                          [styles.chosen]: chosen,
+                        })}
+                        {...trim(sky.stars[from], sky.stars[to])}
+                        pathLength={1}
+                        markerEnd="url(#read-next-arrow)"
+                      />
+                      {editing && (
+                        <line
+                          className={styles['link-hit']}
+                          {...trim(sky.stars[from], sky.stars[to])}
+                          onClick={() => {
+                            setSelectedId(null);
+                            setSelectedLink(link);
+                          }}
+                        />
+                      )}
+                    </g>
+                  );
+                })}
                 <text
                   className={styles.name}
                   x={constellation.labelX}
@@ -280,9 +491,24 @@ export const ConnectionsPage = ({
               )}
             </g>
 
+            {editing &&
+              selectedId !== null &&
+              pointer &&
+              starOf(selectedId) && (
+                <line
+                  className={styles.preview}
+                  x1={(starOf(selectedId) as Star).x}
+                  y1={(starOf(selectedId) as Star).y}
+                  x2={pointer.x}
+                  y2={pointer.y}
+                />
+              )}
+
             {activeStar && <StarLabel star={activeStar} width={sky.width} />}
           </svg>
         )}
+
+        {editing && renderLinkToolbar()}
       </div>
     </div>
   );
