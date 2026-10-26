@@ -57,7 +57,6 @@ export const WhoWeArePage = () => (
     <ul className={styles.team}>
       {TEAM.map(({ name, caption, photo }, i) => (
         <li key={name} className={cn(styles.member, styles[`member-${i + 1}`])}>
-          <span className={styles.tape} aria-hidden="true" />
           <div className={styles.frame}>
             {photo ? (
               <img src={photo} alt={name} className={styles.photo} />
