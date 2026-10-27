@@ -147,3 +147,46 @@
   font-family: $font-base;
   margin: 0 0 8px;
 }
+
+.dangerZone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid rgba($color-primary, 0.35);
+  border-radius: $radius-lg;
+  background: rgba($color-primary, 0.03);
+}
+
+.dangerTitle {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: $color-text;
+}
+
+.dangerText {
+  margin: 0;
+  font-size: 13px;
+  color: $color-text-secondary;
+}
+
+.dangerError {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: $color-primary;
+}
+
+.dangerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.deletedActions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}

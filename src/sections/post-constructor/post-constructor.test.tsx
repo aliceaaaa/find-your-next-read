@@ -2,9 +2,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   apiCreateBook,
+  apiDeleteBook,
   apiDeleteBookCover,
   apiGetBook,
   apiRemoveNextBook,
+  apiRestoreBook,
   apiSetNextBooks,
   apiUpdateBook,
   apiUploadBookCover,
@@ -21,6 +23,8 @@ jest.mock('api', () => ({
   apiDeleteBookCover: jest.fn(),
   apiSetNextBooks: jest.fn(),
   apiRemoveNextBook: jest.fn(),
+  apiDeleteBook: jest.fn(),
+  apiRestoreBook: jest.fn(),
   fetchBooks: jest.fn(() => Promise.resolve([])),
 }));
 
@@ -31,6 +35,8 @@ beforeEach(() => {
   (apiDeleteBookCover as jest.Mock).mockResolvedValue(undefined);
   (apiSetNextBooks as jest.Mock).mockResolvedValue(undefined);
   (apiRemoveNextBook as jest.Mock).mockResolvedValue(undefined);
+  (apiDeleteBook as jest.Mock).mockResolvedValue(undefined);
+  (apiRestoreBook as jest.Mock).mockResolvedValue({ id: 5 });
 });
 
 const renderWith = (
@@ -292,6 +298,69 @@ describe('PostConstructor', () => {
         await waitFor(() => expect(onSaved).toHaveBeenCalledWith(5));
         expect(apiDeleteBookCover).not.toHaveBeenCalled();
         expect(apiUploadBookCover).not.toHaveBeenCalled();
+      });
+
+      it('asks for confirmation before deleting', async () => {
+        renderWith(true, { bookId: 5 });
+        await screen.findByAltText('Upload preview');
+        fireEvent.click(screen.getByRole('button', { name: /^delete book$/i }));
+        expect(apiDeleteBook).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }));
+        expect(
+          screen.getByRole('button', { name: /^delete book$/i }),
+        ).toBeInTheDocument();
+        expect(apiDeleteBook).not.toHaveBeenCalled();
+      });
+
+      it('deletes the book and offers to restore it', async () => {
+        const onSaved = jest.fn();
+        const onDeleted = jest.fn();
+        renderWith(true, { bookId: 5, onSaved, onDeleted });
+        await screen.findByAltText('Upload preview');
+        fireEvent.click(screen.getByRole('button', { name: /^delete book$/i }));
+        fireEvent.click(
+          screen.getByRole('button', { name: /yes, delete “saved book”/i }),
+        );
+
+        expect(await screen.findByTestId('deleted-message')).toBeInTheDocument();
+        expect(apiDeleteBook).toHaveBeenCalledWith(5);
+
+        fireEvent.click(screen.getByRole('button', { name: /restore/i }));
+        await waitFor(() => expect(onSaved).toHaveBeenCalledWith(5));
+        expect(apiRestoreBook).toHaveBeenCalledWith(5);
+        expect(onDeleted).not.toHaveBeenCalled();
+      });
+
+      it('goes to the library after deleting when asked', async () => {
+        const onDeleted = jest.fn();
+        renderWith(true, { bookId: 5, onDeleted });
+        await screen.findByAltText('Upload preview');
+        fireEvent.click(screen.getByRole('button', { name: /^delete book$/i }));
+        fireEvent.click(screen.getByRole('button', { name: /yes, delete/i }));
+        fireEvent.click(
+          await screen.findByRole('button', { name: /go to library/i }),
+        );
+        expect(onDeleted).toHaveBeenCalled();
+      });
+
+      it('stays on the form when deleting fails', async () => {
+        (apiDeleteBook as jest.Mock).mockRejectedValue(new Error('500'));
+        renderWith(true, { bookId: 5 });
+        await screen.findByAltText('Upload preview');
+        fireEvent.click(screen.getByRole('button', { name: /^delete book$/i }));
+        fireEvent.click(screen.getByRole('button', { name: /yes, delete/i }));
+        expect(
+          await screen.findByText(/could not delete the book/i),
+        ).toBeInTheDocument();
+        expect(screen.queryByTestId('deleted-message')).not.toBeInTheDocument();
+      });
+
+      it('does not offer deleting a book that is being added', () => {
+        renderWith(true);
+        expect(
+          screen.queryByRole('button', { name: /^delete book$/i }),
+        ).not.toBeInTheDocument();
       });
 
       it('loads the book with its "read next" links', async () => {

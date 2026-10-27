@@ -82,6 +82,7 @@ const EditBookRoute = () => {
       onSaved={(savedId) =>
         navigate(`/books/${savedId}/summary/`, { replace: true })
       }
+      onDeleted={() => navigate('/library/', { replace: true })}
     />
   );
 };

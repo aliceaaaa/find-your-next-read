@@ -4,9 +4,11 @@ import {
   ApiBook,
   CreateBookPayload,
   apiCreateBook,
+  apiDeleteBook,
   apiDeleteBookCover,
   apiGetBook,
   apiRemoveNextBook,
+  apiRestoreBook,
   apiSetNextBooks,
   apiUpdateBook,
   apiUploadBookCover,
@@ -101,9 +103,14 @@ const fromApiBook = (book: ApiBook): FormState => ({
 type PostConstructorProps = {
   bookId?: number;
   onSaved?: (bookId: number) => void;
+  onDeleted?: () => void;
 };
 
-export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
+export const PostConstructor = ({
+  bookId,
+  onSaved,
+  onDeleted,
+}: PostConstructorProps) => {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { data: categories = [] } = useCategories();
@@ -274,6 +281,26 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
     },
   });
 
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  const deletion = useMutation({
+    mutationFn: () => apiDeleteBook(bookId as number),
+    onSuccess: () => {
+      track('delete_book', { title: form.title.trim() });
+      setConfirmingDelete(false);
+      return queryClient.invalidateQueries({ queryKey: ['books'], exact: true });
+    },
+  });
+
+  const restoration = useMutation({
+    mutationFn: () => apiRestoreBook(bookId as number),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['books'] });
+      deletion.reset();
+      onSaved?.(bookId as number);
+    },
+  });
+
   const languageOptions =
     form.language && !LANGUAGE_CODES.includes(form.language)
       ? [toLanguageOption(form.language), ...LANGUAGE_OPTIONS]
@@ -294,6 +321,36 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         <p className={styles.accessText}>
           This page is only available for administrators.
         </p>
+      </div>
+    );
+  }
+
+  if (isEdit && deletion.isSuccess) {
+    return (
+      <div className={styles.success} data-testid="deleted-message">
+        <div className={styles.successIcon} aria-hidden="true">
+          🗑
+        </div>
+        <h2 className={styles.successTitle}>Book Deleted</h2>
+        <p className={styles.successText}>
+          “{form.title}” is no longer in the catalogue. Changed your mind? You
+          can bring it back.
+        </p>
+        {restoration.isError && (
+          <p role="alert" className={styles.successText}>
+            Could not restore the book. Please try again.
+          </p>
+        )}
+        <div className={styles.deletedActions}>
+          <Button
+            variant="ghost"
+            onClick={() => restoration.mutate()}
+            loading={restoration.isPending}
+          >
+            Restore
+          </Button>
+          {onDeleted && <Button onClick={onDeleted}>Go to library</Button>}
+        </div>
       </div>
     );
   }
@@ -506,6 +563,52 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
           <p role="alert" className={styles.subtitle}>
             Could not {isEdit ? 'save' : 'add'} the book. Please check the fields and try again.
           </p>
+        )}
+        {isEdit && (
+          <section className={styles.dangerZone}>
+            <div>
+              <h2 className={styles.dangerTitle}>Delete this book</h2>
+              <p className={styles.dangerText}>
+                It disappears from the catalogue right away. You can restore it
+                on the next screen.
+              </p>
+              {deletion.isError && (
+                <p role="alert" className={styles.dangerError}>
+                  Could not delete the book. Please try again.
+                </p>
+              )}
+            </div>
+            {confirmingDelete ? (
+              <div className={styles.dangerActions}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setConfirmingDelete(false)}
+                  disabled={deletion.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => deletion.mutate()}
+                  loading={deletion.isPending}
+                >
+                  Yes, delete “{form.title || 'this book'}”
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirmingDelete(true)}
+              >
+                Delete book
+              </Button>
+            )}
+          </section>
         )}
         <div className={styles.actions}>
           <Button
