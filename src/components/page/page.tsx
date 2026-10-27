@@ -28,7 +28,6 @@ export const Page = ({
   children,
 }: PageProps) => {
   const location = useLocation();
-  // Outside the results page the search bar starts empty again.
   const searchQuery =
     normalizePathname(location.pathname) === '/search'
       ? new URLSearchParams(location.search).get('q') ?? ''

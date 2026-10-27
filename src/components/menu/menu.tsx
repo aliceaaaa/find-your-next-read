@@ -10,9 +10,15 @@ type MenuProps = {
   activeNav: NavItemId;
   isAdmin?: boolean;
   onNavChange: (id: NavItemId) => void;
-  /** Opens a random book; the button is hidden when not provided. */
   onRandomBook?: () => void;
 };
+
+const NavLabel = ({ label, short }: { label: string; short?: string }) => (
+  <>
+    <span className={cn({ [styles['long-label']]: short })}>{label}</span>
+    {short && <span className={styles['short-label']}>{short}</span>}
+  </>
+);
 
 export const Menu = ({
   activeNav,
@@ -21,8 +27,6 @@ export const Menu = ({
   onRandomBook,
 }: MenuProps) => {
   const { user, isAuthenticated, logout } = useAuth();
-  // Sessions from before the user was stored only have a token; still show
-  // that someone is signed in.
   const account =
     user ?? (isAuthenticated ? { name: 'Admin', email: '' } : null);
 
@@ -30,16 +34,17 @@ export const Menu = ({
     <aside className={styles.menu}>
       <Logo onNavChange={onNavChange} />
       <nav>
-        {navItems.map(({ id, label, Icon }) => (
+        {navItems.map(({ id, label, shortLabel, Icon }) => (
           <button
             key={id}
+            aria-label={label}
             className={cn(styles['nav-item'], {
               [styles.active]: activeNav === id,
             })}
             onClick={() => onNavChange(id)}
           >
             <Icon className={styles.icon} />
-            {label}
+            <NavLabel label={label} short={shortLabel} />
           </button>
         ))}
         {onRandomBook && (
@@ -47,9 +52,10 @@ export const Menu = ({
             type="button"
             className={cn(styles['nav-item'], styles.random)}
             onClick={onRandomBook}
+            aria-label="Random book"
           >
             <ShuffleIcon className={styles.icon} />
-            Random book
+            <NavLabel label="Random book" short="Random" />
           </button>
         )}
         {isAdmin && (
@@ -58,9 +64,10 @@ export const Menu = ({
               [styles.active]: activeNav === 'post-constructor',
             })}
             onClick={() => onNavChange('post-constructor')}
+            aria-label="Add Book"
           >
             <PlusCircleIcon className={styles.icon} />
-            Add Book
+            <NavLabel label="Add Book" short="Add" />
           </button>
         )}
       </nav>

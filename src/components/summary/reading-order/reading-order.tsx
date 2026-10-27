@@ -5,9 +5,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from '../../../icons';
 import styles from './reading-order.module.scss';
 
 type ReadingOrderProps = {
-  /** Books that link to this one as "read next". */
   before: Book[];
-  /** Books this one links to as "read next", in order. */
   next: Book[];
   onBookSelect: (book: Book) => void;
 };

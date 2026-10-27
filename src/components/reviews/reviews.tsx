@@ -12,7 +12,6 @@ type ReviewsProps = {
   reviews: Review[];
   expandedReviews: Set<number>;
   onToggleReview: (id: number) => void;
-  /** Review to briefly highlight, e.g. after following a link to it. */
   highlightedId?: number | null;
 };
 

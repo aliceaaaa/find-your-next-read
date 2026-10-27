@@ -11,8 +11,6 @@ type BookOfTheDayProps = {
   onBookmark: (id: number) => void;
 };
 
-// Clamps the text to as many whole lines as fit into its container, so it
-// fills the available height without a half-cut line at the bottom.
 const useFitLines = <T extends HTMLElement>(text: string) => {
   const ref = useRef<T>(null);
 

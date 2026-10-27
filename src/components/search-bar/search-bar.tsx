@@ -4,9 +4,7 @@ import { SearchIcon, XIcon } from '../../icons';
 import styles from './search-bar.module.scss';
 
 type SearchBarProps = {
-  /** Also called with an empty string when the query is cleared. */
   onSearch?: (query: string) => void;
-  /** Current query, e.g. from the URL; the input follows it when it changes. */
   value?: string;
   className?: string;
   autoFocus?: boolean;

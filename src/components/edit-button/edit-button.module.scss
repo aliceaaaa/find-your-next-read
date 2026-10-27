@@ -17,8 +17,6 @@
     color: $color-primary;
   }
 
-  // Tooltip. Anchored to the right edge so it opens leftwards: the button
-  // usually sits at the right edge of a card and would get clipped otherwise.
   &::after {
     content: attr(data-tooltip);
     position: absolute;

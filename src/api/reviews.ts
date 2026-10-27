@@ -22,6 +22,7 @@ export const mapApiReview = (apiReview: ApiReview): Review => ({
     month: 'long',
     day: 'numeric',
   }),
+  createdAt: apiReview.created_at,
 });
 
 export const fetchReviews = async (): Promise<Review[]> => {

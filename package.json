@@ -26,6 +26,7 @@
     "build": "react-scripts build",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "prerender": "node scripts/prerender-books.mjs",
+    "icons": "node scripts/generate-icons.mjs",
     "report:next-books": "node scripts/next-books-report.mjs",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

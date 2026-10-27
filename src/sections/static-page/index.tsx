@@ -391,8 +391,6 @@ export const StaticPage = () => {
   );
 };
 
-// Meta comes from page-meta.json so pages with their own section (Who we
-// are) get it too.
 export const getStaticPageMeta = (slug: string) =>
   (pageMeta.pages as Record<string, { title: string; description: string }>)[
     slug

@@ -38,13 +38,10 @@ type FormState = {
   isbn: string;
   categories: string[];
   description: string;
-  /** Cover preview: the saved cover's URL or a data URL of a picked file. */
   image: string;
-  /** A newly picked cover, uploaded after the book is saved. */
   coverFile: File | null;
   coverColor: string;
   coverTextColor: string;
-  /** "Read next" links: books to read after this one, in order. */
   nextBookIds: number[];
 };
 
@@ -67,7 +64,6 @@ const makeInitial = (): FormState => ({
   nextBookIds: [],
 });
 
-// ISO 639-1 codes, which is what the API stores.
 const LANGUAGE_CODES = [
   'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'he', 'hi', 'hu',
   'it', 'ja', 'ko', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sv', 'tr', 'uk',
@@ -103,7 +99,6 @@ const fromApiBook = (book: ApiBook): FormState => ({
 });
 
 type PostConstructorProps = {
-  /** When set, the form loads this book and saves changes to it. */
   bookId?: number;
   onSaved?: (bookId: number) => void;
 };
@@ -195,7 +190,6 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
       return null;
     }
 
-    // Keep the full original date when the year was not changed.
     if (
       editedBook?.published &&
       String(new Date(editedBook.published).getFullYear()) === form.published
@@ -219,7 +213,6 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         pages: form.pages ? Number(form.pages) : null,
         language: form.language.trim() || null,
         isbn: form.isbn.trim() || null,
-        // The API takes category ids; names are what the form works with.
         category_ids: categories
           .filter((c) => form.categories.includes(c.name))
           .map((c) => c.id),
@@ -234,9 +227,6 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
           : await apiCreateBook(payload);
       const savedId = saved?.id ?? (bookId as number);
 
-      // The cover has its own endpoint, so it can only go up once the book
-      // exists. Its failure is reported apart from the book's: the book is
-      // already saved, and publishing again would create a duplicate.
       let coverSaved = true;
 
       try {
@@ -249,8 +239,6 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
         coverSaved = false;
       }
 
-      // "Read next" links also have their own endpoints; sync only the
-      // difference. Reported apart from the book for the same reason.
       let linksSaved = true;
       const savedLinks = (editedBook?.next_books ?? []).map((b) => b.id);
       const added = form.nextBookIds.filter((id) => !savedLinks.includes(id));
@@ -273,7 +261,6 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
       setLinksFailed(!linksSaved);
       await queryClient.invalidateQueries({ queryKey: ['books'] });
 
-      // Stay on the edit form so the cover or links can be tried again.
       if (isEdit && (!coverSaved || !linksSaved)) {
         return;
       }
@@ -287,7 +274,6 @@ export const PostConstructor = ({ bookId, onSaved }: PostConstructorProps) => {
     },
   });
 
-  // Keep a saved code that is not in the list selectable.
   const languageOptions =
     form.language && !LANGUAGE_CODES.includes(form.language)
       ? [toLanguageOption(form.language), ...LANGUAGE_OPTIONS]

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { Book } from 'types';
 import { Card } from '../card';
@@ -16,13 +16,7 @@ type BookShelfProps = {
   isLoading?: boolean;
   title?: string;
   cardType?: BookShelfCardType;
-  /**
-   * `row` scrolls horizontally; `stretch` is a single row whose cards share
-   * the full width (scrolling only when too narrow); `grid` wraps smaller
-   * cards into tiles.
-   */
   layout?: BookShelfLayout;
-  /** With `grid`, show only as many books as fit into this many rows. */
   maxRows?: number;
   skeletonCount?: number;
   emptyTitle?: string;
@@ -30,6 +24,7 @@ type BookShelfProps = {
   onBookmark?: (id: number) => void;
   onBookSelect: (book: Book) => void;
   onViewAll?: () => void;
+  actions?: ReactNode;
 };
 
 export const BookShelf = ({
@@ -45,6 +40,7 @@ export const BookShelf = ({
   onBookmark,
   onBookSelect,
   onViewAll,
+  actions,
 }: BookShelfProps) => {
   const listRef = useRef<HTMLDivElement>(null);
   const [columns, setColumns] = useState<number | null>(null);
@@ -57,8 +53,6 @@ export const BookShelf = ({
       return;
     }
 
-    // auto-fill resolves to the actual column tracks, so counting them gives
-    // how many cards fit per row at the current width.
     const measure = () => {
       const tracks = getComputedStyle(el)
         .gridTemplateColumns.split(' ')
@@ -121,6 +115,7 @@ export const BookShelf = ({
       {title && (
         <div className={styles.header}>
           <h2>{title}</h2>
+          {actions}
           {onViewAll && (
             <button className={styles.viewAll} onClick={onViewAll}>
               View all

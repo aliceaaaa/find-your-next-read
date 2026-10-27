@@ -21,13 +21,10 @@ import styles from './connections.module.scss';
 type ConnectionsPageProps = {
   books: Book[];
   isLoading?: boolean;
-  /** Admins can add, reverse and remove "read next" links here. */
   canEdit?: boolean;
   onBookSelect: (book: Book) => void;
 };
 
-// The layout is redone only when the width changes by a full step, not on
-// every pixel of a window resize.
 const WIDTH_STEP = 40;
 
 const truncate = (text: string, max: number) =>
@@ -62,7 +59,6 @@ const useWidth = () => {
   return { ref, width };
 };
 
-// The line stops short of both stars, so the arrowhead stays visible.
 const trim = (from: Star, to: Star) => {
   const length = Math.hypot(to.x - from.x, to.y - from.y) || 1;
   const ux = (to.x - from.x) / length;
@@ -111,7 +107,6 @@ export const ConnectionsPage = ({
   const svgRef = useRef<SVGSVGElement>(null);
   const [active, setActive] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
-  // Book ids, so a selection survives the sky being laid out again.
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [selectedLink, setSelectedLink] = useState<Link | null>(null);
   const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);
@@ -124,7 +119,6 @@ export const ConnectionsPage = ({
 
   useEffect(() => setActive(null), [sky]);
 
-  // Signing out mid-edit ends edit mode too.
   useEffect(() => {
     if (!canEdit) {
       setEditing(false);
@@ -161,8 +155,6 @@ export const ConnectionsPage = ({
 
   const selectedBook = selectedId === null ? null : starOf(selectedId)?.book;
 
-  // Outside edit mode a click opens the book. In edit mode the first click
-  // picks a book and the second one the book to read after it.
   const handleStarClick = (book: Book) => {
     if (!editing) {
       onBookSelect(book);
@@ -184,7 +176,6 @@ export const ConnectionsPage = ({
       return;
     }
 
-    // Linking the other way round turns the existing link around.
     editor.mutate(
       hasLink(to, from)
         ? { remove: [to, from], add: [from, to] }
@@ -278,7 +269,6 @@ export const ConnectionsPage = ({
   const activeStar = sky && active !== null ? sky.stars[active] : null;
   const activeConstellation = activeStar?.constellation ?? null;
 
-  // Names of stars near the edge grow inwards so they are not cut off.
   const starNameAnchor = (star: Star) => {
     if (!sky || star.x < 70) {
       return 'start';

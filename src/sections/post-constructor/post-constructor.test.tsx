@@ -21,7 +21,6 @@ jest.mock('api', () => ({
   apiDeleteBookCover: jest.fn(),
   apiSetNextBooks: jest.fn(),
   apiRemoveNextBook: jest.fn(),
-  // Book list for the "Read next" picker; keeps tests off the network.
   fetchBooks: jest.fn(() => Promise.resolve([])),
 }));
 

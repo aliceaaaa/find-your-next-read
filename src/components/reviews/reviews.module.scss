@@ -7,7 +7,6 @@
 }
 
 .reviewCard {
-  // Clears the sticky page header (72px) when scrolled to via #review-<id>.
   scroll-margin-top: 96px;
   background: $color-bg;
   border-radius: $radius-lg;

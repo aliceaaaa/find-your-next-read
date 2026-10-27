@@ -20,12 +20,10 @@ export const ReviewsPage = ({ books, onBookSelect }: ReviewsPageProps) => {
   const author = searchParams.get('author') ?? '';
   const [input, setInput] = useState(author);
 
-  // Keep the field in sync when the URL changes (chips, links, back button).
   useEffect(() => {
     setInput(author);
   }, [author]);
 
-  // Debounce typing into the URL, which drives the request.
   useEffect(() => {
     const trimmed = input.trim();
 

@@ -6,7 +6,6 @@ type ImageUploadProps = {
   accept?: string;
   label?: string;
   value?: string;
-  /** Receives a data URL for previewing and the picked file for uploading. */
   onChange?: (dataUrl: string, file: File) => void;
   onRemove?: () => void;
 };

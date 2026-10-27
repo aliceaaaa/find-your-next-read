@@ -10,7 +10,6 @@ import styles from './review-form.module.scss';
 
 type ReviewFormProps = {
   bookId: number;
-  /** When set, the form edits this review instead of creating a new one. */
   review?: Review;
   onCancel?: () => void;
   onSaved?: () => void;

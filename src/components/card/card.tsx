@@ -8,7 +8,6 @@ type CardProps = {
   book: Book;
   onSelect: (book: Book) => void;
   onBookmark: (id: number) => void;
-  /** Smaller type and spacing for dense grids. */
   compact?: boolean;
 };
 

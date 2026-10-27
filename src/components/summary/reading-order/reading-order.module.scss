@@ -35,8 +35,6 @@
   }
 }
 
-// With only "next" links, keep them on the right so the direction reads
-// naturally; on mobile everything stacks.
 .columnNext {
   grid-column: 2;
 
@@ -80,8 +78,6 @@
 
 .thumb {
   flex-shrink: 0;
-  // The small cover (90px) scaled down as a whole, so its text keeps the
-  // same layout instead of re-wrapping in a narrower box.
   width: 52px;
   height: calc(52px * 297 / 210);
 

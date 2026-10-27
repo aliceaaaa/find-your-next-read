@@ -4,6 +4,49 @@ import { useBookOfTheDay } from './use-book-of-the-day';
 
 const POPULAR_COUNT = 5;
 
+const byAdded = (a: Book, b: Book) =>
+  (b.createdAt ?? '').localeCompare(a.createdAt ?? '');
+
+export const orderReleases = (books: Book[], reviews: Review[]) => {
+  const lastReviewAt = new Map<number, string>();
+
+  reviews.forEach(({ bookId, createdAt = '' }) => {
+    if (createdAt > (lastReviewAt.get(bookId) ?? '')) {
+      lastReviewAt.set(bookId, createdAt);
+    }
+  });
+
+  const reviewedAt = (book: Book) => lastReviewAt.get(book.id) ?? '';
+
+  return [...books].sort(
+    (a, b) =>
+      reviewedAt(b).localeCompare(reviewedAt(a)) || byAdded(a, b),
+  );
+};
+
+export type ReleaseSort = 'reviewed' | 'added' | 'published';
+
+export const RELEASE_SORTS: { id: ReleaseSort; label: string }[] = [
+  { id: 'reviewed', label: 'Latest review' },
+  { id: 'added', label: 'Recently added' },
+  { id: 'published', label: 'Year published' },
+];
+
+export const sortReleases = (
+  books: Book[],
+  reviews: Review[],
+  sort: ReleaseSort,
+): Book[] => {
+  if (sort === 'reviewed') {
+    return orderReleases(books, reviews);
+  }
+  if (sort === 'added') {
+    return [...books].sort(byAdded);
+  }
+
+  return [...books].sort((a, b) => b.published - a.published || byAdded(a, b));
+};
+
 export const useBooksStats = (
   apiBooks: Book[],
   reviews: Review[],
@@ -37,14 +80,17 @@ export const useBooksStats = (
     [apiBooks, reviewStats, bookmarks],
   );
 
-  // Newest first; the shelf shows as many as fit in one row.
   const releases = useMemo(
-    () => [...allBooks].sort((a, b) => b.published - a.published),
-    [allBooks],
+    () =>
+      Object.fromEntries(
+        RELEASE_SORTS.map(({ id }) => [
+          id,
+          sortReleases(allBooks, reviews, id),
+        ]),
+      ) as Record<ReleaseSort, Book[]>,
+    [allBooks, reviews],
   );
 
-  // Top rated by review score (what the card shows); visitor ratings and
-  // review count break ties so unrated books don't win by list order.
   const popular = useMemo(
     () =>
       [...allBooks]

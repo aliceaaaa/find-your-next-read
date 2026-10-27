@@ -21,7 +21,6 @@ interface SummaryProps {
   book: Book;
   reviews: Review[];
   nextBooks?: Book[];
-  /** Reading order: books linked before / after this one. */
   readBefore?: Book[];
   readNext?: Book[];
   onBack: () => void;
@@ -53,8 +52,6 @@ export const Summary = ({
 
   const bookReviews = reviews.filter((r) => r.bookId === book.id);
 
-  // `#review-<id>` in the URL (e.g. from Book of the Day): open that review,
-  // scroll to it and highlight it. Waits until reviews have loaded.
   const { hash } = useLocation();
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
   const targetReviewId = Number(hash.match(/^#review-(\d+)$/)?.[1]) || null;
@@ -68,7 +65,6 @@ export const Summary = ({
     setExpandedReviews((prev) => new Set(prev).add(targetReviewId));
     setHighlightedId(targetReviewId);
 
-    // Let the expanded review render before scrolling to it.
     const timer = setTimeout(() => {
       document
         .getElementById(`review-${targetReviewId}`)

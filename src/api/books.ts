@@ -1,10 +1,5 @@
 import { Book } from 'types';
-import {
-  ApiBook,
-  ApiCategory,
-  apiGetBook,
-  apiGetBooks,
-} from './client';
+import { ApiBook, ApiCategory, apiGetBook, apiGetBooks } from './client';
 
 type RichTextNode = {
   type?: string;
@@ -69,8 +64,6 @@ export const descriptionToString = (desc: ApiBook['description']): string => {
   return text.join(' ');
 };
 
-// Descriptions written in the rich text editor are stored as HTML. Turn them
-// into plain text for display, keeping paragraph and list breaks as newlines.
 export const htmlToText = (html: string): string => {
   if (!/<[a-z!/][\s\S]*>/i.test(html)) {
     return html;
@@ -154,6 +147,7 @@ export const mapApiBook = (apiBook: ApiBook): Book => ({
   ratingsCount: apiBook.ratings_count ?? 0,
   isBookmarked: false,
   nextBookIds: (apiBook.next_books ?? []).map((next) => next.id),
+  createdAt: apiBook.created_at,
 });
 
 export const fetchBooks = async (search?: string): Promise<Book[]> => {
@@ -161,8 +155,6 @@ export const fetchBooks = async (search?: string): Promise<Book[]> => {
   let page = 1;
 
   while (true) {
-    // nextBooks: the "read next" links, so the book page can show the
-    // reading order without an extra request per book.
     const res = await apiGetBooks(page, { search, include: 'nextBooks' });
 
     allBooks.push(...res.data.map(mapApiBook));

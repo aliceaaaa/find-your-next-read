@@ -1,0 +1,44 @@
+@use '../../styles/variables' as *;
+
+.sort {
+  display: flex;
+  gap: 4px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 3px;
+  border-radius: 999px;
+  background: $color-bg;
+}
+
+.sort-option {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-family: $font-base;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text-secondary;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  white-space: nowrap;
+
+  &:hover {
+    color: $color-text;
+  }
+
+  @media (max-width: 768px) {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+
+  &.active {
+    background: $color-white;
+    color: $color-text;
+    box-shadow: 0 1px 3px rgba($color-dark, 0.12);
+  }
+}

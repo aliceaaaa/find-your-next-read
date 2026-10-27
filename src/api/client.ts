@@ -15,8 +15,6 @@ const request = async <T>(
   { auth = true }: { auth?: boolean } = {},
 ): Promise<T> => {
   const token = auth ? getToken() : null;
-  // Uploads must let the browser set the multipart Content-Type with its
-  // boundary; forcing JSON makes the API see no file at all.
   const isUpload = options.body instanceof FormData;
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -69,7 +67,6 @@ export type ApiBook = {
   ratings_sum: number | null;
   ratings_count: number | null;
   rating_avg: number | string | null;
-  /** Present when requested with `include=nextBooks`. */
   next_books?: ApiBook[];
 };
 
@@ -91,8 +88,6 @@ export const apiLogin = (
   email: string,
   password: string,
 ): Promise<LoginResponse> =>
-  // Sent without the stored token: a stale one makes the API treat the
-  // request as already signed in instead of logging in.
   request<LoginResponse>(
     '/login',
     {
@@ -120,7 +115,6 @@ export type BooksQuery = {
   search?: string;
   perPage?: number;
   sort?: string;
-  /** Relations to embed, e.g. `nextBooks`. */
   include?: string;
 };
 
@@ -175,7 +169,6 @@ export const apiGetCategories = (
   request<ApiPaginatedResponse<ApiCategory>>(`/categories?page=${page}`);
 
 export type ReviewsQuery = {
-  /** Reviewer name, case-insensitive partial match. */
   author?: string;
   bookId?: number;
   perPage?: number;
@@ -261,8 +254,10 @@ export const apiUpdateBook = (
 export const apiDeleteBook = (id: number): Promise<unknown> =>
   request(`/books/${id}`, { method: 'DELETE' });
 
-// Replaces any existing cover. The API limits the file to 5 MB.
-export const apiUploadBookCover = (id: number, file: Blob): Promise<ApiBook> => {
+export const apiUploadBookCover = (
+  id: number,
+  file: Blob,
+): Promise<ApiBook> => {
   const body = new FormData();
   body.append('cover', file);
 

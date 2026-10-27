@@ -6,7 +6,6 @@
 }
 
 .grid {
-  // Columns stretch to fill the row instead of leaving a gap on the right.
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;

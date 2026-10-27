@@ -24,7 +24,6 @@ $link: #ff8f8f;
   margin: 0 auto;
 }
 
-// ---------- Header ----------
 .header {
   display: flex;
   flex-direction: column;
@@ -285,7 +284,6 @@ $link: #ff8f8f;
     transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 
-// Stars without a reading path sit further away.
 .lone {
   .core {
     opacity: 0.6;
@@ -388,8 +386,6 @@ $link: #ff8f8f;
   }
 }
 
-// ---------- Editing ----------
-
 .edit-bar {
   display: flex;
   align-items: center;
@@ -432,7 +428,6 @@ $link: #ff8f8f;
   pointer-events: none;
 }
 
-// The book picked as the start of a new link.
 .selected {
   .core {
     fill: $gold;

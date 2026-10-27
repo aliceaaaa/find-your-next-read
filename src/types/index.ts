@@ -11,14 +11,13 @@ export type Book = {
   coverImage?: string | null;
   categories: string[];
   description: string;
-  /** Description markup as written in the editor; may be plain text. */
   descriptionHtml?: string;
   published: number;
   pages: number;
   language: string;
   isBookmarked?: boolean;
-  /** Books linked as "read next" after this one, in order. */
   nextBookIds?: number[];
+  createdAt?: string;
 };
 
 export type User = {
@@ -50,6 +49,7 @@ export type Review = {
   rating: number;
   text: string;
   date: string;
+  createdAt?: string;
 };
 
 export type NavItemId =

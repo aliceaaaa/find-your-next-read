@@ -81,7 +81,6 @@ describe('buildSky', () => {
   });
 
   it('keeps stars off lines that are not their own', () => {
-    // 1 leads to 3 directly and through 2, so 2 sits between them.
     const sky = buildSky([book(1, [2, 3]), book(2, [3]), book(3)], 1000);
     const [a, b, c] = [1, 2, 3].map(
       (id) => sky.stars.find((s) => s.book.id === id)!,
@@ -95,7 +94,6 @@ describe('buildSky', () => {
   });
 
   it('keeps a reading loop compact instead of stretching it', () => {
-    // 1 → 2 → 3 → 4 → 1, plus a book leading into the loop.
     const loop = [
       book(1, [2]),
       book(2, [3]),
@@ -111,7 +109,6 @@ describe('buildSky', () => {
       Math.max(...ys) - Math.min(...ys),
     );
 
-    // Five steps at most, never one per pass over the loop.
     expect(spread).toBeLessThan(5 * 200);
     expect(sky.constellations[0].links).toHaveLength(5);
   });

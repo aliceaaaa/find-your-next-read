@@ -16,13 +16,11 @@
   margin-top: 20px;
   --card-width: 190px;
 
-  // The book card matches the height of the reviews and info columns.
   >article {
     align-self: stretch;
   }
 }
 
-// Without reviews the description takes the freed space.
 .content.noReviews {
   grid-template-columns: 190px 1fr;
 
@@ -157,9 +155,6 @@
   align-self: stretch;
 }
 
-// Takes the free height of the panel. The text inside is positioned
-// absolutely so it never makes the row taller than the column on the left;
-// the number of clamped lines is fitted to this height in JS.
 .infoDescriptionWrap {
   position: relative;
   flex: 1 1 auto;

@@ -43,7 +43,6 @@ const storeUser = (user: AuthUser | null) => {
       localStorage.removeItem(USER_KEY);
     }
   } catch {
-    // Storage unavailable; the user just won't survive a reload.
   }
 };
 

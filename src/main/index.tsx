@@ -36,9 +36,6 @@ import {
 
 const NOT_FOUND_META = { title: 'Page not found', noindex: true };
 
-// Enough to fill one row of tiles on wide screens; the shelf trims the rest.
-// Reading order from the "read next" links: books this one links to, and
-// books that link to it.
 const getReadingOrder = (allBooks: Book[], current: Book) => {
   const byId = new Map(allBooks.map((b) => [b.id, b]));
 
@@ -137,7 +134,6 @@ export const AppContent = () => {
   };
 
   const isSearchPage = normalizePathname(location.pathname) === '/search';
-  // The page the search was started from, to return to when it is cleared.
   const searchFrom: string = isSearchPage
     ? (location.state as { from?: string } | null)?.from ?? '/'
     : `${location.pathname}${location.search}`;
@@ -215,8 +211,6 @@ export const AppContent = () => {
             undefined,
         });
       } else if (!isLoading && !isBooksError) {
-        // Only a successful load proves the book is gone; a failed API call
-        // must not noindex a real book page.
         setDocumentMeta(NOT_FOUND_META);
       }
     } else if (path.startsWith('/pages/')) {
@@ -227,8 +221,6 @@ export const AppContent = () => {
           : NOT_FOUND_META,
       );
     } else {
-      // The server answers every unknown URL with 200 and the SPA shell, so
-      // noindex is what keeps them out of the index as soft 404s.
       setDocumentMeta(NOT_FOUND_META);
     }
   }, [location, summaryBook, isLoading, isBooksError]);

@@ -40,9 +40,6 @@ const setRobotsMeta = (noindex: boolean) => {
   }
 };
 
-// Book, library and static pages are served as directories (prerendered
-// index.html), so their canonical form keeps the trailing slash; everything
-// else drops it.
 const PRERENDERED_PATH = /^\/(books|library|pages)(\/|$)/;
 
 const setCanonical = (path: string) => {
@@ -85,7 +82,6 @@ export const setDocumentMeta = ({
   setRobotsMeta(Boolean(noindex));
 
   if (noindex) {
-    // A canonical on a noindex page sends Google conflicting signals.
     document.head.querySelector('link[rel="canonical"]')?.remove();
   } else {
     setCanonical(path);

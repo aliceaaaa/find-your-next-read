@@ -10,8 +10,6 @@ export const navPathMap: Record<NavItemId, string> = {
   'post-constructor': '/create-post',
 };
 
-// Prerendered pages are served with a trailing slash ("/library/"), routes
-// are matched without one.
 export const normalizePathname = (pathname: string) =>
   pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
 

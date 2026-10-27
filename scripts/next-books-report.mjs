@@ -1,19 +1,4 @@
-// Connectivity report for next_books links.
-//
-// Prints:
-//   1. Totals: books, next_books links, integrity checks.
-//   2. Books with at most --max-in incoming and --max-out outgoing links.
-//
-// Usage:
-//   node scripts/next-books-report.mjs [--max-in N] [--max-out N]
-//
-// Examples:
-//   node scripts/next-books-report.mjs              # 0..1 in / 0..1 out
-//   node scripts/next-books-report.mjs --max-in 0   # only fully unreferenced
-
 import { SITE_URL, API_URL, bookPath, fetchAllBooks } from './lib/books.mjs';
-
-// --- CLI flags ---------------------------------------------------------------
 
 const args = process.argv.slice(2);
 
@@ -25,8 +10,6 @@ const numFlag = (name, fallback) => {
 
 const MAX_IN = numFlag('max-in', 1);
 const MAX_OUT = numFlag('max-out', 1);
-
-// --- Colors (disabled when piped or NO_COLOR is set) --------------------------
 
 const paint = process.stdout.isTTY && !process.env.NO_COLOR;
 const wrap =
@@ -41,8 +24,6 @@ const green = wrap('32');
 const yellow = wrap('33');
 const cyan = wrap('36');
 const gray = wrap('90');
-
-// --- Stats --------------------------------------------------------------------
 
 const buildStats = (books) => {
   const outgoing = new Map();
@@ -81,12 +62,9 @@ const buildStats = (books) => {
   };
 };
 
-// --- Rendering helpers ---------------------------------------------------------
-
 const truncate = (text, width) =>
   text.length > width ? `${text.slice(0, Math.max(1, width - 1))}…` : text;
 
-// Pad first, color after — escape codes must not affect the width.
 const pad = (text, width, alignStart = false) => {
   const value = truncate(text, width);
   return alignStart ? value.padStart(width) : value.padEnd(width);
@@ -106,12 +84,12 @@ const stat = (label, value) => {
 
 const renderTable = (books, stats) => {
   const width = Math.min(process.stdout.columns ?? 100, 120);
-  const gaps = 2 * 5; // between the 6 columns
+  const gaps = 2 * 5;
 
   const idW = Math.max(2, ...books.map((b) => String(b.id).length));
   const pathW = Math.max(4, ...books.map((b) => bookPath(b).length));
-  const inW = 2; // ВХ
-  const outW = 3; // ИСХ
+  const inW = 2;
+  const outW = 3;
 
   const rest = Math.max(
     28,
@@ -176,8 +154,6 @@ const renderDistribution = (books, stats) => {
     stat(key, `${String(count).padStart(3)} ${bar}${barVoid}`);
   }
 };
-
-// --- Main ------------------------------------------------------------------------
 
 const main = async () => {
   const books = await fetchAllBooks({ include: 'nextBooks' });

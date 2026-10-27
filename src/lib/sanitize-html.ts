@@ -1,5 +1,3 @@
-// Tags the rich text editor can produce. Everything else is unwrapped to its
-// text, and every attribute is dropped, so the result is safe to render.
 const ALLOWED_TAGS = new Set([
   'P',
   'BR',

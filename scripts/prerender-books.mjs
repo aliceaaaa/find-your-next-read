@@ -1,22 +1,11 @@
-// Runs after `react-scripts build`. For every book writes
-// build/books/{id}/summary/index.html with book-specific <title>, description,
-// Open Graph / Twitter tags, canonical, Book JSON-LD and static fallback
-// content, plus a 1200×630 PNG preview at build/og/books/{id}.png. The library
-// and static pages get the same treatment at build/library/index.html and
-// build/pages/{slug}/index.html, so they stop inheriting the home page's
-// title and canonical from build/index.html.
-//
-// Crawlers that don't execute JS (Telegram, VK, Facebook, Slack, Yandex)
-// read these tags directly. The web server must serve $uri/index.html before
-// falling back to /index.html.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { Resvg } from '@resvg/resvg-js';
 import { SITE_NAME, SITE_URL, bookPath, fetchAllBooks } from './lib/books.mjs';
 import { loadStaticPages } from './lib/pages.mjs';
 
 const BUILD_DIR = new URL('../build/', import.meta.url);
-const OG_WIDTH = 1200;
-const OG_HEIGHT = 630;
+const OG_SIZE = 200;
+const SITE_OG_IMAGE = 'og-image.png';
 const DESCRIPTION_LIMIT = 160;
 
 const escapeHtml = (value) =>
@@ -36,7 +25,6 @@ const decodeEntities = (value) =>
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
 
-// Mirrors descriptionToString in src/api/books.ts, then strips markup.
 const descriptionToText = (desc) => {
   let raw = '';
 
@@ -69,8 +57,6 @@ const truncate = (text, limit) => {
   return `${cut.slice(0, cut.lastIndexOf(' ')) || cut}…`;
 };
 
-// Uploaded cover URL, or null when the book has none and needs a generated
-// og image.
 const coverUrl = (book) =>
   /^https?:\/\//.test(book.cover?.url ?? '') ? book.cover.url : null;
 
@@ -102,14 +88,35 @@ const wrapText = (text, maxChars, maxLines) => {
   return lines;
 };
 
-const renderOgImage = (book) => {
+const fetchCoverDataUri = async (book) => {
+  const url = coverUrl(book);
+
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const res = await fetch(url);
+    const type = res.headers.get('content-type') ?? '';
+
+    if (!res.ok || !/^image\/(jpeg|png|webp|gif)/.test(type)) {
+      return null;
+    }
+
+    const data = Buffer.from(await res.arrayBuffer()).toString('base64');
+
+    return `data:${type};base64,${data}`;
+  } catch {
+    return null;
+  }
+};
+
+const renderOgImage = (book, coverDataUri) => {
   const coverColor = book.cover_color || '#E63946';
   const coverText = book.cover_text_color || '#FFFFFF';
   const lastName = (book.author ?? '').split(' ').slice(-1)[0] ?? '';
-
-  const coverLines = wrapText(book.title.toUpperCase(), 12, 5);
-  const titleLines = wrapText(book.title, 22, 3);
-  const titleSize = titleLines.length > 2 ? 54 : 64;
+  const cover = { x: 39, y: 14, width: 122, height: 172, radius: 8 };
+  const font = 'Helvetica Neue, Helvetica, Arial, sans-serif';
 
   const tspans = (lines, x, lineHeight) =>
     lines
@@ -119,21 +126,24 @@ const renderOgImage = (book) => {
       )
       .join('');
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}">
+  const generatedCover = `
+  <rect x="${cover.x}" y="${cover.y}" width="${cover.width}" height="${cover.height}" rx="${cover.radius}" fill="${escapeHtml(coverColor)}"/>
+  <text x="${cover.x + 10}" y="${cover.y + 18}" font-family="${font}" font-size="7" font-weight="500" fill="#fff" fill-opacity="0.65" letter-spacing="0.5">${escapeHtml(lastName.toUpperCase())}</text>
+  <text x="${cover.x + 10}" y="${cover.y + 64}" font-family="${font}" font-size="13" font-weight="900" fill="${escapeHtml(coverText)}">${tspans(wrapText(book.title.toUpperCase(), 12, 5), cover.x + 10, 15)}</text>
+  <text x="${cover.x + 10}" y="${cover.y + cover.height - 10}" font-family="${font}" font-size="7" fill="${escapeHtml(coverText)}" fill-opacity="0.7">A Novel</text>`;
+
+  const uploadedCover = `
+  <defs><clipPath id="cover"><rect x="${cover.x}" y="${cover.y}" width="${cover.width}" height="${cover.height}" rx="${cover.radius}"/></clipPath></defs>
+  <image href="${coverDataUri}" x="${cover.x}" y="${cover.y}" width="${cover.width}" height="${cover.height}" preserveAspectRatio="xMidYMid slice" clip-path="url(#cover)"/>`;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${OG_SIZE}" height="${OG_SIZE}" viewBox="0 0 ${OG_SIZE} ${OG_SIZE}">
   <rect width="100%" height="100%" fill="#F5F5F7"/>
-  <rect x="80" y="75" width="340" height="480" rx="16" fill="${escapeHtml(coverColor)}"/>
-  <rect x="81" y="76" width="338" height="478" rx="15" fill="none" stroke="#fff" stroke-opacity="0.24" stroke-width="2"/>
-  <text x="110" y="125" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="500" fill="#fff" fill-opacity="0.65" letter-spacing="1">${escapeHtml(lastName.toUpperCase())}</text>
-  <text x="110" y="270" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="38" font-weight="900" fill="${escapeHtml(coverText)}">${tspans(coverLines, 110, 42)}</text>
-  <text x="110" y="520" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" fill="${escapeHtml(coverText)}" fill-opacity="0.7">A Novel</text>
-  <text x="490" y="${titleLines.length > 2 ? 190 : 230}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${titleSize}" font-weight="700" fill="#1A1A1A">${tspans(titleLines, 490, titleSize + 8)}</text>
-  <text x="490" y="${titleLines.length > 2 ? 190 + 3 * (titleSize + 8) + 10 : 230 + titleLines.length * 72 + 10}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="34" fill="#6B7280">by ${escapeHtml(book.author ?? '')}</text>
-  <rect x="490" y="500" width="40" height="56" rx="5" fill="#E63946"/>
-  <text x="550" y="540" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#1A1A1A">${SITE_NAME}</text>
+  <rect x="${cover.x + 2}" y="${cover.y + 4}" width="${cover.width}" height="${cover.height}" rx="${cover.radius}" fill="#000" fill-opacity="0.08"/>
+  ${coverDataUri ? uploadedCover : generatedCover}
 </svg>`;
 
   return new Resvg(svg, {
-    fitTo: { mode: 'width', value: OG_WIDTH },
+    fitTo: { mode: 'width', value: OG_SIZE },
     font: { loadSystemFonts: true, defaultFontFamily: 'Helvetica Neue' },
   })
     .render()
@@ -176,7 +186,6 @@ const bookJsonLd = (book, { url, image, description }) => {
     delete data.genre;
   }
 
-  // "<" in JSON could close the <script> tag early.
   return JSON.stringify(data).replace(/</g, '\\u003c');
 };
 
@@ -188,8 +197,6 @@ const replaceOnce = (html, pattern, replacement, label) => {
   return html.replace(pattern, replacement);
 };
 
-// Swaps the home page's title, description, social tags, canonical and
-// #root fallback in build/index.html for the page's own.
 const renderPage = (template, tags, fallback) => {
   let html = template;
 
@@ -219,8 +226,7 @@ const renderBookHtml = (template, book) => {
     DESCRIPTION_LIMIT,
   );
   const title = `${book.title} by ${book.author} · ${SITE_NAME}`;
-  const image = coverUrl(book) ?? `${SITE_URL}/og/books/${book.id}.png`;
-  const hasGeneratedImage = image.startsWith(`${SITE_URL}/og/`);
+  const image = `${SITE_URL}/og/books/${book.id}.png`;
 
   const tags = [
     `<title>${escapeHtml(title)}</title>`,
@@ -232,22 +238,18 @@ const renderBookHtml = (template, book) => {
     `<meta property="og:description" content="${escapeHtml(description)}">`,
     `<meta property="og:url" content="${url}">`,
     `<meta property="og:image" content="${escapeHtml(image)}">`,
-    ...(hasGeneratedImage
-      ? [
-          `<meta property="og:image:width" content="${OG_WIDTH}">`,
-          `<meta property="og:image:height" content="${OG_HEIGHT}">`,
-        ]
-      : []),
+    `<meta property="og:image:width" content="${OG_SIZE}">`,
+    `<meta property="og:image:height" content="${OG_SIZE}">`,
     `<meta property="og:image:alt" content="${escapeHtml(`${book.title} by ${book.author}`)}">`,
     `<meta property="book:author" content="${escapeHtml(book.author)}">`,
     ...(book.isbn
       ? [`<meta property="book:isbn" content="${escapeHtml(book.isbn)}">`]
       : []),
-    `<meta name="twitter:card" content="summary_large_image">`,
+    `<meta name="twitter:card" content="summary">`,
     `<meta name="twitter:title" content="${escapeHtml(title)}">`,
     `<meta name="twitter:description" content="${escapeHtml(description)}">`,
     `<meta name="twitter:image" content="${escapeHtml(image)}">`,
-    `<script type="application/ld+json">${bookJsonLd(book, { url, image, description })}</script>`,
+    `<script type="application/ld+json">${bookJsonLd(book, { url, image: coverUrl(book) ?? image, description })}</script>`,
   ].join('');
 
   const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a></p><h1>${escapeHtml(book.title)}</h1><p>by ${escapeHtml(book.author)}</p></header><main><p>${escapeHtml(fullText)}</p></main><nav><a href="/library/">Browse all books</a></nav></div>`;
@@ -255,11 +257,10 @@ const renderBookHtml = (template, book) => {
   return renderPage(template, tags, fallback);
 };
 
-// Same title format as setDocumentMeta in src/lib/meta.ts.
 const renderStaticPageHtml = (template, page, staticPages, mainHtml = '') => {
   const url = `${SITE_URL}${page.path}`;
   const title = `${page.title} · ${SITE_NAME}`;
-  const image = `${SITE_URL}/logo512.png`;
+  const image = `${SITE_URL}/${SITE_OG_IMAGE}`;
 
   const tags = [
     `<title>${escapeHtml(title)}</title>`,
@@ -271,6 +272,8 @@ const renderStaticPageHtml = (template, page, staticPages, mainHtml = '') => {
     `<meta property="og:description" content="${escapeHtml(page.description)}">`,
     `<meta property="og:url" content="${url}">`,
     `<meta property="og:image" content="${image}">`,
+    `<meta property="og:image:width" content="${OG_SIZE}">`,
+    `<meta property="og:image:height" content="${OG_SIZE}">`,
     `<meta property="og:image:alt" content="${SITE_NAME} — personalized book recommendations">`,
     `<meta name="twitter:card" content="summary">`,
     `<meta name="twitter:title" content="${escapeHtml(title)}">`,
@@ -286,8 +289,6 @@ const renderStaticPageHtml = (template, page, staticPages, mainHtml = '') => {
   return renderPage(template, tags, fallback);
 };
 
-// Raw-HTML links to every book, so crawlers reach them from the library
-// without running JS.
 const libraryMainHtml = (books) =>
   `<main><ul>${books
     .map(
@@ -308,9 +309,10 @@ const main = async () => {
     await mkdir(dir, { recursive: true });
     await writeFile(new URL('index.html', dir), renderBookHtml(template, book));
 
-    if (!coverUrl(book)) {
-      await writeFile(new URL(`${book.id}.png`, ogDir), renderOgImage(book));
-    }
+    await writeFile(
+      new URL(`${book.id}.png`, ogDir),
+      renderOgImage(book, await fetchCoverDataUri(book)),
+    );
   }
 
   const staticPages = await loadStaticPages();

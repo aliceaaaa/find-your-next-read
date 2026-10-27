@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Book } from 'types';
 import { apiRemoveNextBook, apiSetNextBooks } from 'api';
 
-/** A "read next" link: [book, the book to read after it]. */
 export type Link = [number, number];
 
 export type LinkChange = {
@@ -24,10 +23,6 @@ export const applyChange = (books: Book[], { add, remove }: LinkChange) =>
     return next === book.nextBookIds ? book : { ...book, nextBookIds: next };
   });
 
-/**
- * Adds, removes or reverses "read next" links. The sky updates right away;
- * if the API refuses, the change is rolled back.
- */
 export const useLinkEditor = () => {
   const queryClient = useQueryClient();
 

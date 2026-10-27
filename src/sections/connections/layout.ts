@@ -3,9 +3,7 @@ import { Book } from 'types';
 const MARGIN = 56;
 const COLUMN_GAP = 160;
 const ROW_GAP = 170;
-// How far a star keeps from a line that is not its own.
 const CLEARANCE = 44;
-// Name labels: 10px mono with wide letter spacing, and a length cap.
 const LABEL_CHAR_WIDTH = 7.8;
 export const LABEL_MAX_CHARS = 32;
 const CONSTELLATION_GAP = 130;
@@ -20,18 +18,13 @@ export type Star = {
   x: number;
   y: number;
   r: number;
-  /** Index into `Sky.constellations`, or null for a star without links. */
   constellation: number | null;
-  /** Seconds, so the stars don't all twinkle in step. */
   twinkleDelay: number;
 };
 
 export type Constellation = {
-  /** The genre most of its books share. */
   name: string;
-  /** Indexes into `Sky.stars`. */
   stars: number[];
-  /** "Read next" links as [from, to] indexes into `Sky.stars`. */
   links: [number, number][];
   labelX: number;
   labelY: number;
@@ -42,9 +35,7 @@ export type Sky = {
   height: number;
   stars: Star[];
   constellations: Constellation[];
-  /** Where the band of stars without links starts, if there are any. */
   loneTop: number | null;
-  /** Background specks, purely decorative. */
   dust: { x: number; y: number; r: number }[];
 };
 
@@ -61,7 +52,6 @@ const hash = (text: string) => {
   return h >>> 0;
 };
 
-// Seeded, so the sky keeps its shape between visits.
 const makeRandom = (seed: number) => {
   let a = seed;
 
@@ -75,7 +65,6 @@ const makeRandom = (seed: number) => {
   };
 };
 
-/** The point of segment a–b closest to p. */
 const closestOnSegment = (p: Point, a: Point, b: Point): Point => {
   const dx = b.x - a.x;
   const dy = b.y - a.y;
@@ -90,7 +79,6 @@ const closestOnSegment = (p: Point, a: Point, b: Point): Point => {
 
 const starRadius = (book: Book) => (book.reviewCount > 0 ? 4.6 : 3.4);
 
-/** Groups of books joined by "read next" links, in either direction. */
 const findGroups = (books: Book[]) => {
   const byId = new Map(books.map((book) => [book.id, book]));
   const neighbours = new Map<number, Set<number>>(
@@ -136,11 +124,6 @@ const findGroups = (books: Book[]) => {
   return groups;
 };
 
-/**
- * The links of a group minus the ones that close a loop (A → B → … → A).
- * A loop has no first book, so ordering by it would push the books
- * further and further apart.
- */
 const acyclicLinks = (group: Book[]) => {
   const ids = new Set(group.map((book) => book.id));
   const byId = new Map(group.map((book) => [book.id, book]));
@@ -165,7 +148,6 @@ const acyclicLinks = (group: Book[]) => {
     state.set(id, 'done');
   };
 
-  // Start from books nothing leads to, so a loop is cut at its far end.
   const targets = new Set(group.flatMap((book) => book.nextBookIds ?? []));
   const sorted = [...group].sort((a, b) => a.id - b.id);
 
@@ -181,11 +163,6 @@ const acyclicLinks = (group: Book[]) => {
   return links;
 };
 
-/**
- * Lays one group out in reading order: each book one step after the
- * furthest book that leads to it, left to right, or top to bottom when the
- * order is too long for the width. Returns positions around (0, 0).
- */
 const shapeGroup = (
   group: Book[],
   random: () => number,
@@ -196,7 +173,6 @@ const shapeGroup = (
   const links = acyclicLinks(group);
   const depth = new Map(group.map((book) => [book.id, 0]));
 
-  // Longest path from a start; the links have no loops, so this settles.
   for (let round = 0; round < group.length; round++) {
     let changed = false;
 
@@ -223,15 +199,12 @@ const shapeGroup = (
     columns.set(column, [...(columns.get(column) ?? []), book]);
   });
 
-  // Work in reading-order space: x along the order, y across it.
   const points = new Map<number, Point>();
   const sortedColumns = Array.from(columns.keys()).sort((a, b) => a - b);
 
   sortedColumns.forEach((column) => {
     const books = columns.get(column) as Book[];
 
-    // Put each book level with the books that lead to it, which keeps
-    // the lines from crossing.
     const parentLevel = (book: Book) => {
       const levels = links
         .filter(([from, to]) => to === book.id && points.has(from))
@@ -256,8 +229,6 @@ const shapeGroup = (
     });
   });
 
-  // Nudge a star off any line that is not its own, so a path never seems
-  // to run through a book it does not lead to.
   const edges = group.flatMap((book) =>
     (book.nextBookIds ?? [])
       .filter((nextId) => ids.has(nextId))
@@ -294,12 +265,10 @@ const shapeGroup = (
     }
   }
 
-  // Narrow screens read the order top to bottom instead.
   if (vertical) {
     points.forEach((p, id) => points.set(id, { x: p.y * 0.9, y: p.x * 0.8 }));
   }
 
-  // A slight tilt keeps the chains from looking like a table.
   const angle = (random() - 0.5) * 0.3;
   const all = Array.from(points.values());
   const cx = all.reduce((sum, p) => sum + p.x, 0) / all.length;
@@ -340,11 +309,6 @@ const bounds = (points: Point[]) => ({
   maxY: Math.max(...points.map((p) => p.y)),
 });
 
-/**
- * One sky for the whole catalogue. Books joined by "read next" links form
- * constellations, biggest first, packed in rows; books without links sit
- * apart below them as lone stars.
- */
 export const buildSky = (books: Book[], width: number): Sky => {
   const random = makeRandom(hash(books.map((b) => b.id).join(',')));
   const margin = width < 600 ? MARGIN * 0.8 : MARGIN;
@@ -358,11 +322,9 @@ export const buildSky = (books: Book[], width: number): Sky => {
   const constellations: Constellation[] = [];
   const indexById = new Map<number, number>();
 
-  // Shelf packing: fill a row left to right, then start the next one.
   let cursorX = margin;
   let cursorY = margin;
   let rowHeight = 0;
-  // Constellation indexes per row, with where each one ends on the right.
   const rows: { index: number; right: number }[][] = [[]];
 
   linked.forEach((group) => {
@@ -371,7 +333,6 @@ export const buildSky = (books: Book[], width: number): Sky => {
     const name = dominantGenre(group);
     const raw = bounds(Array.from(points.values()));
 
-    // Squeeze a chain that is wider than a narrow screen.
     if (raw.maxX - raw.minX > maxWidth) {
       const scale = maxWidth / (raw.maxX - raw.minX);
       points.forEach((p, id) => points.set(id, { ...p, x: p.x * scale }));
@@ -384,7 +345,6 @@ export const buildSky = (books: Book[], width: number): Sky => {
       maxWidth,
       Math.max(box.maxX - box.minX, labelWidth),
     );
-    // Room for the star labels and the name below.
     const boxHeight = box.maxY - box.minY + 64;
 
     if (cursorX > margin && cursorX + boxWidth > width - margin) {
@@ -426,8 +386,6 @@ export const buildSky = (books: Book[], width: number): Sky => {
     rowHeight = Math.max(rowHeight, boxHeight + 24);
   });
 
-  // Spread each row over the full width, with a little wobble so the rows
-  // don't look ruled.
   rows.forEach((row) => {
     if (!row.length) {
       return;
@@ -464,8 +422,6 @@ export const buildSky = (books: Book[], width: number): Sky => {
     });
   });
 
-  // Books without links get a band of their own at the bottom, so they
-  // don't look attached to a constellation.
   const loneTop = lone.length
     ? linked.length
       ? cursorY + rowHeight + CONSTELLATION_GAP / 2

@@ -34,7 +34,6 @@ export const useNavigation = (apiBooks: Book[]) => {
     navigate(navPathMap[id]);
   };
 
-  // With a reviewId the book page scrolls to that review (see Summary).
   const handleBookSelect = (book: Book, reviewId?: number) => {
     const hash = reviewId != null ? `#review-${reviewId}` : '';
 

@@ -15,9 +15,6 @@ const matchesQuery = (book: Book, query: string) =>
     field.toLowerCase().includes(query),
   );
 
-// The API ignores filter[search] and returns every book, so search the
-// already loaded catalogue instead. This also matches genres, which the
-// search bar promises.
 export const useBookSearch = (query: string) => {
   const { data: books = [], isPending } = useBooks();
   const trimmed = query.trim().toLowerCase();

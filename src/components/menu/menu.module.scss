@@ -19,6 +19,10 @@
     gap: 2px;
   }
 
+  .short-label {
+    display: none;
+  }
+
   .nav-item {
     display: flex;
     align-items: center;
@@ -213,8 +217,15 @@
 
     nav {
       flex-direction: row;
-      padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-      gap: 4px;
+      min-width: 0;
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
 
     .nav-item {
@@ -222,10 +233,13 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      padding: 8px 4px;
-      font-size: 11px;
-      flex: 1;
+      padding: 8px 3px;
+      font-size: 10.5px;
+      flex: 1 0 auto;
+      width: auto;
+      min-width: 40px;
       text-align: center;
+      white-space: nowrap;
 
       &.active::before {
         display: none;
@@ -234,6 +248,14 @@
 
     .user {
       display: none;
+    }
+
+    .long-label {
+      display: none;
+    }
+
+    .short-label {
+      display: inline;
     }
   }
 
