@@ -1,7 +1,7 @@
 {
   "short_name": "FYNR",
   "name": "Find Your Next Read",
-  "description": "Personalized book recommendations, reviews and books similar to the ones you love.",
+  "description": "Book reviews written entirely by humans, personalized recommendations and books similar to the ones you love.",
   "icons": [
     {
       "src": "favicon.ico",

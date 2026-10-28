@@ -7,6 +7,7 @@ const BUILD_DIR = new URL('../build/', import.meta.url);
 const OG_SIZE = 200;
 const SITE_OG_IMAGE = 'og-image.png';
 const DESCRIPTION_LIMIT = 160;
+const TAGLINE = 'Book reviews written entirely by humans';
 
 const escapeHtml = (value) =>
   String(value)
@@ -252,7 +253,7 @@ const renderBookHtml = (template, book) => {
     `<script type="application/ld+json">${bookJsonLd(book, { url, image: coverUrl(book) ?? image, description })}</script>`,
   ].join('');
 
-  const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a></p><h1>${escapeHtml(book.title)}</h1><p>by ${escapeHtml(book.author)}</p></header><main><p>${escapeHtml(fullText)}</p></main><nav><a href="/library/">Browse all books</a></nav></div>`;
+  const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a> — ${TAGLINE}</p><h1>${escapeHtml(book.title)}</h1><p>by ${escapeHtml(book.author)}</p></header><main><p>${escapeHtml(fullText)}</p></main><nav><a href="/library/">Browse all books</a></nav></div>`;
 
   return renderPage(template, tags, fallback);
 };
@@ -274,7 +275,7 @@ const renderStaticPageHtml = (template, page, staticPages, mainHtml = '') => {
     `<meta property="og:image" content="${image}">`,
     `<meta property="og:image:width" content="${OG_SIZE}">`,
     `<meta property="og:image:height" content="${OG_SIZE}">`,
-    `<meta property="og:image:alt" content="${SITE_NAME} — personalized book recommendations">`,
+    `<meta property="og:image:alt" content="${SITE_NAME} — ${TAGLINE.toLowerCase()}">`,
     `<meta name="twitter:card" content="summary">`,
     `<meta name="twitter:title" content="${escapeHtml(title)}">`,
     `<meta name="twitter:description" content="${escapeHtml(page.description)}">`,
@@ -284,7 +285,7 @@ const renderStaticPageHtml = (template, page, staticPages, mainHtml = '') => {
   const nav = staticPages
     .map((p) => `<a href="${p.path}">${escapeHtml(p.title)}</a>`)
     .join(' ');
-  const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a></p><h1>${escapeHtml(page.title)}</h1><p>${escapeHtml(page.description)}</p></header>${mainHtml}<nav>${nav}</nav></div>`;
+  const fallback = `<div id="root"><header><p><a href="/">${SITE_NAME}</a> — ${TAGLINE}</p><h1>${escapeHtml(page.title)}</h1><p>${escapeHtml(page.description)}</p></header>${mainHtml}<nav>${nav}</nav></div>`;
 
   return renderPage(template, tags, fallback);
 };

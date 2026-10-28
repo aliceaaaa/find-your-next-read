@@ -24,7 +24,7 @@ const baseBook = {
   coverTextColor: '#C42B3F',
   categories: ['Romance', 'History'],
   description:
-    'A deeply moving and thought-provoking story about love, loss, and the search for meaning.',
+    'A deeply moving and thought-provoking story about love, loss and the search for meaning.',
   published: 2020,
   pages: 352,
   language: 'English',

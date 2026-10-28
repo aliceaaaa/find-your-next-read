@@ -1,3 +1,4 @@
+import { KeyboardEvent, useState } from 'react';
 import cn from 'classnames';
 import styles from './who-we-are.module.scss';
 
@@ -13,6 +14,7 @@ type Member = {
   name: string;
   caption: string;
   photo?: string;
+  bio?: string[];
 };
 
 const TEAM: Member[] = [
@@ -20,14 +22,103 @@ const TEAM: Member[] = [
     name: 'Nikolai',
     caption: 'reads with eyes closed',
     photo: '/team/nikolai.jpg',
+    bio: [
+      'Nikolai will write something about himself at some point.',
+      'For sure. Definitely. He’s almost done. The draft is practically in his head already.',
+      'Any day now…',
+    ],
   },
   {
     name: 'Alice',
     caption: 'lives in a fairy forest',
     photo: '/team/alisa.jpg',
+    bio: [
+      'Hi, I’m Alice: full-stack developer by day, indie creator by night and a self-proclaimed comedian at all hours (the jury’s still out).',
+      'I write book reviews the old-fashioned way, entirely by myself, like a medieval peasant with a keyboard. You’ll know it’s really me from the bold grammar choices.',
+      'I also build my own apps and every now and then I do it without AI, just to remind myself what suffering, I mean craftsmanship, feels like.',
+    ],
   },
-  { name: 'Ilya', caption: 'identity pending' },
+  {
+    name: 'Ilya',
+    caption: 'identity pending',
+    bio: ['Ilya is mysterious.'],
+  },
 ];
+
+const MemberCard = ({ member, index }: { member: Member; index: number }) => {
+  const { name, caption, photo, bio } = member;
+  const [flipped, setFlipped] = useState(false);
+  const canFlip = !!bio?.length;
+  const number = `Nº 0${index + 1}`;
+
+  const flip = () => {
+    if (canFlip) {
+      setFlipped((value) => !value);
+    }
+  };
+
+  const handleClick = () => {
+    if (!window.matchMedia?.('(hover: hover)').matches) {
+      flip();
+    }
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      flip();
+    }
+  };
+
+  return (
+    <li
+      className={cn(styles.member, styles[`member-${index + 1}`], {
+        [styles.flippable]: canFlip,
+        [styles.flipped]: flipped,
+      })}
+    >
+      <div
+        className={styles.card}
+        onClick={handleClick}
+        {...(canFlip && {
+          role: 'button',
+          tabIndex: 0,
+          'aria-pressed': flipped,
+          'aria-label': flipped ? `Back to ${name}'s photo` : `About ${name}`,
+          onKeyDown: handleKeyDown,
+        })}
+      >
+        <div className={cn(styles.face, styles.front)} aria-hidden={flipped}>
+          <div className={styles.frame}>
+            {photo ? (
+              <img src={photo} alt={name} className={styles.photo} />
+            ) : (
+              <div className={styles.unknown} role="img" aria-label={name}>
+                ?
+              </div>
+            )}
+          </div>
+          <div className={styles.caption}>
+            <span className={styles.number}>{number}</span>
+            <span className={styles.name}>{name}</span>
+            <span className={styles.role}>{caption}</span>
+          </div>
+        </div>
+        {canFlip && (
+          <div className={cn(styles.face, styles.back)} aria-hidden={!flipped}>
+            <span className={styles.number}>{number}</span>
+            <span className={styles.name}>{name}</span>
+            <div className={styles.bio}>
+              {bio?.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </li>
+  );
+};
 
 export const WhoWeArePage = () => (
   <article className={styles.page}>
@@ -54,24 +145,15 @@ export const WhoWeArePage = () => (
       </div>
     </div>
 
+    <p className={styles.hint}>
+      Psst… <span className={styles['hint-hover']}>hover over</span>
+      <span className={styles['hint-tap']}>tap</span> us to get to know us
+      better <span aria-hidden="true">↓</span>
+    </p>
+
     <ul className={styles.team}>
-      {TEAM.map(({ name, caption, photo }, i) => (
-        <li key={name} className={cn(styles.member, styles[`member-${i + 1}`])}>
-          <div className={styles.frame}>
-            {photo ? (
-              <img src={photo} alt={name} className={styles.photo} />
-            ) : (
-              <div className={styles.unknown} role="img" aria-label={name}>
-                ?
-              </div>
-            )}
-          </div>
-          <div className={styles.caption}>
-            <span className={styles.number}>Nº 0{i + 1}</span>
-            <span className={styles.name}>{name}</span>
-            <span className={styles.role}>{caption}</span>
-          </div>
-        </li>
+      {TEAM.map((member, i) => (
+        <MemberCard key={member.name} member={member} index={i} />
       ))}
     </ul>
 

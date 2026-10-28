@@ -50,7 +50,7 @@ const CookiesTable = () => (
         <td>Google LLC</td>
         <td>
           Distinguishes individual users. Used by Google Analytics 4 to compute
-          visitor, session, and campaign counts.
+          visitor, session and campaign counts.
         </td>
         <td>2 years</td>
         <td>Analytics</td>
@@ -102,7 +102,7 @@ const PAGES: Record<string, StaticContent> = {
       'Our website may contain links to external third-party websites over whose content we have no influence. Therefore, we cannot assume any liability for these external contents. The respective provider or operator of the pages is always responsible for the content of the linked pages.',
       'The linked pages were checked for possible legal violations at the time of linking. Illegal content was not recognizable at the time of linking. However, permanent monitoring of the content of the linked pages is not reasonable without concrete evidence of a violation. Upon notification of rights violations, we will remove such links immediately.',
       <h2>Copyright (Urheberrecht)</h2>,
-      'The content and works created by the site operator on these pages are subject to German copyright law (Deutsches Urheberrecht). Duplication, processing, distribution, and any kind of exploitation outside the limits of copyright law require the written consent of the respective author or creator.',
+      'The content and works created by the site operator on these pages are subject to German copyright law (Deutsches Urheberrecht). Duplication, processing, distribution and any kind of exploitation outside the limits of copyright law require the written consent of the respective author or creator.',
       'Downloads and copies of this site are only permitted for private, non-commercial use. Insofar as the content on this site was not created by the operator, the copyrights of third parties are respected. In particular, third-party content is identified as such. Should you nevertheless become aware of a copyright infringement, please inform us accordingly. Upon notification of violations, we will remove such content immediately.',
     ],
   },
@@ -114,11 +114,11 @@ const PAGES: Record<string, StaticContent> = {
       </>,
       'Welcome to Find your next read (hereinafter referred to as "the Website"). By accessing or using this Website, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use the Website.',
       <h2>1. Content & Intellectual Property</h2>,
-      'All content published on this Website—including book reviews, articles, summaries, text, logos, and overall design—is the intellectual property of the Website owner unless stated otherwise.',
-      'You may read, share links, and quote short excerpts of the text provided that clear and proper credit/link-back is given to this Website.',
+      'All content published on this Website—including book reviews, articles, summaries, text, logos and overall design—is the intellectual property of the Website owner unless stated otherwise.',
+      'You may read, share links and quote short excerpts of the text provided that clear and proper credit/link-back is given to this Website.',
       'Commercial reproduction, redistribution, or republishing of any content without prior written consent is strictly prohibited.',
       <h2>2. Disclaimer & Nature of Information</h2>,
-      'The content on this Website consists of personal opinions, literary analysis, and subjective reviews.',
+      'The content on this Website consists of personal opinions, literary analysis and subjective reviews.',
       'All reviews and information are provided on an "as is" and "as available" basis for informational and entertainment purposes only.',
       'While I strive to ensure the accuracy of the information provided, I make no warranties or guarantees regarding the completeness or accuracy of any content.',
       <h2>3. External Links</h2>,
@@ -169,10 +169,10 @@ const PAGES: Record<string, StaticContent> = {
           A pseudonymous Client ID assigned by Google and stored in the{' '}
           <code>_ga</code> cookie, used to recognise your browser across pages.
         </li>
-        <li>Information about your device, browser, and operating system.</li>
+        <li>Information about your device, browser and operating system.</li>
         <li>
           The pages you visit on our Website, the duration of your visit, the
-          referral source, and your approximate geographic region (derived from
+          referral source and your approximate geographic region (derived from
           the anonymised IP address).
         </li>
         <li>
@@ -197,13 +197,13 @@ const PAGES: Record<string, StaticContent> = {
       </ul>,
       'Consent is given voluntarily. You may withdraw it at any time without affecting the lawfulness of processing carried out before the withdrawal (Art. 7 (3) GDPR).',
       <h2>5. Purpose of Processing</h2>,
-      'We process data via GA4 exclusively for the purpose of statistical analysis (Reichweitenmessung / Webanalyse). The data enables us to understand how visitors find and use our Website, which content is popular, and how the usability of the site can be improved. The data is not used to make individual decisions about you, nor is it used to create personalised advertising profiles.',
+      'We process data via GA4 exclusively for the purpose of statistical analysis (Reichweitenmessung / Webanalyse). The data enables us to understand how visitors find and use our Website, which content is popular and how the usability of the site can be improved. The data is not used to make individual decisions about you, nor is it used to create personalised advertising profiles.',
       <h2>6. Recipients of the Data</h2>,
       'The recipient of the data collected via GA4 is Google Ireland Limited, acting as our processor (Auftragsverarbeiter) within the meaning of Art. 28 GDPR. We have concluded a Data Processing Agreement (Auftragsverarbeitungsvertrag, AVV) with Google, which can be reviewed upon request.',
       'Google may, in turn, engage sub-processors (e.g. Google LLC, USA) for technical infrastructure. Further information on Google&apos;s sub-processors is available at <a href="https://privacy.google.com/businesses/subprocessors/" target="_blank" rel="noopener noreferrer">https://privacy.google.com/businesses/subprocessors/</a>.',
       <h2>7. Transfer to Third Countries (United States)</h2>,
       'Data collected by GA4 may be transferred to the United States of America. The European Commission has adopted an adequacy decision for the USA under the EU-US Data Privacy Framework (DPF) on 10 July 2023, which permits data transfers to US organisations that are certified under the DPF. Google LLC is certified under the DPF. The current certificate can be verified at <a href="https://www.dataprivacyframework.gov/" target="_blank" rel="noopener noreferrer">https://www.dataprivacyframework.gov/</a>.',
-      'For transfers not covered by the DPF, appropriate safeguards are in place, in particular Standard Contractual Clauses (SCCs) between us, Google Ireland Limited, and Google LLC. A copy of the SCCs can be provided on request.',
+      'For transfers not covered by the DPF, appropriate safeguards are in place, in particular Standard Contractual Clauses (SCCs) between us, Google Ireland Limited and Google LLC. A copy of the SCCs can be provided on request.',
       'Please be aware that, despite these safeguards, the possibility cannot be fully excluded that US authorities may access data for surveillance purposes in a manner that may not be subject to effective legal redress in the EU. For further information, please consult Google&apos;s privacy policy referenced in section 15.',
       <h2>8. Data Retention</h2>,
       'We have configured GA4 to retain user-level and event-level data for a maximum of 14 months. After this period, the data is automatically deleted or fully anonymised by Google. Aggregate, statistical data may be retained for a longer period in line with Google&apos;s own retention settings. Cookies set by GA4 have a default lifetime of up to 2 years, but are removed from your device as soon as you withdraw consent.',
@@ -255,7 +255,7 @@ const PAGES: Record<string, StaticContent> = {
         </a>
       </>,
       <h2>12. Withdrawal of Consent</h2>,
-      'You can withdraw your consent to GA4 at any time with effect for the future. To do so, open "Cookie settings" in the footer of any page and uncheck the "Analytics" option. Upon withdrawal, Google Analytics will stop collecting new data, the GA4 cookies will be removed from your device, and we will initiate deletion of your pseudonymous data via the GA4 User Deletion API. Withdrawal does not affect the lawfulness of processing that took place before the withdrawal.',
+      'You can withdraw your consent to GA4 at any time with effect for the future. To do so, open "Cookie settings" in the footer of any page and uncheck the "Analytics" option. Upon withdrawal, Google Analytics will stop collecting new data, the GA4 cookies will be removed from your device and we will initiate deletion of your pseudonymous data via the GA4 User Deletion API. Withdrawal does not affect the lawfulness of processing that took place before the withdrawal.',
       <h2>13. No Automated Decision-Making or Profiling</h2>,
       'There is no automated decision-making or profiling as described in Art. 22 GDPR in connection with the use of GA4 on this Website.',
       <h2>14. Server-Side Consent Record</h2>,
@@ -284,7 +284,7 @@ const PAGES: Record<string, StaticContent> = {
       <>
         Last updated: <b>August 2026</b>
       </>,
-      'This Cookie Policy explains what cookies and similar storage technologies (collectively, "cookies") are used on the Website Find your next read, why they are used, and how you can manage them. It should be read together with our Privacy Policy.',
+      'This Cookie Policy explains what cookies and similar storage technologies (collectively, "cookies") are used on the Website Find your next read, why they are used and how you can manage them. It should be read together with our Privacy Policy.',
       <h2>1. What are cookies?</h2>,
       <p className={styles.paragraph}>
         Cookies are small text files placed on your device by the websites you

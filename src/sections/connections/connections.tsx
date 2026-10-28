@@ -335,7 +335,7 @@ export const ConnectionsPage = ({
         </h1>
         <p className={styles.subtitle}>
           Every book is a star. When we say which book to read next, the two
-          stars are joined, and a reading order becomes a constellation. Hover a
+          stars are joined and a reading order becomes a constellation. Hover a
           star to light up its path, click it to open the book.
         </p>
         <ul className={styles.legend}>

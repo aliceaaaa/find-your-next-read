@@ -166,7 +166,7 @@ export const AppContent = () => {
     if (path === '/') {
       setDocumentMeta({
         description:
-          'Find Your Next Read — discover your next favorite book. Personalized book recommendations, reader reviews and books similar to the ones you love.',
+          'Find Your Next Read — book reviews written entirely by humans. Discover your next favorite book with personalized recommendations and books similar to the ones you love.',
       });
     } else if (path === '/library') {
       setDocumentMeta(pageMeta.library);
@@ -180,7 +180,8 @@ export const AppContent = () => {
       const author = new URLSearchParams(search).get('author') ?? '';
       setDocumentMeta({
         title: author ? `Reviews by ${author}` : 'Reviews',
-        description: 'Reader reviews of books on Find Your Next Read.',
+        description:
+          'Book reviews written entirely by humans on Find Your Next Read.',
       });
     } else if (path === '/connections') {
       setDocumentMeta({

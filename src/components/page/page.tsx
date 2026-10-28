@@ -30,7 +30,7 @@ export const Page = ({
   const location = useLocation();
   const searchQuery =
     normalizePathname(location.pathname) === '/search'
-      ? new URLSearchParams(location.search).get('q') ?? ''
+      ? (new URLSearchParams(location.search).get('q') ?? '')
       : '';
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -52,9 +52,14 @@ export const Page = ({
         />
         <div className={styles.content} ref={contentRef}>
           <header className={styles.header}>
-            <h1 className={styles.title}>
-              Find your next <em>read</em>
-            </h1>
+            <div className={styles.brand}>
+              <h1 className={styles.title}>
+                Find your next <em>read</em>
+              </h1>
+              <span className={styles.tagline}>
+                All reviews written by humans
+              </span>
+            </div>
             <SearchBar
               value={searchQuery}
               onSearch={onSearch}

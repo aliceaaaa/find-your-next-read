@@ -1,12 +1,12 @@
 {
   "library": {
     "title": "Library",
-    "description": "Browse the full Find Your Next Read catalogue of books by genre, rating and release."
+    "description": "Browse the full Find Your Next Read catalogue of books by genre, rating and release. Every review is written by a human."
   },
   "pages": {
     "who-we-are": {
       "title": "Who we are",
-      "description": "The people behind Find your next read, and why we review books."
+      "description": "The people behind Find your next read and why we review books."
     },
     "about": {
       "title": "About",

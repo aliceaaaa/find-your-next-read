@@ -1,5 +1,5 @@
 const BASE_TITLE = 'Find Your Next Read';
-const HOME_TITLE = `${BASE_TITLE} — Personalized Book Recommendations`;
+const HOME_TITLE = `${BASE_TITLE} — Human-Written Book Reviews & Recommendations`;
 const SITE_URL = 'https://findyournextread.com';
 
 const setMetaTag = (
