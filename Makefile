@@ -1,4 +1,4 @@
-.PHONY: build deploy
+.PHONY: build deploy deploy-sitemap
 
 build:
 	npm run sitemap
@@ -7,3 +7,7 @@ build:
 
 deploy: build
 	rsync -avz --delete build/ famchat:/root/findyournextread/frontend/
+
+deploy-sitemap:
+	npm run sitemap
+	rsync -avz public/sitemap.xml famchat:/root/findyournextread/frontend/sitemap.xml
