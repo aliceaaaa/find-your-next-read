@@ -17,12 +17,29 @@ export const CategoryFilter = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const categoriesKey = categories.join('\n');
+
   useEffect(() => {
-    const activePill = scrollRef.current?.querySelector<HTMLButtonElement>(
+    const list = scrollRef.current;
+    const activePill = list?.querySelector<HTMLButtonElement>(
       `.${styles.active}`,
     );
-    activePill?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
-  }, [active, categories]);
+
+    if (!list || !activePill) {
+      return;
+    }
+
+    const pillBox = activePill.getBoundingClientRect();
+    const listBox = list.getBoundingClientRect();
+    const left = pillBox.left - listBox.left + list.scrollLeft;
+    const right = left + pillBox.width;
+
+    if (left < list.scrollLeft) {
+      list.scrollTo?.({ left });
+    } else if (right > list.scrollLeft + list.clientWidth) {
+      list.scrollTo?.({ left: right - list.clientWidth });
+    }
+  }, [active, categoriesKey]);
 
   const scroll = () => {
     scrollRef.current?.scrollBy({ left: 150, behavior: 'smooth' });

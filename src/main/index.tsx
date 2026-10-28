@@ -103,7 +103,7 @@ export const AppContent = () => {
   const {
     activeNavFromRoute,
     activeCategory,
-    summaryBook,
+    summaryBook: routeBook,
     handleCategoryChange,
     handleNavChange,
     handleBookSelect,
@@ -113,6 +113,10 @@ export const AppContent = () => {
 
   const { allBooks, popular, releases, favoritesBooks, bookOfTheDayData } =
     useBooksStats(apiBooks, reviews, bookmarks);
+
+  const summaryBook = routeBook
+    ? (allBooks.find((book) => book.id === routeBook.id) ?? routeBook)
+    : null;
 
   const { data: apiCategories = [] } = useCategories();
   const categories = [
