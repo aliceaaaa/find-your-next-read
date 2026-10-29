@@ -1,5 +1,6 @@
 import { KeyboardEvent, useState } from 'react';
 import cn from 'classnames';
+import { SUPPORT_URL } from '../../constants';
 import styles from './who-we-are.module.scss';
 
 const MARQUEE = [
@@ -145,11 +146,24 @@ export const WhoWeArePage = () => (
       </div>
     </div>
 
-    <p className={styles.hint}>
-      Psst… <span className={styles['hint-hover']}>hover over</span>
-      <span className={styles['hint-tap']}>tap</span> us to get to know us
-      better <span aria-hidden="true">↓</span>
-    </p>
+    <div className={styles.hints}>
+      <p className={styles.hint}>
+        Psst… <span className={styles['hint-hover']}>hover over</span>
+        <span className={styles['hint-tap']}>tap</span> us to get to know us
+        better <span aria-hidden="true">↓</span>
+      </p>
+      <p className={styles.coffee}>
+        Or to support us
+        <a
+          className={styles['coffee-link']}
+          href={SUPPORT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Buy us a coffee
+        </a>
+      </p>
+    </div>
 
     <ul className={styles.team}>
       {TEAM.map((member, i) => (

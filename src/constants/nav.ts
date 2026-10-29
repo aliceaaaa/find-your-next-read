@@ -10,6 +10,8 @@ export const navPathMap: Record<NavItemId, string> = {
   'post-constructor': '/create-post',
 };
 
+export const SUPPORT_URL = 'https://buymeacoffee.com/olenius';
+
 export const normalizePathname = (pathname: string) =>
   pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
 

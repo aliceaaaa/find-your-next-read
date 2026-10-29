@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SUPPORT_URL } from '../../constants';
 import { openConsentSettings } from '../../lib';
 import styles from './footer.module.scss';
 
@@ -21,6 +22,14 @@ export const Footer = () => (
           {link.label}
         </Link>
       ))}
+      <a
+        href={SUPPORT_URL}
+        className={styles.link}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Buy us a coffee
+      </a>
       <button
         type="button"
         className={styles['link-button']}
