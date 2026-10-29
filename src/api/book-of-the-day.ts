@@ -15,7 +15,10 @@ export const fetchBookOfTheDay = async ({
   books,
   reviews,
 }: GetBookOfTheDayParams): Promise<BookOfTheDayPayload> => {
-  if (!books.length) {
+  const reviewedIds = new Set(reviews.map((review) => review.bookId));
+  const candidates = books.filter((book) => reviewedIds.has(book.id));
+
+  if (!candidates.length) {
     return {
       bookOfTheDay: null,
       reviewsOfTheDay: [],
@@ -24,8 +27,8 @@ export const fetchBookOfTheDay = async ({
 
   const now = new Date();
   const daySeed = now.getFullYear() * 1000 + getDayOfYear(now);
-  const index = daySeed % books.length;
-  const bookOfTheDay = books[index];
+  const index = daySeed % candidates.length;
+  const bookOfTheDay = candidates[index];
 
   return {
     bookOfTheDay,

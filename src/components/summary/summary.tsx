@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import cn from 'classnames';
 
 import { apiTrackImpression } from 'api';
 import { Book, Review } from '../../types';
@@ -8,7 +9,6 @@ import { ArrowLeftIcon } from '../../icons';
 import { sanitizeHtml } from '../../lib';
 
 import { Reviews } from '../reviews';
-import { RateBook } from '../rate-book';
 import { ReviewForm } from '../review-form';
 import { BookShelf } from '../book-shelf';
 import { MainInfo } from './main-info';
@@ -74,6 +74,8 @@ export const Summary = ({
     return () => clearTimeout(timer);
   }, [targetReviewId, hasTargetReview]);
   const reviewCount = bookReviews.length;
+  const hasReadingOrder =
+    !!onBookSelect && readBefore.length + readNext.length > 0;
 
   const reviewAverage = reviewCount
     ? Math.round(
@@ -107,7 +109,7 @@ export const Summary = ({
         <ArrowLeftIcon size={16} /> Back
       </button>
       <div
-        className={styles.hero}
+        className={cn(styles.hero, hasReadingOrder && styles.withOrder)}
         style={{ background: `${book.coverColor}14` }}
       >
         <div className={styles.coverWrap}>
@@ -118,34 +120,47 @@ export const Summary = ({
             book={bookWithRating}
             onBookmark={onBookmark}
             onEdit={onEdit}
-            onCategorySelect={onCategorySelect}
           />
-          <RateBook bookId={book.id} />
-          {book.description &&
-            (book.descriptionHtml && /<[a-z]/i.test(book.descriptionHtml) ? (
-              <div
-                className={styles.description}
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(book.descriptionHtml),
-                }}
-              />
-            ) : (
-              <p className={styles.description}>{book.description}</p>
-            ))}
-          <SummaryMeta book={book} />
+          {/* <RateBook bookId={book.id} /> */}
+          {book.description && (
+            <div className={styles.about}>
+              <span className={styles.aboutLabel}>
+                Synopsis · not our opinion
+              </span>
+              {book.descriptionHtml && /<[a-z]/i.test(book.descriptionHtml) ? (
+                <div
+                  className={styles.description}
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(book.descriptionHtml),
+                  }}
+                />
+              ) : (
+                <p className={styles.description}>{book.description}</p>
+              )}
+            </div>
+          )}
+          <SummaryMeta book={book} onCategorySelect={onCategorySelect} />
         </div>
+        {hasReadingOrder && onBookSelect && (
+          <div className={styles.orderColumn}>
+            <ReadingOrder
+              books={readBefore}
+              direction="before"
+              onBookSelect={onBookSelect}
+            />
+            <ReadingOrder
+              books={readNext}
+              direction="next"
+              onBookSelect={onBookSelect}
+            />
+          </div>
+        )}
       </div>
-      {onBookSelect && (
-        <ReadingOrder
-          before={readBefore}
-          next={readNext}
-          onBookSelect={onBookSelect}
-        />
-      )}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>
+        <h4 className={styles.sectionTitle}>
           Reviews{bookReviews.length > 0 ? ` (${bookReviews.length})` : ''}
-        </h2>
+          <span className={styles.aboutLabel}> · our opinion</span>
+        </h4>
         {bookReviews.length === 0 ? (
           <p className={styles.empty}>No reviews yet.</p>
         ) : (

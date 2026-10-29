@@ -71,25 +71,11 @@ export const BookOfTheDay = ({
         {hasReviews && (
           <div className={styles.reviewsWrap}>
             {reviewsOfTheDay.map((review) => (
-              <section key={review.id} className={styles.reviewSection}>
-                <div className={styles.reviewHeader}>
-                  <div className={styles.avatar}>{review.authorInitials}</div>
-                  <h3 className={styles.reviewTitle}>
-                    Review from {review.authorName}
-                  </h3>
-                </div>
-                <p className={styles.reviewText}>{review.text}</p>
-                <button
-                  className={styles.readMore}
-                  onClick={() => onBookSelect(bookOfTheDay, review.id)}
-                >
-                  Read the review →
-                </button>
-                <div className={styles.reviewMeta}>
-                  <StarRating rating={review.rating} outOf={10} size={13} />
-                  <span>{review.rating}/10</span>
-                </div>
-              </section>
+              <ReviewOfTheDay
+                key={review.id}
+                review={review}
+                onRead={() => onBookSelect(bookOfTheDay, review.id)}
+              />
             ))}
           </div>
         )}
@@ -131,5 +117,41 @@ export const BookOfTheDay = ({
         </aside>
       </div>
     </div>
+  );
+};
+
+type ReviewOfTheDayProps = {
+  review: Review;
+  onRead: () => void;
+};
+
+const ReviewOfTheDay = ({ review, onRead }: ReviewOfTheDayProps) => {
+  const textRef = useFitLines<HTMLParagraphElement>(review.text);
+
+  return (
+    <section className={styles.reviewSection}>
+      <div className={styles.reviewHeader}>
+        <div className={styles.avatar}>{review.authorInitials}</div>
+        <div>
+          <h3 className={styles.reviewTitle}>
+            Review from {review.authorName}
+          </h3>
+          <div className={styles.reviewMeta}>
+            <StarRating rating={review.rating} outOf={10} size={13} />
+            <span>{review.rating}/10</span>
+          </div>
+        </div>
+      </div>
+      <div className={styles.reviewTextWrap}>
+        <p ref={textRef} className={styles.reviewText}>
+          {review.text}
+        </p>
+      </div>
+      <div className={styles.reviewFooter}>
+        <button className={styles.readMore} onClick={onRead}>
+          Read the review →
+        </button>
+      </div>
+    </section>
   );
 };

@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import cn from 'classnames';
 import { Book, Review } from 'types';
 import { Button, Cover, EmptyState, StarRating } from 'components';
-import { SearchIcon } from '../../icons';
 import { useReviewSearch, useReviews } from '../../hooks';
 import styles from './reviews-page.module.scss';
 
 const TOP_REVIEWERS = 8;
-const SEARCH_DELAY = 300;
 
 type ReviewsPageProps = {
   books: Book[];
@@ -18,28 +16,8 @@ type ReviewsPageProps = {
 export const ReviewsPage = ({ books, onBookSelect }: ReviewsPageProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const author = searchParams.get('author') ?? '';
-  const [input, setInput] = useState(author);
-
-  useEffect(() => {
-    setInput(author);
-  }, [author]);
-
-  useEffect(() => {
-    const trimmed = input.trim();
-
-    if (trimmed === author) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setSearchParams(trimmed ? { author: trimmed } : {}, { replace: true });
-    }, SEARCH_DELAY);
-
-    return () => clearTimeout(timer);
-  }, [input, author, setSearchParams]);
 
   const selectAuthor = (name: string) => {
-    setInput(name);
     setSearchParams(name ? { author: name } : {});
   };
 
@@ -137,21 +115,9 @@ export const ReviewsPage = ({ books, onBookSelect }: ReviewsPageProps) => {
       <div className={styles.header}>
         <h2 className={styles.title}>Reviews</h2>
         <p className={styles.subtitle}>
-          What readers think — find everything a reviewer has written.
+          Our reviews. Pick a human to see their thoughts.
         </p>
       </div>
-
-      <label className={styles.search}>
-        <SearchIcon size={18} className={styles.searchIcon} />
-        <input
-          type="search"
-          className={styles.searchInput}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Search by reviewer name…"
-          aria-label="Search by reviewer name"
-        />
-      </label>
 
       {topReviewers.length > 0 && (
         <div className={styles.reviewers} aria-label="Top reviewers">

@@ -8,14 +8,12 @@ type MainInfoProps = {
   book: Book;
   onBookmark: (id: number) => void;
   onEdit?: () => void;
-  onCategorySelect?: (category: string) => void;
 };
 
 export const MainInfo = ({
   book,
   onBookmark,
   onEdit,
-  onCategorySelect,
 }: MainInfoProps) => (
   <div className={styles.mainInfo}>
     <div className={styles.titleRow}>
@@ -46,23 +44,6 @@ export const MainInfo = ({
             book.reviewCount === 1 ? 'review' : 'reviews'
           })`}
       </span>
-    </div>
-    <div className={styles.categories}>
-      {book.categories.map((cat) =>
-        onCategorySelect ? (
-          <button
-            key={cat}
-            className={styles.tag}
-            onClick={() => onCategorySelect(cat)}
-          >
-            {cat}
-          </button>
-        ) : (
-          <span key={cat} className={styles.tag}>
-            {cat}
-          </span>
-        ),
-      )}
     </div>
   </div>
 );

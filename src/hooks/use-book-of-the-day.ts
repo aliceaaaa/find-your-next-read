@@ -9,7 +9,7 @@ export const useBookOfTheDay = ({
   const dayKey = new Date().toISOString().slice(0, 10);
 
   return useQuery({
-    queryKey: ['book-of-the-day', dayKey, allBooks.length],
+    queryKey: ['book-of-the-day', dayKey, allBooks.length, reviews.length],
     queryFn: () => fetchBookOfTheDay({ books: allBooks, reviews }),
     staleTime: 1000 * 60 * 60,
   });

@@ -3,7 +3,7 @@
 .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px 48px;
+  gap: 16px 32px;
   padding-top: 20px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
@@ -38,4 +38,66 @@
   font-size: 14px;
   font-weight: 600;
   color: $color-text;
+}
+
+.genre {
+  flex: 1 1 120px;
+  min-width: 0;
+  max-width: 260px;
+}
+
+.genreValueWrap {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.hasTooltip {
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    transform: translateY(4px);
+    width: max-content;
+    max-width: 280px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: $color-text;
+    color: $color-white;
+    font-family: $font-base;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 0.15s,
+      transform 0.15s;
+    z-index: 10;
+  }
+
+  &:hover::after,
+  &:focus-within::after {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.genreValue {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.genreLink {
+  font: inherit;
+  color: inherit;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $color-primary;
+  }
 }

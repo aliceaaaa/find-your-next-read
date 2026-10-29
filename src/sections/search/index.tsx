@@ -6,12 +6,14 @@ import { useBookSearch } from '../../hooks';
 import styles from './search-results.module.scss';
 
 type SearchResultsProps = {
+  books: Book[];
   bookmarks: Record<number, boolean>;
   onBookSelect: (book: Book) => void;
   onBookmark: (id: number) => void;
 };
 
 export const SearchResults = ({
+  books,
   bookmarks,
   onBookSelect,
   onBookmark,
@@ -21,14 +23,17 @@ export const SearchResults = ({
 
   const { results: found, isLoading } = useBookSearch(query);
 
-  const results = useMemo(
-    () =>
-      found.map((book) => ({
-        ...book,
-        isBookmarked: bookmarks[book.id] ?? false,
-      })),
-    [found, bookmarks],
-  );
+  const results = useMemo(() => {
+    const byId = new Map(books.map((book) => [book.id, book]));
+
+    return found.map(
+      (book) =>
+        byId.get(book.id) ?? {
+          ...book,
+          isBookmarked: bookmarks[book.id] ?? false,
+        },
+    );
+  }, [found, books, bookmarks]);
 
   const emptySubtitle = query
     ? `We couldn't find anything for “${query}”. Try another title, author, or genre.`

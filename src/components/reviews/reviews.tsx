@@ -25,7 +25,7 @@ export const Reviews = ({
   const [editingId, setEditingId] = useState<number | null>(null);
 
   return (
-    <div className={styles.reviews}>
+    <div className={cn(styles.reviews, reviews.length > 1 && styles.grid)}>
       {reviews.map((review) => {
         if (isAdmin && editingId === review.id) {
           return (

@@ -369,6 +369,7 @@ export const AppContent = () => {
           path="/search"
           element={
             <SearchResults
+              books={allBooks}
               bookmarks={bookmarks}
               onBookSelect={handleBookSelect}
               onBookmark={handleBookmark}

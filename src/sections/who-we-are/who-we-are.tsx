@@ -162,8 +162,8 @@ export const WhoWeArePage = () => (
         We're just some <em>dudes</em>.
       </p>
       <p className={styles.text}>
-        We read books and have opinions about them! Yours might be different,
-        and that's fine! You can make your own website and share them with the
+        We read books and have opinions about them! Yours might be different and
+        that's fine! You can make your own website and share them with the
         world.
       </p>
       <p className={cn(styles.text, styles.aside)}>
